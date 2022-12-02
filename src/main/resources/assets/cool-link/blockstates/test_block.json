@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "cool-link:block/test_block" }
+  }
+}
