@@ -5,7 +5,6 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -22,18 +21,18 @@ public class AIO_Network extends Block implements BlockEntityProvider {
 		super(settings);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
 		Direction dir = state.get(HORIZONTAL_FACING);
 		switch(dir) {
-			case NORTH:
-				return makeShapeN();
 			case SOUTH:
 				return makeShapeS();
 			case EAST:
 				return makeShapeE();
 			case WEST:
 				return makeShapeW();
+			case NORTH:
 			default:
 				return makeShapeN();
 		}
@@ -123,7 +122,7 @@ public class AIO_Network extends Block implements BlockEntityProvider {
 
 	@Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return (BlockState)this.getDefaultState().with(HORIZONTAL_FACING, ctx.getPlayerFacing());
+		return this.getDefaultState().with(HORIZONTAL_FACING, ctx.getPlayerFacing());
 	}
 
 	@Override
