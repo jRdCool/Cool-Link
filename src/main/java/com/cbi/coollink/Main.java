@@ -1,10 +1,13 @@
 package com.cbi.coollink;
 
+import com.cbi.coollink.blocks.AIOBlockEntity;
 import com.cbi.coollink.blocks.AIO_Network;
 import com.cbi.coollink.blocks.TestBlock;
 import com.cbi.coollink.items.SmartPhone;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
@@ -16,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class Main implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("cool-link");
+    public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "aio_block_entity"), FabricBlockEntityTypeBuilder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
 
     @Override
     public void onInitialize() {
@@ -25,5 +29,5 @@ public class Main implements ModInitializer {
         Registry.register(Registry.BLOCK, new Identifier("cool-link","aio_network"), AIO_Network.ENTRY);
         Registry.register(Registry.ITEM, new Identifier("cool-link", "aio_network"),new BlockItem(AIO_Network.ENTRY, new FabricItemSettings().group(ItemGroup.MISC)));
         Registry.register(Registry.ITEM, new Identifier("cool-link", "smart_phone"),new SmartPhone(new FabricItemSettings().group(ItemGroup.MISC)));
-    }
+        }
 }

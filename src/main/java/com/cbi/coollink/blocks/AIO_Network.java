@@ -1,10 +1,8 @@
 package com.cbi.coollink.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
@@ -18,7 +16,7 @@ import net.minecraft.world.BlockView;
 import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 
-public class AIO_Network extends Block{
+public class AIO_Network extends Block implements BlockEntityProvider {
 	public static final AIO_Network ENTRY = new AIO_Network(FabricBlockSettings.of(Material.CARPET).hardness(0.5f));
 	public AIO_Network(Settings settings) {
 		super(settings);
@@ -126,5 +124,10 @@ public class AIO_Network extends Block{
 	@Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
 		return (BlockState)this.getDefaultState().with(HORIZONTAL_FACING, ctx.getPlayerFacing());
+	}
+
+	@Override
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new AIOBlockEntity(pos, state);
 	}
 }
