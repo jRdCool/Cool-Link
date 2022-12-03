@@ -1,10 +1,9 @@
 {
 	"credit": "Made with Blockbench",
-	"parent": "AIO_Network",
 	"texture_size": [64, 32],
 	"textures": {
-		"0": "AIO_Texture",
-		"particle": "AIO_Texture"
+		"0": "cool-link:block/aio_texture",
+		"particle": "cool-link:block/aio_texture"
 	},
 	"elements": [
 		{
