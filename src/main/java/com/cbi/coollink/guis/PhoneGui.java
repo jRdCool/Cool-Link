@@ -15,7 +15,7 @@ public class PhoneGui extends LightweightGuiDescription {
         WGridPanel root = new WGridPanel();
         setRootPanel(root);
         root.setSize(300,250);
-        WButton accessPointButton = new WButton().setIcon(new TextureIcon(new Identifier("cool-link","cbi")));
+        WButton accessPointButton = new WButton().setIcon(new TextureIcon(new Identifier("cool-link","textures/icon/cbi.png")));
         WLabel label = new WLabel(netButtonLabel);
         root.add(accessPointButton,2,1);
         root.add(label,1,3);
