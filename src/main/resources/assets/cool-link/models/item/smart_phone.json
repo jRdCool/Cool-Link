@@ -1,0 +1,68 @@
+{
+	"credit": "by: jSdCool",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "cool-link:item/phone",
+		"particle": "cool-link:item/phone"
+	},
+	"elements": [
+		{
+			"from": [1, 0, 5],
+			"to": [15, 1, 11],
+			"faces": {
+				"north": {"uv": [0, 6, 7, 6.5], "texture": "#0"},
+				"east": {"uv": [0, 7, 3, 7.5], "texture": "#0"},
+				"south": {"uv": [0, 6.5, 7, 7], "texture": "#0"},
+				"west": {"uv": [7, 0, 10, 0.5], "texture": "#0"},
+				"up": {"uv": [14, 13.5, 0, 7.5], "texture": "#0"},
+				"down": {"uv": [7, 3.25, 0, 6], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, 0, 90],
+			"translation": [-6, 1, 1.5],
+			"scale": [0.55, 0.55, 0.55]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [180, 0, 90],
+			"translation": [-6, 1, 1.5],
+			"scale": [0.55, 0.55, 0.55]
+		},
+		"firstperson_righthand": {
+			"rotation": [90, 90, 0],
+			"translation": [-1.75, 2, 9.5],
+			"scale": [0.7, 0.76, 0.77]
+		},
+		"firstperson_lefthand": {
+			"rotation": [90, -90, 0],
+			"translation": [-1.75, 2, 9.5],
+			"scale": [0.7, 0.76, 0.77]
+		},
+		"ground": {
+			"rotation": [-88, 0, 0],
+			"translation": [0, -1.75, 0],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"gui": {
+			"rotation": [90, 90, 0],
+			"scale": [1.1, 1.1, 1.2]
+		},
+		"head": {
+			"translation": [0, 14.25, 0]
+		},
+		"fixed": {
+			"rotation": [90, -90, -180],
+			"translation": [0, 0, -7.5]
+		}
+	},
+	"groups": [
+		{
+			"name": "root",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

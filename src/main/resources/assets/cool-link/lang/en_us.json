@@ -1,5 +1,6 @@
 {
   "block.cool-link.test_block": "Test block :)",
-  "block.cool-link.aio_network": "AIO Network"
+  "block.cool-link.aio_network": "AIO Network",
+  "item.cool-link.smart_phone": "Smart Phone"
 
 }
