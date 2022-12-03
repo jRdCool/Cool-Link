@@ -1,5 +1,8 @@
 {
   "variants": {
-    "": { "model": "cool-link:block/aio_network" }
+    "facing=north": { "model": "cool-link:block/aio_network", "uvlock": true },
+    "facing=east":  { "model": "cool-link:block/aio_network", "y":  90, "uvlock": true },
+    "facing=south": { "model": "cool-link:block/aio_network", "y": 180, "uvlock": true },
+    "facing=west":  { "model": "cool-link:block/aio_network", "y": 270, "uvlock": true }
   }
 }
