@@ -17,7 +17,9 @@ public class SmartPhone extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand){
-        MinecraftClient.getInstance().setScreen(new PhoneScreen(new PhoneGui()));
+        MinecraftClient client = MinecraftClient.getInstance();
+        client.execute(() -> client.setScreen(new PhoneScreen(new PhoneGui())));
+        //MinecraftClient.getInstance().setScreen(new PhoneScreen(new PhoneGui()));
         return super.use(world, user, hand);
     }
 }
