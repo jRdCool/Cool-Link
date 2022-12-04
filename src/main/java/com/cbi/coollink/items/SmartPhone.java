@@ -16,14 +16,19 @@ public class SmartPhone extends Item {
         super(settings);
     }
 
+
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand){
 
-        MinecraftClient client = MinecraftClient.getInstance();
-        client.execute(() -> {
+        String currentThread = Thread.currentThread().getName();
+        //check witch thread the code is being executed on
+        if(currentThread.equals("Render thread")) {//if the code is being executed on the render thread
+
+            //open the phone GUI
+            MinecraftClient client = MinecraftClient.getInstance();
             client.setScreen(new PhoneScreen(new PhoneGui(this)));
 
-        });
+        }
         //MinecraftClient.getInstance().setScreen(new PhoneScreen(new PhoneGui()));
         return super.use(world, user, hand);
     }
