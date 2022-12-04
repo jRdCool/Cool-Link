@@ -7,4 +7,9 @@ public class PhoneScreen extends CottonClientScreen {
     public PhoneScreen(GuiDescription description) {
         super(description);
     }
+
+    public boolean shouldPause(){
+        return false;
+    }
+
 }

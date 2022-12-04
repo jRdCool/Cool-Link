@@ -1,5 +1,6 @@
 package com.cbi.coollink.items;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.guis.PhoneGui;
 import com.cbi.coollink.guis.PhoneScreen;
 import net.minecraft.client.MinecraftClient;
@@ -17,8 +18,12 @@ public class SmartPhone extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand){
+
         MinecraftClient client = MinecraftClient.getInstance();
-        client.execute(() -> client.setScreen(new PhoneScreen(new PhoneGui())));
+        client.execute(() -> {
+            client.setScreen(new PhoneScreen(new PhoneGui()));
+
+        });
         //MinecraftClient.getInstance().setScreen(new PhoneScreen(new PhoneGui()));
         return super.use(world, user, hand);
     }
