@@ -1,18 +1,14 @@
 package com.cbi.coollink.guis;
 
 import com.cbi.coollink.items.SmartPhone;
-import io.github.cottonmc.cotton.gui.client.BackgroundPainter;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
-import io.github.cottonmc.cotton.gui.impl.LibGuiCommon;
 import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.icon.TextureIcon;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Identifier;
 
-import static io.github.cottonmc.cotton.gui.client.BackgroundPainter.createLightDarkVariants;
-import static io.github.cottonmc.cotton.gui.client.BackgroundPainter.createNinePatch;
 
 public class PhoneGui extends LightweightGuiDescription {
     public PhoneGui(SmartPhone phone){
@@ -26,10 +22,15 @@ public class PhoneGui extends LightweightGuiDescription {
         root.add(label,1,3);
 
     }
+
+    /**sets tha background of the GUI
+     *
+     */
     @Override
     public void addPainters() {
         if (this.rootPanel!=null && !fullscreen) {
             this.rootPanel.setBackgroundPainter((matrices, left, top, panel) -> {
+                //sets the background to a textures                                                                                                                            UVs go form 0 to 1 indicating where on the image to pull from
                 ScreenDrawing.texturedRect(matrices,left-4,top-4,panel.getWidth()+2,panel.getHeight()+2,new Identifier("cool-link","textures/background.png"),0,0,1,1,0xFF_FFFFFF);
             });
         }

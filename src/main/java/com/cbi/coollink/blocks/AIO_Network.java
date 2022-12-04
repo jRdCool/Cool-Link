@@ -21,10 +21,12 @@ public class AIO_Network extends Block implements BlockEntityProvider {
 		super(settings);
 	}
 
+	//this function is used to create the in game hit box of the block. despite the fact that this function is deprecated it still works for now
 	@SuppressWarnings("deprecation")
 	@Override
 	public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
 		Direction dir = state.get(HORIZONTAL_FACING);
+		//use a different hit box based on the rotation of the block
 		switch(dir) {
 			case SOUTH:
 				return makeShapeS();
