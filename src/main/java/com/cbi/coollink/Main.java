@@ -5,11 +5,13 @@ import com.cbi.coollink.blocks.AIO_Network;
 import com.cbi.coollink.blocks.TestBlock;
 import com.cbi.coollink.items.*;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.slf4j.Logger;
@@ -21,17 +23,24 @@ public class Main implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("cool-link");
     public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "aio_block_entity"), FabricBlockEntityTypeBuilder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
 
+    public static final ItemGroup COOL_LINK_ITEM_GROUP = FabricItemGroupBuilder.create(
+                    new Identifier("cool-link", "cool-link"))
+            .icon(() -> new ItemStack(AIO_Network.ENTRY))
+            .build();
     @Override
     public void onInitialize() {
         LOGGER.info("loading cool link");
+
+
+
         Registry.register(Registry.BLOCK, new Identifier("cool-link","test_block"),TestBlock.ENTRY);
-        Registry.register(Registry.ITEM, new Identifier("cool-link", "test_block"),new BlockItem(TestBlock.ENTRY, new FabricItemSettings().group(ItemGroup.MISC)));
+        Registry.register(Registry.ITEM, new Identifier("cool-link", "test_block"),new BlockItem(TestBlock.ENTRY, new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
         Registry.register(Registry.BLOCK, new Identifier("cool-link","aio_network"), AIO_Network.ENTRY);
-        Registry.register(Registry.ITEM, new Identifier("cool-link", "aio_network"),new BlockItem(AIO_Network.ENTRY, new FabricItemSettings().group(ItemGroup.MISC)));
-        Registry.register(Registry.ITEM, new Identifier("cool-link", "smart_phone"),new SmartPhone(new FabricItemSettings().group(ItemGroup.MISC)));
-        Registry.register(Registry.ITEM, new Identifier("cool-link", "cat6_ethernet_cable"),new Cat6Cable(new FabricItemSettings().group(ItemGroup.MISC)));
-        Registry.register(Registry.ITEM, new Identifier("cool-link", "coaxial_cable"),new CoaxialCable(new FabricItemSettings().group(ItemGroup.MISC)));
-        Registry.register(Registry.ITEM, new Identifier("cool-link", "wire_tester"),new WireTester(new FabricItemSettings().group(ItemGroup.MISC)));
-        Registry.register(Registry.ITEM, new Identifier("cool-link", "programing_cable"),new ProgramingCable(new FabricItemSettings().group(ItemGroup.MISC)));
-        }
+        Registry.register(Registry.ITEM, new Identifier("cool-link", "aio_network"),new BlockItem(AIO_Network.ENTRY, new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier("cool-link", "smart_phone"),new SmartPhone(new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier("cool-link", "cat6_ethernet_cable"),new Cat6Cable(new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier("cool-link", "coaxial_cable"),new CoaxialCable(new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier("cool-link", "wire_tester"),new WireTester(new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier("cool-link", "programing_cable"),new ProgramingCable(new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
+    }
 }
