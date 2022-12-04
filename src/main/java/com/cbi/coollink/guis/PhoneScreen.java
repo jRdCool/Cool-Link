@@ -8,6 +8,7 @@ public class PhoneScreen extends CottonClientScreen {
         super(description);
     }
 
+    @Override
     public boolean shouldPause(){
         return false;
     }
