@@ -21,7 +21,7 @@ public class SmartPhone extends Item {
 
         MinecraftClient client = MinecraftClient.getInstance();
         client.execute(() -> {
-            client.setScreen(new PhoneScreen(new PhoneGui()));
+            client.setScreen(new PhoneScreen(new PhoneGui(this)));
 
         });
         //MinecraftClient.getInstance().setScreen(new PhoneScreen(new PhoneGui()));
