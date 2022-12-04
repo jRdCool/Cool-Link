@@ -5,10 +5,12 @@ import com.cbi.coollink.blocks.AIO_Network;
 import com.cbi.coollink.blocks.TestBlock;
 import com.cbi.coollink.items.*;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -34,8 +36,9 @@ public class Main implements ModInitializer {
 
 
         Registry.register(Registry.BLOCK, new Identifier("cool-link","test_block"),TestBlock.ENTRY);
-        Registry.register(Registry.ITEM, new Identifier("cool-link", "test_block"),new BlockItem(TestBlock.ENTRY, new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier("cool-link", "test_block"),new BlockItem(TestBlock.ENTRY, new FabricItemSettings()));
         Registry.register(Registry.BLOCK, new Identifier("cool-link","aio_network"), AIO_Network.ENTRY);
+        BlockRenderLayerMap.INSTANCE.putBlock(AIO_Network.ENTRY, RenderLayer.getCutout());
         Registry.register(Registry.ITEM, new Identifier("cool-link", "aio_network"),new BlockItem(AIO_Network.ENTRY, new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier("cool-link", "smart_phone"),new SmartPhone(new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier("cool-link", "cat6_ethernet_cable"),new Cat6Cable(new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
