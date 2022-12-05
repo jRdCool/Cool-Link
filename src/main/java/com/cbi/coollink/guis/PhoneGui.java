@@ -83,6 +83,7 @@ public class PhoneGui extends LightweightGuiDescription {
             this.rootPanel.setBackgroundPainter((matrices, left, top, panel) -> {
                 //sets the background to a textures                                                                                                                            UVs go form 0 to 1 indicating where on the image to pull from
                 ScreenDrawing.texturedRect(matrices, left - 4, top - 4, panel.getWidth() + 2, panel.getHeight() + 2, new Identifier("cool-link", "textures/gui/phone_background.png"), 0, 0, 1, 1, 0xFF_FFFFFF);
+                //ScreenDrawing.coloredRect(matrices,left-4,top-4,panel.getWidth()+2,panel.getHeight()+2,0x007BAB);
             });
         }
     }
