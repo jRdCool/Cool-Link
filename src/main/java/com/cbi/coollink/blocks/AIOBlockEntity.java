@@ -1,6 +1,7 @@
 package com.cbi.coollink.blocks;
 
 import com.cbi.coollink.Main;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -73,5 +74,8 @@ public class AIOBlockEntity extends BlockEntity {
 
 	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//Main.LOGGER.info(be.password);
+	}
+	public void updateStates(){
+		world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
 	}
 }

@@ -68,6 +68,7 @@ public class Main implements ModInitializer {
                 if(be instanceof AIOBlockEntity aio){
                     aio.password=password;
                     aio.markDirty();
+                    aio.updateStates();
                 }
             });
         });
