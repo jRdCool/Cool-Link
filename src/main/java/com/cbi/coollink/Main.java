@@ -2,6 +2,7 @@ package com.cbi.coollink;
 
 import com.cbi.coollink.blocks.AIOBlockEntity;
 import com.cbi.coollink.blocks.AIO_Network;
+import com.cbi.coollink.blocks.ServerRack;
 import com.cbi.coollink.blocks.TestBlock;
 import com.cbi.coollink.items.*;
 import net.fabricmc.api.ModInitializer;
@@ -45,5 +46,9 @@ public class Main implements ModInitializer {
         Registry.register(Registry.ITEM, new Identifier("cool-link", "coaxial_cable"),new CoaxialCable(new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier("cool-link", "wire_tester"),new WireTester(new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier("cool-link", "programing_cable"),new ProgramingCable(new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
+
+        Registry.register(Registry.BLOCK, new Identifier("cool-link","server_rack"), ServerRack.ENTRY);
+        BlockRenderLayerMap.INSTANCE.putBlock(AIO_Network.ENTRY, RenderLayer.getCutout());
+        Registry.register(Registry.ITEM, new Identifier("cool-link", "server_rack"),new BlockItem(ServerRack.ENTRY, new FabricItemSettings().group(COOL_LINK_ITEM_GROUP)));
     }
 }

@@ -6,6 +6,7 @@
   "item.cool-link.coaxial_cable": "Coaxial Cable",
   "item.cool-link.wire_tester": "Wire Tester",
   "item.cool-link.programing_cable": "Programing Cable",
-  "itemGroup.cool-link.cool-link": "Cool Link"
+  "itemGroup.cool-link.cool-link": "Cool Link",
+  "block.cool-link.server_rack": "Server Rack"
 
 }
