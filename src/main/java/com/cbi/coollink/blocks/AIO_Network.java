@@ -1,8 +1,11 @@
 package com.cbi.coollink.blocks;
 
+import com.cbi.coollink.Main;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
@@ -10,12 +13,14 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
+
 
 
 import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 
-public class AIO_Network extends Block implements BlockEntityProvider {
+public class AIO_Network extends BlockWithEntity implements BlockEntityProvider {
 	public static final AIO_Network ENTRY = new AIO_Network(FabricBlockSettings.of(Material.CARPET).hardness(0.5f));
 	public AIO_Network(Settings settings) {
 		super(settings);
@@ -130,5 +135,15 @@ public class AIO_Network extends Block implements BlockEntityProvider {
 	@Override
 	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
 		return new AIOBlockEntity(pos, state);
+	}
+
+	@Override
+	public BlockRenderType getRenderType(BlockState state) {
+		// With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
+		return BlockRenderType.MODEL;
+	}
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+		return checkType(type, Main.AIO_BLOCK_ENTITY, (world1, pos, state1, be) -> AIOBlockEntity.tick(world1, pos, state1, be));
 	}
 }

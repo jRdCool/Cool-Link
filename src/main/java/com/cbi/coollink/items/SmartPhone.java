@@ -21,6 +21,7 @@ public class SmartPhone extends Item {
     public SmartPhone(Settings settings) {
         super(settings);
     }
+    public BlockEntity usedBlockEntity;
 
 
     @Override
@@ -31,8 +32,9 @@ public class SmartPhone extends Item {
         if(currentThread.equals("Render thread")) {//if the code is being executed on the render thread
             //Main.LOGGER.info("normal");
             //open the phone GUI
+
             MinecraftClient client = MinecraftClient.getInstance();
-            client.setScreen(new PhoneScreen(new PhoneGui(this)));
+            client.setScreen(new PhoneScreen(new PhoneGui(this,world)));
             clickedOnAIO=false;
 
         }
@@ -49,6 +51,7 @@ public class SmartPhone extends Item {
                 //Main.LOGGER.info(be.getClass().getName());
                 if(be instanceof AIOBlockEntity aio){
                     //Main.LOGGER.info("its an aio");
+                    usedBlockEntity=aio;
                     clickedOnAIO=true;
                 }
             }

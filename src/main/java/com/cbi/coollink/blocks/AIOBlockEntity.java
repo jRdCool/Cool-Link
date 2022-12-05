@@ -8,6 +8,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 // Made with Blockbench 4.5.2
@@ -20,6 +21,7 @@ public class AIOBlockEntity extends BlockEntity {
 
 	private int number = 0;
 	private String key;
+	public String password;
 
 	public void writeDataTo(NbtCompound nbt,String key, int value){//how to write NBT data from anywhere in the mod
 		number = value;
@@ -38,8 +40,15 @@ public class AIOBlockEntity extends BlockEntity {
 	@Override
 	public void writeNbt(NbtCompound nbt) {
 		// Save the current value of the number to the nbt
-		nbt.putInt(key, number);
-
+		nbt.putInt("number", 89);
+		//Main.LOGGER.info("password is: "+password);
+		if(password==null){
+			nbt.putString("password","password123546");
+			//Main.LOGGER.info("saving password as: password123546" );
+		}else {
+			nbt.putString("password", password);
+			//Main.LOGGER.info("saving password as: " + password);
+		}
 		super.writeNbt(nbt);
 	}
 
@@ -47,7 +56,7 @@ public class AIOBlockEntity extends BlockEntity {
 	@Override
 	public void readNbt(NbtCompound nbt) {
 		super.readNbt(nbt);
-
+		password=nbt.getString("password");
 		number = nbt.getInt("number");
 	}
 
@@ -60,5 +69,9 @@ public class AIOBlockEntity extends BlockEntity {
 	@Override
 	public NbtCompound toInitialChunkDataNbt() {
 		return createNbt();
+	}
+
+	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
+		//Main.LOGGER.info(be.password);
 	}
 }
