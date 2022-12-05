@@ -1,5 +1,6 @@
 package com.cbi.coollink.guis;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.items.SmartPhone;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
@@ -7,19 +8,35 @@ import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.icon.TextureIcon;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.util.Identifier;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 public class PhoneGui extends LightweightGuiDescription {
+    boolean onAIO;
+    WPlainPanel root;
+    WLabel time;
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("hh:mm a");
     public PhoneGui(SmartPhone phone){
+        onAIO=phone.clickedOnAIO;
         MutableText netButtonLabel = MutableText.of(new LiteralTextContent("Network Router"));
-        WGridPanel root = new WGridPanel();//.setBackgroundPainter(new BackgroundPainter());
+        root = new WPlainPanel();//.setBackgroundPainter(new BackgroundPainter());
         setRootPanel(root);
-        root.setSize(300,250);
+        root.setSize(400,200);
         WButton accessPointButton = new WButton().setIcon(new TextureIcon(new Identifier("cool-link","textures/icon/cbi.png")));
         WLabel label = new WLabel(netButtonLabel);
         root.add(accessPointButton,2,1);
         root.add(label,1,3);
+        if(onAIO) {
+            root.add(new WLabel(MutableText.of(new LiteralTextContent("clicked on an AIO"))), 2, 2);
+        }
+
+        time=new WLabel(MutableText.of(new LiteralTextContent(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
+        root.add(time,(int)(400*0.86),(int)(250*0.02));
+
 
     }
 
@@ -35,4 +52,10 @@ public class PhoneGui extends LightweightGuiDescription {
             });
         }
     }
+
+    public void tick(){
+        //Main.LOGGER.info("ticked");
+        time.setText(MutableText.of(new LiteralTextContent(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
+    }
+
 }

@@ -13,4 +13,12 @@ public class PhoneScreen extends CottonClientScreen {
         return false;
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+        if(description instanceof PhoneGui phoneGui){
+            phoneGui.tick();
+        }
+    }
+
 }
