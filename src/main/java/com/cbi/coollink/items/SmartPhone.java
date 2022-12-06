@@ -1,6 +1,8 @@
 package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.app.AbstractPhoneApp;
+import com.cbi.coollink.app.SettingsPhoneApp;
 import com.cbi.coollink.blocks.AIOBlockEntity;
 import com.cbi.coollink.guis.PhoneGui;
 import com.cbi.coollink.guis.PhoneScreen;
@@ -16,12 +18,17 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+
 public class SmartPhone extends Item {
     public boolean clickedOnAIO=false;
+    public ArrayList<AbstractPhoneApp> apps = new ArrayList<>();
     public SmartPhone(Settings settings) {
         super(settings);
+        apps.add(SettingsPhoneApp.getDummyInstance());
     }
     public BlockEntity usedBlockEntity;
+
 
 
     @Override
@@ -34,8 +41,12 @@ public class SmartPhone extends Item {
             //open the phone GUI
 
             MinecraftClient client = MinecraftClient.getInstance();
-            client.setScreen(new PhoneScreen(new PhoneGui(this,world)));
-            clickedOnAIO=false;
+            if(usedBlockEntity instanceof AIOBlockEntity){
+                client.setScreen(new PhoneScreen(new PhoneGui(this, world, usedBlockEntity).openApp(SettingsPhoneApp.getDummyInstance())));
+            }else {
+                client.setScreen(new PhoneScreen(new PhoneGui(this, world, usedBlockEntity)));
+            }
+            usedBlockEntity=null;
 
         }
         //MinecraftClient.getInstance().setScreen(new PhoneScreen(new PhoneGui()));
@@ -49,11 +60,7 @@ public class SmartPhone extends Item {
             BlockEntity be = context.getWorld().getBlockEntity(pos);
             if (be != null) {
                 //Main.LOGGER.info(be.getClass().getName());
-                if(be instanceof AIOBlockEntity aio){
-                    //Main.LOGGER.info("its an aio");
-                    usedBlockEntity=aio;
-                    clickedOnAIO=true;
-                }
+                usedBlockEntity=be;
             }
 
         }

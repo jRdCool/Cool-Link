@@ -21,4 +21,13 @@ public class PhoneScreen extends CottonClientScreen {
         }
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+        super.mouseClicked(mouseX,mouseY,mouseButton);
+        if(description instanceof PhoneGui phoneGui){
+            phoneGui.mouseClicked(mouseX,mouseY);
+        }
+        return true;
+    }
+
 }
