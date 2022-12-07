@@ -1,6 +1,7 @@
 package com.cbi.coollink.app;
 
 import io.github.cottonmc.cotton.gui.widget.WPanel;
+import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -41,6 +42,15 @@ public abstract class AbstractPhoneApp {
      *
      */
     abstract public void addPainters();
+
+    /**determines weather this app should open on the phone when the phone is activated while clicking on a specific block entity
+     *
+     * @param blockEntity the block entity that was clicked on
+     * @return weather or not this app should open
+     */
+    public boolean openOnBlockEntity(BlockEntity blockEntity){
+        return false;
+    }
 
 
 }

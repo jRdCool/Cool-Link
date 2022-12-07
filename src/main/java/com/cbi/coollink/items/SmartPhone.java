@@ -1,6 +1,7 @@
 package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.app.AIOSettingApp;
 import com.cbi.coollink.app.AbstractPhoneApp;
 import com.cbi.coollink.app.SettingsPhoneApp;
 import com.cbi.coollink.blocks.AIOBlockEntity;
@@ -26,6 +27,7 @@ public class SmartPhone extends Item {
     public SmartPhone(Settings settings) {
         super(settings);
         apps.add(SettingsPhoneApp.getDummyInstance());
+        apps.add(AIOSettingApp.getDummyInstance());
     }
     public BlockEntity usedBlockEntity;
 
@@ -41,11 +43,9 @@ public class SmartPhone extends Item {
             //open the phone GUI
 
             MinecraftClient client = MinecraftClient.getInstance();
-            if(usedBlockEntity instanceof AIOBlockEntity){
-                client.setScreen(new PhoneScreen(new PhoneGui(this, world, usedBlockEntity).openApp(SettingsPhoneApp.getDummyInstance())));
-            }else {
-                client.setScreen(new PhoneScreen(new PhoneGui(this, world, usedBlockEntity)));
-            }
+            //open the phone screen
+            client.setScreen(new PhoneScreen(new PhoneGui(this, world, usedBlockEntity)));
+            //reset the used block entity
             usedBlockEntity=null;
 
         }
