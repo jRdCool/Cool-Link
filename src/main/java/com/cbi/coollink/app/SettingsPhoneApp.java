@@ -1,12 +1,18 @@
 package com.cbi.coollink.app;
 
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
+import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
+import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 public class SettingsPhoneApp extends AbstractPhoneApp{
+
+    WLabel title=new WLabel(Text.of("Settings"));
+
     /**do not use this constructor to initialize the app
      * only use to get an instance of this app
      */
@@ -18,6 +24,9 @@ public class SettingsPhoneApp extends AbstractPhoneApp{
         root=new WPlainPanel();
         root.setSize(phoneWidth,phoneHeight);
         timeColor=TIME_COLOR_BLACK;
+        title.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        WPlainPanel panel = (WPlainPanel)root;
+        panel.add(title,phoneWidth/2,5);
     }
 
 

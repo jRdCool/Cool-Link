@@ -8,12 +8,14 @@ import io.github.cottonmc.cotton.gui.widget.WButton;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import io.github.cottonmc.cotton.gui.widget.WToggleButton;
+import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -21,6 +23,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
 
     WPasswordField networkPasswordField;
     WToggleButton passwordVisibleButton;
+    WLabel title=new WLabel(Text.of("AIO Link"));
 
 
 
@@ -31,6 +34,8 @@ public class AIOSettingApp extends AbstractPhoneApp{
         timeColor=TIME_COLOR_BLACK;
 
         WPlainPanel panel = (WPlainPanel)root;
+        title.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        panel.add(title,phoneWidth/2,5);
         if(clickedOnBlockEntity instanceof AIOBlockEntity aio) {
             networkPasswordField = new WPasswordField(MutableText.of(new LiteralTextContent("admins may be able to see text entered here")));
             networkPasswordField.setMaxLength(96);

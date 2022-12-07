@@ -53,6 +53,7 @@ public class PhoneGui extends LightweightGuiDescription {
             if(currentApp!=null) {
                 root.remove(currentApp.getPanel());
                 root.add(appPanel,0,0);
+                root.remove(homeButtonPanel);
             }
             currentApp=null;
         });
@@ -61,7 +62,7 @@ public class PhoneGui extends LightweightGuiDescription {
         time = new WLabel(MutableText.of(new LiteralTextContent(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
         notchAndTimePanel.add(time, (int) (400 * 0.89), (int) (250 * 0.02));
         root.add(notchAndTimePanel,0,0,1,1);
-        root.add(homeButtonPanel,190,180,20,20);
+        //root.add(homeButtonPanel,190,180,20,20);
 
         //open a specific app based on the block that was clicked on
         if(clickedOnBLockEntity!=null)
