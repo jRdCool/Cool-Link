@@ -22,13 +22,16 @@ public class AIOSettingApp extends AbstractPhoneApp{
     WPasswordField networkPasswordField;
     WToggleButton passwordVisibleButton;
 
+
+
     public AIOSettingApp(World world, BlockEntity clickedOnBlockEntity){
+        icon=new Identifier("cool-link","textures/gui/aio_app_icon.png");
         root=new WPlainPanel();
         root.setSize(phoneWidth,phoneHeight);
         timeColor=TIME_COLOR_BLACK;
 
         WPlainPanel panel = (WPlainPanel)root;
-        if(clickedOnBlockEntity instanceof AIOBlockEntity) {
+        if(clickedOnBlockEntity instanceof AIOBlockEntity aio) {
             networkPasswordField = new WPasswordField(MutableText.of(new LiteralTextContent("admins may be able to see text entered here")));
             networkPasswordField.setMaxLength(96);
             passwordVisibleButton = new WToggleButton();
@@ -38,11 +41,8 @@ public class AIOSettingApp extends AbstractPhoneApp{
             panel.add(networkPasswordField, 50, 85);
             networkPasswordField.setSize(300, 20);
             panel.add(passwordVisibleButton, 355, 85);
-            passwordVisibleButton.setOnToggle(on -> {
-                networkPasswordField.setShown(on);
-            });
+            passwordVisibleButton.setOnToggle(on -> networkPasswordField.setShown(on));
             panel.add(tmpb, 200, 120);
-            AIOBlockEntity aio = (AIOBlockEntity) clickedOnBlockEntity;
             Main.LOGGER.info(aio.password);
             tmpb.setOnClick(() -> {
 //
@@ -60,7 +60,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
     }
 
     private AIOSettingApp(){
-
+        icon=new Identifier("cool-link","textures/gui/aio_app_icon.png");
     }
     @Override
     public void tick() {
@@ -74,9 +74,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
 
     @Override
     public void addPainters() {
-        root.setBackgroundPainter((matrices, left, top, panel) -> {
-            ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_FFFFFF);
-        });
+        root.setBackgroundPainter((matrices, left, top, panel) -> ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_FFFFFF));
     }
 
     public static AIOSettingApp getDummyInstance(){
