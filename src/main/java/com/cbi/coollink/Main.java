@@ -74,3 +74,11 @@ public class Main implements ModInitializer {
         });
     }
 }
+
+
+/*UPDATING TO 1.19.3
+make sure lib gui has updated
+read https://fabricmc.net/2022/11/24/1193.html to be informed about api changes (there are a lot of important ones)
+add missing gradle build files
+
+ */
