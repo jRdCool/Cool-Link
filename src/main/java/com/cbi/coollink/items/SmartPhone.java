@@ -1,10 +1,6 @@
 package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.app.AIOSettingApp;
-import com.cbi.coollink.app.AbstractPhoneApp;
-import com.cbi.coollink.app.SettingsPhoneApp;
-import com.cbi.coollink.blocks.AIOBlockEntity;
 import com.cbi.coollink.guis.PhoneGui;
 import com.cbi.coollink.guis.PhoneScreen;
 import net.minecraft.block.entity.BlockEntity;
@@ -19,15 +15,13 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
 
 public class SmartPhone extends Item {
-    public boolean clickedOnAIO=false;
-    public ArrayList<AbstractPhoneApp> apps = new ArrayList<>();
+
+
     public SmartPhone(Settings settings) {
         super(settings);
-        apps.add(SettingsPhoneApp.getDummyInstance());
-        apps.add(AIOSettingApp.getDummyInstance());
+
     }
     public BlockEntity usedBlockEntity;
 
@@ -41,10 +35,21 @@ public class SmartPhone extends Item {
         if(currentThread.equals("Render thread")) {//if the code is being executed on the render thread
             //Main.LOGGER.info("normal");
             //open the phone GUI
+            ItemStack heldItem = null;
 
+            for (ItemStack itemStack : user.getHandItems()) {
+                if(itemStack.getItem().equals(this)){
+                    heldItem=itemStack;
+                    break;
+                }
+            }
+            if(heldItem==null){
+                Main.LOGGER.error("attempted to open phone GUI when no phone was held in hand");
+                return super.use(world, user, hand);
+            }
             MinecraftClient client = MinecraftClient.getInstance();
             //open the phone screen
-            client.setScreen(new PhoneScreen(new PhoneGui(this, world, usedBlockEntity)));
+            client.setScreen(new PhoneScreen(new PhoneGui( world, usedBlockEntity,heldItem)));
             //reset the used block entity
             usedBlockEntity=null;
 
@@ -66,4 +71,5 @@ public class SmartPhone extends Item {
         }
         return ActionResult.PASS;
     }
+
 }

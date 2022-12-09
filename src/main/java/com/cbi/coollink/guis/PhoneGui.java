@@ -1,11 +1,18 @@
 package com.cbi.coollink.guis;
 
+import com.cbi.coollink.Main;
+import com.cbi.coollink.app.AIOSettingApp;
 import com.cbi.coollink.app.AbstractPhoneApp;
-import com.cbi.coollink.items.SmartPhone;
+import com.cbi.coollink.app.AppRegistry;
+import com.cbi.coollink.app.SettingsPhoneApp;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -14,6 +21,7 @@ import net.minecraft.world.World;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 
 public class PhoneGui extends LightweightGuiDescription {
@@ -25,16 +33,39 @@ public class PhoneGui extends LightweightGuiDescription {
     AbstractPhoneApp currentApp;
     World world;
     BlockEntity clickedOnBLockEntity;
-    int top=0,left=0;
-    SmartPhone phone;
+    int top=0,left=0, numberOfPreinstalledApps;
+
+    ItemStack phoneInstance;
 
     WButton homeButton;
+    ArrayList<AbstractPhoneApp> apps = new ArrayList<>();
 
 
-    public PhoneGui(SmartPhone phone, World world, BlockEntity clickedOnBLockEntity) {
+    public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance) {
+        apps.add(SettingsPhoneApp.getDummyInstance());
+        apps.add(AIOSettingApp.getDummyInstance());
+
+
+        numberOfPreinstalledApps =apps.size();
         this.world=world;
         this.clickedOnBLockEntity=clickedOnBLockEntity;
-        this.phone=phone;
+        this.phoneInstance=phoneInstance;
+
+        //load data from the phone instance
+        NbtCompound nbt= phoneInstance.getOrCreateNbt();
+        if(!nbt.isEmpty()){
+            Main.LOGGER.info("NBT data found\n"+nbt.asString());
+            NbtList nbtApps= (NbtList) nbt.get("apps");
+            if(nbtApps!=null&&!nbtApps.isEmpty()){
+                for(int i=0;i<nbtApps.size();i++){
+                    Identifier tmpName=new Identifier(nbtApps.getString(i));
+                    apps.add(AppRegistry.get(tmpName));
+                }
+            }
+        }else{
+            Main.LOGGER.info("no NBT data");
+        }
+
         root = new WPlainPanel();//.setBackgroundPainter(new BackgroundPainter());
         setRootPanel(root);
         notchAndTimePanel =new WPlainPanel();
@@ -62,18 +93,17 @@ public class PhoneGui extends LightweightGuiDescription {
         time = new WLabel(MutableText.of(new LiteralTextContent(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
         notchAndTimePanel.add(time, (int) (400 * 0.89), (int) (250 * 0.02));
         root.add(notchAndTimePanel,0,0,1,1);
-        //root.add(homeButtonPanel,190,180,20,20);
 
         //open a specific app based on the block that was clicked on
         if(clickedOnBLockEntity!=null)
-            for(int i=0;i<phone.apps.size();i++) {
-                if(phone.apps.get(i).openOnBlockEntity(clickedOnBLockEntity)){
-                    openApp(phone.apps.get(i).init(world,clickedOnBLockEntity));
+            for (AbstractPhoneApp app : apps) {
+                if (app.openOnBlockEntity(clickedOnBLockEntity)) {
+                    openApp(app.init(world, clickedOnBLockEntity));
                     break;
                 }
             }
 
-
+        saveData();
     }
 
     /**
@@ -98,15 +128,13 @@ public class PhoneGui extends LightweightGuiDescription {
             });
             //paint the app panel
             appPanel.setBackgroundPainter((matrices, left, top, panel) -> {
-                for(int i=0;i<phone.apps.size();i++){
-                    ScreenDrawing.texturedRect(matrices,left+20+25*i,top+20,20,20,phone.apps.get(i).icon,0,0,1,1,0xFF_FFFFFF);
+                for(int i=0;i<apps.size();i++){
+                    ScreenDrawing.texturedRect(matrices,left+20+25*i,top+20,20,20,apps.get(i).icon,0,0,1,1,0xFF_FFFFFF);
                 }
             });
 
             //pain the notch to the screen
-            notchAndTimePanel.setBackgroundPainter((matrices, left, top, panel) -> {
-                ScreenDrawing.texturedRect(matrices,left,top+50,17, 100,new Identifier("cool-link", "textures/gui/noch.png"),0,0,1,1,0xFF_FFFFFF);
-            });
+            notchAndTimePanel.setBackgroundPainter((matrices, left, top, panel) -> ScreenDrawing.texturedRect(matrices,left,top+50,17, 100,new Identifier("cool-link", "textures/gui/noch.png"),0,0,1,1,0xFF_FFFFFF));
         }
     }
 
@@ -121,7 +149,7 @@ public class PhoneGui extends LightweightGuiDescription {
     /**
      *
      * @param app the app to open. note: this instance is only used to create a new instance of this app
-     * @return
+     * @return the element executed on
      */
     public PhoneGui openApp(AbstractPhoneApp app){
         if(currentApp!=null){
@@ -144,14 +172,28 @@ public class PhoneGui extends LightweightGuiDescription {
         mouseY-=top;
         //left+20+25*i,top+20,20,20
         if(currentApp==null) {
-            for (int i = 0; i < phone.apps.size(); i++) {
+            for (int i = 0; i < apps.size(); i++) {
                 if (mouseX >= 20 + 25 * i && mouseX <= 20 + 25 * i + 20 && mouseY >= 20 && mouseY <= 20 + 20) {
-                    openApp(phone.apps.get(i));
+                    openApp(apps.get(i));
                 }
             }
         }
 
     }
+
+    /**saves the data of the phone to the world
+     *
+     */
+    void saveData(){
+        NbtCompound nbt=new NbtCompound();
+        NbtList nbtApps=new NbtList();
+        for(int i=2;i<apps.size();i++){
+            nbtApps.add(NbtString.of(apps.get(i).appId.toString()));
+        }
+        nbt.put("apps",nbtApps);
+        phoneInstance.setNbt(nbt);
+    }
+
 
 
 }

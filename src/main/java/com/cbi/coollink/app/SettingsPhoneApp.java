@@ -17,9 +17,11 @@ public class SettingsPhoneApp extends AbstractPhoneApp{
      * only use to get an instance of this app
      */
     private SettingsPhoneApp(){
+        super(new Identifier("cool-link","settings"));
         icon=new Identifier("cool-link","textures/gui/setting_app_icon.png");
     }
     public SettingsPhoneApp(World world, BlockEntity clickedOnBlockEntity){
+        super(new Identifier("cool-link","settings"));
         icon=new Identifier("cool-link","textures/gui/setting_app_icon.png");
         root=new WPlainPanel();
         root.setSize(phoneWidth,phoneHeight);
@@ -27,6 +29,7 @@ public class SettingsPhoneApp extends AbstractPhoneApp{
         title.setHorizontalAlignment(HorizontalAlignment.CENTER);
         WPlainPanel panel = (WPlainPanel)root;
         panel.add(title,phoneWidth/2,5);
+
     }
 
 

@@ -28,6 +28,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
 
 
     public AIOSettingApp(World world, BlockEntity clickedOnBlockEntity){
+        super(new Identifier("cool-link","aio-app"));
         icon=new Identifier("cool-link","textures/gui/aio_app_icon.png");
         root=new WPlainPanel();
         root.setSize(phoneWidth,phoneHeight);
@@ -64,7 +65,11 @@ public class AIOSettingApp extends AbstractPhoneApp{
         }
     }
 
+    /**do not use this constructor to initialize the app
+     * only use to get an instance of this app
+     */
     private AIOSettingApp(){
+        super(new Identifier("cool-link","aio-app"));
         icon=new Identifier("cool-link","textures/gui/aio_app_icon.png");
     }
     @Override
