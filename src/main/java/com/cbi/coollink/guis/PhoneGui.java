@@ -46,7 +46,7 @@ public class PhoneGui extends LightweightGuiDescription {
     public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance) {
         apps.add(SettingsPhoneApp.getDummyInstance());
         apps.add(AIOSettingApp.getDummyInstance());
-        //apps.add(new ExampleApp());
+        apps.add(new AppStore());
 
         numberOfPreinstalledApps =apps.size();
         this.world=world;
@@ -61,6 +61,8 @@ public class PhoneGui extends LightweightGuiDescription {
             if(nbtApps!=null&&!nbtApps.isEmpty()){
                 for(int i=0;i<nbtApps.size();i++){
                     Identifier tmpName=new Identifier(nbtApps.getString(i));
+                    //if(AppRegistry.get(tmpName)==null)
+                    //    continue;
                     apps.add(AppRegistry.get(tmpName));
                 }
             }
@@ -202,7 +204,7 @@ public class PhoneGui extends LightweightGuiDescription {
     void saveData(){
         NbtCompound nbt=new NbtCompound();
         NbtList nbtApps=new NbtList();
-        for(int i=2;i<apps.size();i++){
+        for(int i=numberOfPreinstalledApps;i<apps.size();i++){
             if(apps.get(i).appId==null)
                 Main.LOGGER.info(apps.get(i).getClass().getName());
             nbtApps.add(NbtString.of(apps.get(i).appId.toString()));
