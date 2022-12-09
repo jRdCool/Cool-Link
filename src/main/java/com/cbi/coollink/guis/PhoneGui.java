@@ -1,18 +1,18 @@
 package com.cbi.coollink.guis;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.app.AIOSettingApp;
-import com.cbi.coollink.app.AbstractPhoneApp;
-import com.cbi.coollink.app.AppRegistry;
-import com.cbi.coollink.app.SettingsPhoneApp;
+import com.cbi.coollink.app.*;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -40,11 +40,13 @@ public class PhoneGui extends LightweightGuiDescription {
     WButton homeButton;
     ArrayList<AbstractPhoneApp> apps = new ArrayList<>();
 
+    NbtCompound appData;
+
 
     public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance) {
         apps.add(SettingsPhoneApp.getDummyInstance());
         apps.add(AIOSettingApp.getDummyInstance());
-
+        //apps.add(new ExampleApp());
 
         numberOfPreinstalledApps =apps.size();
         this.world=world;
@@ -62,8 +64,13 @@ public class PhoneGui extends LightweightGuiDescription {
                     apps.add(AppRegistry.get(tmpName));
                 }
             }
+            appData=nbt.getCompound("appData");
+            if(appData==null){
+                appData=new NbtCompound();
+            }
         }else{
             Main.LOGGER.info("no NBT data");
+            appData=new NbtCompound();
         }
 
         root = new WPlainPanel();//.setBackgroundPainter(new BackgroundPainter());
@@ -98,7 +105,7 @@ public class PhoneGui extends LightweightGuiDescription {
         if(clickedOnBLockEntity!=null)
             for (AbstractPhoneApp app : apps) {
                 if (app.openOnBlockEntity(clickedOnBLockEntity)) {
-                    openApp(app.init(world, clickedOnBLockEntity));
+                    openApp(app);
                     break;
                 }
             }
@@ -143,6 +150,10 @@ public class PhoneGui extends LightweightGuiDescription {
         time.setText(MutableText.of(new LiteralTextContent(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor((currentApp==null)?0xFFFFFF:currentApp.timeColor)));
         if(currentApp!=null){
             currentApp.tick();
+            if(currentApp.requestSave) {
+                saveData();
+                currentApp.requestSave=false;
+            }
         }
     }
 
@@ -159,7 +170,11 @@ public class PhoneGui extends LightweightGuiDescription {
         }else{
             root.remove(appPanel);
         }
-        currentApp=app.init(world,clickedOnBLockEntity);
+        NbtCompound dataForApp=appData.getCompound(app.appId.toString());
+        if(dataForApp==null){
+            dataForApp=new NbtCompound();
+        }
+        currentApp=app.init(world,clickedOnBLockEntity, dataForApp);
         root.add(currentApp.getPanel(),0,0,400,200);
         root.add(notchAndTimePanel,0,0,0,0);
         root.add(homeButtonPanel,190,180,20,20);
@@ -188,10 +203,26 @@ public class PhoneGui extends LightweightGuiDescription {
         NbtCompound nbt=new NbtCompound();
         NbtList nbtApps=new NbtList();
         for(int i=2;i<apps.size();i++){
+            if(apps.get(i).appId==null)
+                Main.LOGGER.info(apps.get(i).getClass().getName());
             nbtApps.add(NbtString.of(apps.get(i).appId.toString()));
         }
         nbt.put("apps",nbtApps);
+        if(currentApp!=null) {
+            NbtCompound dataFromApp=currentApp.saveData();
+            if(dataFromApp!=null && !dataFromApp.isEmpty()){
+                appData.put(currentApp.appId.toString(),dataFromApp);
+            }
+        }
+        if(!appData.isEmpty()){
+            nbt.put("appData",appData);
+        }
         phoneInstance.setNbt(nbt);
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeNbt(nbt);
+        buf.writeItemStack(phoneInstance);
+        ClientPlayNetworking.send(new Identifier("cool-link", "save-phone-data"), buf);
+
     }
 
 

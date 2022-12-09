@@ -5,6 +5,7 @@ import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -39,7 +40,7 @@ public class SettingsPhoneApp extends AbstractPhoneApp{
     }
 
     @Override
-    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity) {
+    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData) {
         return new SettingsPhoneApp(world,clickedOnBlockEntity);
     }
 

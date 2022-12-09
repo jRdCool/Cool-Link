@@ -17,6 +17,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -70,6 +71,26 @@ public class Main implements ModInitializer {
                     aio.markDirty();
                     aio.updateStates();
                 }
+            });
+        });
+
+        //receive incoming data from the phone and write it to the server version of the phone object
+        ServerPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","save-phone-data"),(server, player, handler, buf, responseSender) -> {
+
+            NbtCompound nbt=buf.readNbt();
+            ItemStack itemFromClient = buf.readItemStack();
+
+            server.execute(() -> {
+                ItemStack heldItem = null;
+                for (ItemStack itemStack : player.getHandItems()) {
+                    if (itemStack.getItem().equals(itemFromClient.getItem())) {
+                        heldItem = itemStack;
+                        break;
+                    }
+                }
+                if(heldItem!=null)
+                heldItem.setNbt(nbt);
+
             });
         });
     }
