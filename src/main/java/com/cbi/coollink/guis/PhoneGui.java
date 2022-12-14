@@ -35,12 +35,12 @@ public class PhoneGui extends LightweightGuiDescription {
     BlockEntity clickedOnBLockEntity;
     int top=0,left=0, numberOfPreinstalledApps;
 
-    ItemStack phoneInstance;
+    public ItemStack phoneInstance;
 
     WButton homeButton;
-    ArrayList<AbstractPhoneApp> apps = new ArrayList<>();
+    public ArrayList<AbstractPhoneApp> apps = new ArrayList<>();
 
-    NbtCompound appData;
+    public NbtCompound appData;
 
 
     public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance) {
@@ -160,11 +160,9 @@ public class PhoneGui extends LightweightGuiDescription {
     }
 
     /**
-     *
      * @param app the app to open. note: this instance is only used to create a new instance of this app
-     * @return the element executed on
      */
-    public PhoneGui openApp(AbstractPhoneApp app){
+    public void openApp(AbstractPhoneApp app){
         if(currentApp!=null){
             root.remove(currentApp.getPanel());
             root.remove(notchAndTimePanel);
@@ -176,12 +174,15 @@ public class PhoneGui extends LightweightGuiDescription {
         if(dataForApp==null){
             dataForApp=new NbtCompound();
         }
-        currentApp=app.init(world,clickedOnBLockEntity, dataForApp);
+        if(app instanceof AbstractRootApp rootApp){
+            currentApp=rootApp.init(world,clickedOnBLockEntity,dataForApp,this);
+        }else {
+            currentApp = app.init(world, clickedOnBLockEntity, dataForApp);
+        }
         root.add(currentApp.getPanel(),0,0,400,200);
         root.add(notchAndTimePanel,0,0,0,0);
         root.add(homeButtonPanel,190,180,20,20);
         currentApp.getPanel().setHost(this);
-        return this;
     }
 
     public void mouseClicked(double mouseX,double mouseY){

@@ -5,6 +5,7 @@ import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -13,6 +14,9 @@ public class ExampleApp extends AbstractPhoneApp{
         super(new Identifier("cool-link","example-app"));//the id of the app
 
         //set app icon here
+
+        //set app description here (this will be displayed in the app shop)
+        description= Text.of("this is a test app\nlets try 2 lines");
 
     }
 

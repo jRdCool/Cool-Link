@@ -3,6 +3,7 @@ package com.cbi.coollink.app;
 import io.github.cottonmc.cotton.gui.widget.WPanel;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -17,6 +18,7 @@ public abstract class AbstractPhoneApp {
     public boolean requestSave=false;
     public Identifier icon = new Identifier("minecraft","textures/misc/unknown_pack.png");
     public final Identifier appId;
+    public Text description;
 
     public AbstractPhoneApp(Identifier appId) {
         this.appId = appId;

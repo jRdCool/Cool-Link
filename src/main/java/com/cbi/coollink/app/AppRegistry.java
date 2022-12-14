@@ -8,6 +8,8 @@ import java.util.ArrayList;
 public class AppRegistry {
     static ArrayList<AbstractPhoneApp> registerApps =new ArrayList<>();
     public static AbstractPhoneApp registerApp(AbstractPhoneApp app){
+        if(app instanceof AbstractRootApp)
+            throw new RuntimeException("attempted to register app with root permissions to app registry");
         registerApps.add(app);
         return app;
     }

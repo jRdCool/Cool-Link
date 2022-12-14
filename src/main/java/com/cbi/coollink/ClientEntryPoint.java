@@ -1,5 +1,6 @@
 package com.cbi.coollink;
 
+import com.cbi.coollink.app.AIOSettingApp;
 import com.cbi.coollink.app.AppRegistry;
 import com.cbi.coollink.app.ExampleApp;
 import net.fabricmc.api.ClientModInitializer;
