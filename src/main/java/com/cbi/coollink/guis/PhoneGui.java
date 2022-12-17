@@ -41,6 +41,7 @@ public class PhoneGui extends LightweightGuiDescription {
     public ArrayList<AbstractPhoneApp> apps = new ArrayList<>();
 
     public NbtCompound appData;
+    public int backgroundNumber=0;
 
 
     public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance) {
@@ -70,6 +71,7 @@ public class PhoneGui extends LightweightGuiDescription {
             if(appData==null){
                 appData=new NbtCompound();
             }
+            backgroundNumber= nbt.getInt("background");
         }else{
             Main.LOGGER.info("no NBT data");
             appData=new NbtCompound();
@@ -94,6 +96,7 @@ public class PhoneGui extends LightweightGuiDescription {
                 root.remove(currentApp.getPanel());
                 root.add(appPanel,0,0);
                 root.remove(homeButtonPanel);
+                saveData();
             }
             currentApp=null;
         });
@@ -128,7 +131,7 @@ public class PhoneGui extends LightweightGuiDescription {
                 //sets the background to a textures                                                                                                                            UVs go form 0 to 1 indicating where on the image to pull from
 
                 ScreenDrawing.coloredRect(matrices,left-bezel,top-bezel,panel.getWidth()+2*bezel,panel.getHeight()+2*bezel,0xFF007BAB);
-                ScreenDrawing.texturedRect(matrices,left,top,panel.getWidth(),panel.getHeight(),new Identifier("cool-link", "textures/gui/phone_background_1.png"),0,0,1,1,0xFF_FFFFFF);
+                ScreenDrawing.texturedRect(matrices,left,top,panel.getWidth(),panel.getHeight(),new Identifier("cool-link", "textures/gui/phone_background_"+backgroundNumber+".png"),0,0,1,1,0xFF_FFFFFF);
 
                 if(currentApp!=null){
                     currentApp.addPainters();
@@ -188,7 +191,7 @@ public class PhoneGui extends LightweightGuiDescription {
     public void mouseClicked(double mouseX,double mouseY){
         mouseX-=left;//adjust the mouse pos to be centered around the top corner of the root panel
         mouseY-=top;
-        //left+20+25*i,top+20,20,20
+        Main.LOGGER.info("mouse clicked at: "+mouseX+" "+mouseY);
         if(currentApp==null) {
             for (int i = 0; i < apps.size(); i++) {
                 if (mouseX >= 20 + 25 * i && mouseX <= 20 + 25 * i + 20 && mouseY >= 20 && mouseY <= 20 + 20) {
@@ -220,6 +223,9 @@ public class PhoneGui extends LightweightGuiDescription {
         if(!appData.isEmpty()){
             nbt.put("appData",appData);
         }
+        nbt.putInt("background",backgroundNumber);
+
+        //write the data
         phoneInstance.setNbt(nbt);
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeNbt(nbt);
