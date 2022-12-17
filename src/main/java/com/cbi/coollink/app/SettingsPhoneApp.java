@@ -13,12 +13,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
+import java.time.format.DateTimeFormatter;
+
 public class SettingsPhoneApp extends AbstractRootApp{
 
     WLabel title=new WLabel(Text.of("Settings"));
     PhoneGui phoneInstance;
-    WButton prevBackground,nextBackground;
-    WLabel currentBackground,backgroundLabel;
+    WButton prevBackground,nextBackground, amPmClock,hour24Clock;
+    WLabel currentBackground,backgroundLabel,clockSetting=new WLabel(Text.of("Clock"));
 
     /**do not use this constructor to initialize the app
      * only use to get an instance of this app
@@ -59,6 +61,29 @@ public class SettingsPhoneApp extends AbstractRootApp{
                 currentBackground.setText(Text.of(phone.backgroundNumber+""));
             }
         });
+        amPmClock =new WButton(Text.of("AM/PM"));
+        hour24Clock=new WButton(Text.of("24 Hour"));
+        panel.add(amPmClock,25,60,60,20);
+        panel.add(hour24Clock,90,60,60,20);
+        if(phone.clockTimeType== PhoneGui.ClockTimeType.AMPM){
+            amPmClock.setEnabled(false);
+        }
+        if(phone.clockTimeType== PhoneGui.ClockTimeType.HOUR24){
+            hour24Clock.setEnabled(false);
+        }
+        amPmClock.setOnClick(()->{
+            phone.clockTimeType= PhoneGui.ClockTimeType.AMPM;
+            phone.dtf=DateTimeFormatter.ofPattern("hh:mm a");
+            amPmClock.setEnabled(false);
+            hour24Clock.setEnabled(true);
+        });
+        hour24Clock.setOnClick(()->{
+            phone.clockTimeType= PhoneGui.ClockTimeType.HOUR24;
+            phone.dtf=DateTimeFormatter.ofPattern("HH:mm");
+            amPmClock.setEnabled(true);
+            hour24Clock.setEnabled(false);
+        });
+        panel.add(clockSetting,25,50);
 
 
     }

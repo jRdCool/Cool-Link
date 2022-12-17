@@ -29,7 +29,7 @@ public class PhoneGui extends LightweightGuiDescription {
     WPlainPanel root, notchAndTimePanel,appPanel,homeButtonPanel;
     WLabel time;
 
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("hh:mm a");
+    public DateTimeFormatter dtf = DateTimeFormatter.ofPattern("hh:mm a");
     AbstractPhoneApp currentApp;
     World world;
     BlockEntity clickedOnBLockEntity;
@@ -43,6 +43,8 @@ public class PhoneGui extends LightweightGuiDescription {
     public NbtCompound appData;
     public int backgroundNumber=0;
 
+    public  enum ClockTimeType{AMPM,HOUR24}
+    public ClockTimeType clockTimeType = ClockTimeType.AMPM;
 
     public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance) {
         apps.add(SettingsPhoneApp.getDummyInstance());
@@ -72,6 +74,12 @@ public class PhoneGui extends LightweightGuiDescription {
                 appData=new NbtCompound();
             }
             backgroundNumber= nbt.getInt("background");
+            if (nbt.getInt("clock type") == 1) {
+                clockTimeType = ClockTimeType.HOUR24;
+            } else {
+                clockTimeType = ClockTimeType.AMPM;
+            }
+
         }else{
             Main.LOGGER.info("no NBT data");
             appData=new NbtCompound();
@@ -224,6 +232,7 @@ public class PhoneGui extends LightweightGuiDescription {
             nbt.put("appData",appData);
         }
         nbt.putInt("background",backgroundNumber);
+        nbt.putInt("clock type",(clockTimeType==ClockTimeType.AMPM)? 0: 1);
 
         //write the data
         phoneInstance.setNbt(nbt);
