@@ -61,7 +61,7 @@ public class AIOBlockEntity extends BlockEntity {
 		password=nbt.getString("password");
 		number = nbt.getInt("number");
 		ssid = nbt.getString("ssid");
-		netPass = nbt.getString("Wireless_password");
+		netPass = nbt.getString("Wireless_Password");
 	}
 
 	@Nullable
