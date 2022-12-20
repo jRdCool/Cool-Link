@@ -154,7 +154,7 @@ public class PhoneGui extends LightweightGuiDescription {
             //paint the app panel
             appPanel.setBackgroundPainter((matrices, left, top, panel) -> {
                 for(int i=0;i<apps.size();i++){
-                    ScreenDrawing.texturedRect(matrices,left+20+25*i,top+20,20,20,apps.get(i).icon,0,0,1,1,0xFF_FFFFFF);
+                    ScreenDrawing.texturedRect(matrices,left+20+25*(i%15),top+20+25*(i/15),20,20,apps.get(i).icon,0,0,1,1,0xFF_FFFFFF);
                 }
             });
 
@@ -208,7 +208,7 @@ public class PhoneGui extends LightweightGuiDescription {
         //Main.LOGGER.info("mouse clicked at: "+mouseX+" "+mouseY);
         if(currentApp==null) {
             for (int i = 0; i < apps.size(); i++) {
-                if (mouseX >= 20 + 25 * i && mouseX <= 20 + 25 * i + 20 && mouseY >= 20 && mouseY <= 20 + 20) {
+                if (mouseX >= 20 + 25 * (i%15) && mouseX <= 20 + 25 * (i%15) + 20 && mouseY >= 20+25*(i/15) && mouseY <= 20 + 20+25*(i/15)) {
                     openApp(apps.get(i));
                 }
             }

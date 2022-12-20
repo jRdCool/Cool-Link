@@ -60,7 +60,7 @@ public final class AppStore extends AbstractRootApp{
             }
         }
         for(int i=0;i<4;i++){
-            installButtons[i].setEnabled(i + scrollBar.getValue() < storeApps.length);
+            installButtons[i].setEnabled(i + scrollBar.getValue() < storeApps.length && (phone.apps.size()<105 || phone.apps.contains(storeApps[i+scrollBar.getValue()])));
             if(installButtons[i].isEnabled()){
                 AbstractPhoneApp thisApp=storeApps[i+scrollBar.getValue()];
                 installButtons[i].setLabel( (phone.apps.contains(thisApp)) ? Text.of("Uninstall") : Text.of("Install"));
