@@ -5,6 +5,7 @@ import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WButton;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
+import io.github.cottonmc.cotton.gui.widget.WTextField;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.minecraft.block.entity.BlockEntity;
@@ -19,8 +20,10 @@ public class SettingsPhoneApp extends AbstractRootApp{
 
     WLabel title=new WLabel(Text.of("Settings"));
     PhoneGui phoneInstance;
-    WButton prevBackground,nextBackground, amPmClock,hour24Clock;
-    WLabel currentBackground,backgroundLabel,clockSetting=new WLabel(Text.of("Clock"));
+    WButton prevBackground,nextBackground, amPmClock,hour24Clock,setPhoneName;
+    WLabel currentBackground,backgroundLabel,clockSetting=new WLabel(Text.of("Clock")),phoneName;
+    WTextField phoneNameField;
+    boolean settingPhoneName=false;
 
     /**do not use this constructor to initialize the app
      * only use to get an instance of this app
@@ -84,6 +87,31 @@ public class SettingsPhoneApp extends AbstractRootApp{
             hour24Clock.setEnabled(false);
         });
         panel.add(clockSetting,25,50);
+
+        phoneName=new WLabel(Text.of(phone.phoneName));
+        setPhoneName=new WButton(Text.of("set phone name"));
+        phoneNameField=new WTextField();
+        phoneNameField.setText(phone.phoneName);
+
+        panel.add(phoneName,29,96);
+        panel.add(setPhoneName,140,90,90,20);
+        setPhoneName.setOnClick(()->{
+           if(settingPhoneName){
+               settingPhoneName=false;
+               panel.remove(phoneNameField);
+               panel.add(phoneName,29,96);
+               if(!phoneNameField.getText().equals("")){
+                   phone.phoneName=phoneNameField.getText();
+                   phoneName.setText(Text.of(phone.phoneName));
+               }
+           }else{
+               settingPhoneName=true;
+               panel.remove(phoneName);
+               panel.add(phoneNameField,25,90,110,20);
+               phoneNameField.setText(phone.phoneName);
+
+           }
+        });
 
 
     }

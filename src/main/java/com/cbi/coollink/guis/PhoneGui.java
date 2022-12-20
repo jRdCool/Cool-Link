@@ -45,6 +45,7 @@ public class PhoneGui extends LightweightGuiDescription {
 
     public  enum ClockTimeType{AMPM,HOUR24}
     public ClockTimeType clockTimeType = ClockTimeType.AMPM;
+    public String phoneName;
 
     public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance) {
         apps.add(SettingsPhoneApp.getDummyInstance());
@@ -79,10 +80,14 @@ public class PhoneGui extends LightweightGuiDescription {
             } else {
                 clockTimeType = ClockTimeType.AMPM;
             }
+            phoneName=nbt.getString("Name");
+            if(phoneName==null||phoneName.equals(""))
+                phoneName="UnNamed phone";
 
         }else{
             Main.LOGGER.info("no NBT data");
             appData=new NbtCompound();
+            phoneName="UnNamed phone";
         }
 
         root = new WPlainPanel();//.setBackgroundPainter(new BackgroundPainter());
@@ -167,6 +172,7 @@ public class PhoneGui extends LightweightGuiDescription {
                 saveData();
                 currentApp.requestSave=false;
             }
+            currentApp.getPanel().setHost(this);
         }
     }
 
@@ -199,7 +205,7 @@ public class PhoneGui extends LightweightGuiDescription {
     public void mouseClicked(double mouseX,double mouseY){
         mouseX-=left;//adjust the mouse pos to be centered around the top corner of the root panel
         mouseY-=top;
-        Main.LOGGER.info("mouse clicked at: "+mouseX+" "+mouseY);
+        //Main.LOGGER.info("mouse clicked at: "+mouseX+" "+mouseY);
         if(currentApp==null) {
             for (int i = 0; i < apps.size(); i++) {
                 if (mouseX >= 20 + 25 * i && mouseX <= 20 + 25 * i + 20 && mouseY >= 20 && mouseY <= 20 + 20) {
@@ -233,6 +239,7 @@ public class PhoneGui extends LightweightGuiDescription {
         }
         nbt.putInt("background",backgroundNumber);
         nbt.putInt("clock type",(clockTimeType==ClockTimeType.AMPM)? 0: 1);
+        nbt.putString("Name",phoneName);
 
         //write the data
         phoneInstance.setNbt(nbt);
