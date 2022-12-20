@@ -88,6 +88,38 @@ public class Main implements ModInitializer {
             });
         });
 
+        ServerPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","aio-set-ssid"), (server, player, handler, buf, responseSender) -> {
+            BlockPos pos = buf.readBlockPos();
+            String ssid=buf.readString();
+            RegistryKey<World> wrk=buf.readRegistryKey(RegistryKeys.WORLD);
+            //execute code on the server thread
+            server.execute(() ->{
+                BlockEntity be =server.getWorld(wrk).getBlockEntity(pos);
+
+                if(be instanceof AIOBlockEntity aio){
+                    aio.ssid=ssid;
+                    aio.markDirty();
+                    aio.updateStates();
+                }
+            });
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","aio-set-net-password"), (server, player, handler, buf, responseSender) -> {
+            BlockPos pos = buf.readBlockPos();
+            String netPass=buf.readString();
+            RegistryKey<World> wrk=buf.readRegistryKey(RegistryKeys.WORLD);
+            //execute code on the server thread
+            server.execute(() ->{
+                BlockEntity be =server.getWorld(wrk).getBlockEntity(pos);
+
+                if(be instanceof AIOBlockEntity aio){
+                    aio.netPass=netPass;
+                    aio.markDirty();
+                    aio.updateStates();
+                }
+            });
+        });
+
         //receive incoming data from the phone and write it to the server version of the phone object
         ServerPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","save-phone-data"),(server, player, handler, buf, responseSender) -> {
 
@@ -107,5 +139,7 @@ public class Main implements ModInitializer {
 
             });
         });
+
+
     }
 }

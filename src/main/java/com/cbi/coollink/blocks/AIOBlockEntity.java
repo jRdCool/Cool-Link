@@ -23,19 +23,8 @@ public class AIOBlockEntity extends BlockEntity {
 	private int number = 0;
 	private String key;
 	public String password;
-
-	public void writeDataTo(NbtCompound nbt,String key, int value){//how to write NBT data from anywhere in the mod
-		number = value;
-		this.key=key;
-		writeNbt(nbt);
-		return;
-	}
-
-	public void readDataFrom(NbtCompound nbt,String key){//how to retrieve nbt data from else where in the mod
-		this.key=key;
-		readNbt(nbt);
-		return;
-	}
+	public String ssid;
+	public String netPass;
 
 	// Serialize the BlockEntity
 	@Override
@@ -50,6 +39,18 @@ public class AIOBlockEntity extends BlockEntity {
 			nbt.putString("password", password);
 			//Main.LOGGER.info("saving password as: " + password);
 		}
+		if(ssid==null){
+			nbt.putString("ssid","Unconfigured Network");
+		}
+		else{
+			nbt.putString("ssid", ssid);
+		}
+		if(netPass==null){
+			nbt.putString("Wireless_Password","");
+		}
+		else{
+			nbt.putString("Wireless_Password", netPass);
+		}
 		super.writeNbt(nbt);
 	}
 
@@ -59,6 +60,8 @@ public class AIOBlockEntity extends BlockEntity {
 		super.readNbt(nbt);
 		password=nbt.getString("password");
 		number = nbt.getInt("number");
+		ssid = nbt.getString("ssid");
+		netPass = nbt.getString("Wireless_password");
 	}
 
 	@Nullable
