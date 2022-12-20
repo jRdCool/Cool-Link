@@ -9,6 +9,7 @@ import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import io.github.cottonmc.cotton.gui.widget.WToggleButton;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
+import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.entity.BlockEntity;
@@ -16,6 +17,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -25,7 +27,8 @@ public class AIOSettingApp extends AbstractPhoneApp{
     WPasswordField networkPasswordField;
     WToggleButton passwordVisibleButton;
     WLabel title=new WLabel(Text.of("AIO Link"));
-
+    WLabel errorMsg=new WLabel(Text.of(""));
+    Boolean passAccepted=false;
 
 
     public AIOSettingApp(World world, BlockEntity clickedOnBlockEntity){
@@ -42,25 +45,36 @@ public class AIOSettingApp extends AbstractPhoneApp{
             networkPasswordField = new WPasswordField(MutableText.of(new LiteralTextContent("admins may be able to see text entered here")));
             networkPasswordField.setMaxLength(96);
             passwordVisibleButton = new WToggleButton();
-            WButton tmpb = new WButton();
+            WButton checkPassB = new WButton(MutableText.of(new LiteralTextContent("Submit")).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
 
             panel.add(new WLabel(MutableText.of(new LiteralTextContent("set password for this AIO"))), 100, 50);
             panel.add(networkPasswordField, 50, 85);
             networkPasswordField.setSize(300, 20);
             panel.add(passwordVisibleButton, 355, 85);
             passwordVisibleButton.setOnToggle(on -> networkPasswordField.setShown(on));
-            panel.add(tmpb, 200, 120);
+            panel.add(checkPassB, 180, 120,40,1);
             Main.LOGGER.info(aio.password);
-            tmpb.setOnClick(() -> {
+            checkPassB.setOnClick(() -> {
 //
+                if(aio.password.equals(networkPasswordField.getText()))
+                {
+                    passAccepted=true;
+                }
+                else
+                {
+                    errorMsg.setText(Text.of("Invalid password"));
+                }
                 //Main.LOGGER.info("setting password to: "+aio.password);
-                PacketByteBuf buf = PacketByteBufs.create();
+                /*PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeBlockPos(aio.getPos());
                 buf.writeString(networkPasswordField.getText());
                 buf.writeRegistryKey(world.getRegistryKey());
-                ClientPlayNetworking.send(new Identifier("cool-link", "aio-set-password"), buf);
+                ClientPlayNetworking.send(new Identifier("cool-link", "aio-set-password"), buf);*/
 //
             });
+            errorMsg.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.CENTER);
+            panel.add(errorMsg,192,105);
+
         }else{
             panel.add(new WLabel(MutableText.of(new LiteralTextContent("AIO not detected"))), 100, 100);
         }
