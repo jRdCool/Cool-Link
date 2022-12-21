@@ -19,8 +19,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
+import java.util.function.BiConsumer;
+
 public class AIOSettingApp extends AbstractPhoneApp{
 
+    public Boolean uplinkStatus = true;
     WPasswordField adminPasswordField;
     WToggleButton passwordVisibleButton;
     WLabel title=new WLabel(Text.of("AIO Link"));
@@ -33,7 +36,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
     World world;
     WTextField sSIDName;
     String netPassL;
-    Boolean passVisible = false;
+    Boolean passVisible = false,settingsScreen=false;
     String hiddenText = "";
     WPlainPanel changeAdminPassPanel=new WPlainPanel();
 
@@ -75,7 +78,21 @@ public class AIOSettingApp extends AbstractPhoneApp{
 
     @Override
     public void addPainters() {
-        root.setBackgroundPainter((matrices, left, top, panel) -> ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_FFFFFF));
+        root.setBackgroundPainter((matrices, left, top, panel) -> {
+            ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_FFFFFF);
+            if(settingsScreen) {
+                ScreenDrawing.coloredRect(matrices, left + 95, top + 161, 26, 26, 0xFF_333333);
+                if(uplinkStatus)
+                {
+                    ScreenDrawing.coloredRect(matrices, left + 98, top + 164, 20, 20, 0xFF_00FF00);
+                }
+                else
+                {
+                    ScreenDrawing.coloredRect(matrices, left + 98, top + 164, 20, 20, 0xFF_FF0000);
+                }
+            }
+        });
+
     }
 
     public static AIOSettingApp getDummyInstance(){
@@ -132,7 +149,11 @@ public class AIOSettingApp extends AbstractPhoneApp{
 
     private void aioSettingsScreen(AIOBlockEntity blockA)
     {
-
+        BiConsumer<String, AIODeviceList> configurator = (String name, AIODeviceList destination) -> {
+            destination.device.setLabel(Text.literal(name));
+            //destination.sprite.setImage(new Identifier("libgui-test:portal1.png"));
+        };
+        settingsScreen=true;
         if(blockA.ssid==null)
         {netName="Network Name";}
         else{netName=blockA.ssid;}
@@ -162,6 +183,8 @@ public class AIOSettingApp extends AbstractPhoneApp{
         sSIDName=new WTextField(MutableText.of(new LiteralTextContent(netName)));
         WButton setSSID=new WButton(Text.of("set"));
 
+
+
         //ssid line
         aioSettingsPanel.add(sSID,25,30);
         aioSettingsPanel.add(sSIDName,52,24);
@@ -182,6 +205,16 @@ public class AIOSettingApp extends AbstractPhoneApp{
         //change admin password button
         aioSettingsPanel.add(changeAdminPass,25,104);
         changeAdminPass.setSize(150,20);
+
+        //uplink status
+        aioSettingsPanel.add(uLStatus,25,170);
+
+        //connected devices panel
+        aioSettingsPanel.add(connectedDevices,265,30);
+        WListPanel<String,AIODeviceList> connectedDevicesPanel=new WListPanel<>(blockA.connectedDevices, AIODeviceList::new, configurator);
+        connectedDevicesPanel.setListItemHeight(2*18);
+        aioSettingsPanel.add(connectedDevicesPanel,220,40,190,155);
+
 
 
         passwordVisibleButton.setOnToggle(on -> {
@@ -214,11 +247,20 @@ public class AIOSettingApp extends AbstractPhoneApp{
         });
 
         changeAdminPass.setOnClick(() -> {
+            settingsScreen=false;
             root.remove(aioSettingsPanel);
             logInScreen(blockA,true);
         });
 
+
+
     }
+
+
+
+
+
+
 
     private void adminPassChangeScreen(AIOBlockEntity blockA)
     {
@@ -246,6 +288,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
                 buf.writeString(adminPasswordField.getText());
                 buf.writeRegistryKey(world.getRegistryKey());
                 ClientPlayNetworking.send(new Identifier("cool-link", "aio-set-password"), buf);
+
                 root.remove(changeAdminPassPanel);
                 aioSettingsScreen(blockA);
             }

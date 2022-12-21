@@ -12,6 +12,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+
 // Made with Blockbench 4.5.2
 // Exported for Minecraft version 1.17+ for Yarn
 // Paste this class into your mod and generate all required imports
@@ -25,6 +27,10 @@ public class AIOBlockEntity extends BlockEntity {
 	public String password;
 	public String ssid;
 	public String netPass;
+
+	public ArrayList<String> connectedDevices=new ArrayList<>();
+	public ArrayList<String> deviceName=new ArrayList<>();
+	public ArrayList<String> deviceIP=new ArrayList<>();
 
 	// Serialize the BlockEntity
 	@Override
@@ -77,8 +83,42 @@ public class AIOBlockEntity extends BlockEntity {
 
 	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//Main.LOGGER.info(be.password);
+		be.createConnectedDevices();
+
 	}
 	public void updateStates(){
 		world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
 	}
+
+	void createConnectedDevices() {
+		if(deviceName.isEmpty() && deviceIP.isEmpty()) {
+			if(!connectedDevices.isEmpty())
+			{connectedDevices.clear();}
+			connectedDevices.add("No connected devices");
+
+		}
+		else if(deviceName.size() != deviceIP.size())
+		{
+			if(deviceName.size() < deviceIP.size())
+			{
+				//call a function that assigns ip addresses to devices that don't have them
+				//return;
+			}
+			else {
+				Main.LOGGER.info("!!!!! !!!ERROR!!! MORE IPs THAN DEVICES !!!!!");
+			}
+		}
+		else {
+			for (int i=0;i<deviceName.size();i++)
+			{
+				String space = "  ";
+;				for(int j=16-deviceName.get(i).length();j>0;j--)
+				{
+					space += " ";
+				}
+				connectedDevices.set(i,deviceName.get(i)+space+deviceIP.get(i));
+			}
+		}
+	}
+
 }
