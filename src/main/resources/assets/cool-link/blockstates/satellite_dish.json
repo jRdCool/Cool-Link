@@ -1,0 +1,14 @@
+{
+  "variants": {
+    "assembled=false": {"model": "cool-link:block/satellite_dish_boxed"},
+    "assembled=true,multiblockpart=d1": { "model": "cool-link:block/satellite_dish" },
+    "assembled=true,multiblockpart=d2": { "model": "cool-link:block/satellite_dish_blank" },
+    "assembled=true,multiblockpart=d3": { "model": "cool-link:block/satellite_dish_blank" },
+    "assembled=true,multiblockpart=d4": { "model": "cool-link:block/satellite_dish_blank" },
+    "assembled=true,multiblockpart=u1": { "model": "cool-link:block/satellite_dish_blank" },
+    "assembled=true,multiblockpart=u2": { "model": "cool-link:block/satellite_dish_blank" },
+    "assembled=true,multiblockpart=u3": { "model": "cool-link:block/satellite_dish_blank" },
+    "assembled=true,multiblockpart=u4": { "model": "cool-link:block/satellite_dish_blank" }
+
+  }
+}
