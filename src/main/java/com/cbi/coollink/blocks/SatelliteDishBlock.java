@@ -24,6 +24,7 @@ import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
 public class SatelliteDishBlock extends Block {
     public SatelliteDishBlock(Settings settings) {
         super(settings);
+
         setDefaultState(getDefaultState()
                 .with(ASSEMBLED_BOOLEAN_PROPERTY, false)
                 .with(multiBlockPose, MultiBlockPartStates.NONE)
@@ -56,7 +57,8 @@ public class SatelliteDishBlock extends Block {
             return name;
         }
     }
-    static EnumProperty multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
+
+    static EnumProperty<MultiBlockPartStates> multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
         assignStates();
@@ -68,8 +70,9 @@ public class SatelliteDishBlock extends Block {
         multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
     }
 
+    @SuppressWarnings("deprecation")
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
-        MultiBlockPartStates s= (MultiBlockPartStates) state.get(multiBlockPose);
+        MultiBlockPartStates s=  state.get(multiBlockPose);
         switch (s){
             case D1 -> {return voxelD1();}
             case D2 -> {return voxelD2();}
