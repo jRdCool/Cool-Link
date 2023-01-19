@@ -23,7 +23,7 @@ import java.util.function.BiConsumer;
 
 public class AIOSettingApp extends AbstractPhoneApp{
 
-    public Boolean uplinkStatus = true;
+    public Boolean uplinkStatus = false;
     WPasswordField adminPasswordField;
     WToggleButton passwordVisibleButton;
     WLabel title=new WLabel(Text.of("AIO Link"));

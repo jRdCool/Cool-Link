@@ -1,9 +1,6 @@
 package com.cbi.coollink;
 
-import com.cbi.coollink.blocks.AIOBlockEntity;
-import com.cbi.coollink.blocks.AIO_Network;
-import com.cbi.coollink.blocks.ServerRack;
-import com.cbi.coollink.blocks.TestBlock;
+import com.cbi.coollink.blocks.*;
 import com.cbi.coollink.items.*;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -47,9 +44,11 @@ public class Main implements ModInitializer {
 
         Registry.register(Registries.BLOCK, new Identifier("cool-link","test_block"),TestBlock.ENTRY);
         Registry.register(Registries.ITEM, new Identifier("cool-link", "test_block"),new BlockItem(TestBlock.ENTRY, new FabricItemSettings()));
+
         Registry.register(Registries.BLOCK, new Identifier("cool-link","aio_network"), AIO_Network.ENTRY);
         BlockRenderLayerMap.INSTANCE.putBlock(AIO_Network.ENTRY, RenderLayer.getCutout());
         Registry.register(Registries.ITEM, new Identifier("cool-link", "aio_network"),new BlockItem(AIO_Network.ENTRY, new FabricItemSettings()));
+
         SmartPhone smartPhoneEntry= Registry.register(Registries.ITEM, new Identifier("cool-link", "smart_phone"),new SmartPhone(new FabricItemSettings()));
         Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, new Identifier("cool-link", "cat6_ethernet_cable"),new Cat6Cable(new FabricItemSettings()));
         CoaxialCable coaxialCableEntry = Registry.register(Registries.ITEM, new Identifier("cool-link", "coaxial_cable"),new CoaxialCable(new FabricItemSettings()));
@@ -59,6 +58,10 @@ public class Main implements ModInitializer {
         Registry.register(Registries.BLOCK, new Identifier("cool-link","server_rack"), ServerRack.ENTRY);
         BlockRenderLayerMap.INSTANCE.putBlock(AIO_Network.ENTRY, RenderLayer.getCutout());
         Registry.register(Registries.ITEM, new Identifier("cool-link", "server_rack"),new BlockItem(ServerRack.ENTRY, new FabricItemSettings() ));
+
+        Registry.register(Registries.BLOCK, new Identifier("cool-link","small_conduit"), SmallConduit.ENTRY);
+        Registry.register(Registries.ITEM, new Identifier("cool-link", "small_conduit"),new BlockItem(SmallConduit.ENTRY, new FabricItemSettings()));
+
 
 
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
