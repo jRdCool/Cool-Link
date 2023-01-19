@@ -20,6 +20,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -31,6 +32,8 @@ import org.slf4j.LoggerFactory;
 public class Main implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("cool-link");
     public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "aio_block_entity"), FabricBlockEntityTypeBuilder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
+
+    public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
 
     public static final ItemGroup COOL_LINK_ITEM_GROUP = FabricItemGroup.builder(
                     new Identifier("cool-link", "cool-link"))
@@ -61,10 +64,6 @@ public class Main implements ModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(SatelliteDishBlock.ENTRY, RenderLayer.getCutout());
         Registry.register(Registries.ITEM, new Identifier("cool-link", "satellite_dish"),new BlockItem(SatelliteDishBlock.ENTRY, new FabricItemSettings()));
 
-        Registry.register(Registries.BLOCK, new Identifier("cool-link","small_conduit"), SmallConduit.ENTRY);
-        Registry.register(Registries.ITEM, new Identifier("cool-link", "small_conduit"),new BlockItem(SmallConduit.ENTRY, new FabricItemSettings()));
-
-
 
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
@@ -73,6 +72,7 @@ public class Main implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(coaxialCableEntry));
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(wireTesterEntry));
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(programingCableEntry));
+        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(SatelliteDishBlock.ENTRY));
 
 
 

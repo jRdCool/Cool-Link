@@ -1,5 +1,5 @@
 {
   "variants": {
-    "": { "model": "cool-link:block/server_rack" }
+    "half=bottom": { "model": "cool-link:block/server_rack" }
   }
 }
