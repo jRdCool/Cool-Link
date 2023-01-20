@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "axis=z": { "model": "cool-link:block/small_conduit", "uvlock": true },
+    "axis=x":  { "model": "cool-link:block/small_conduit", "y":  90}
+
+  }
+}
