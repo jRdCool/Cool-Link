@@ -57,7 +57,7 @@ public class Main implements ModInitializer {
         ProgramingCable programingCableEntry = Registry.register(Registries.ITEM, new Identifier("cool-link", "programing_cable"),new ProgramingCable(new FabricItemSettings()));
 
         Registry.register(Registries.BLOCK, new Identifier("cool-link","server_rack"), ServerRack.ENTRY);
-        BlockRenderLayerMap.INSTANCE.putBlock(AIO_Network.ENTRY, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ServerRack.ENTRY, RenderLayer.getCutout());
         Registry.register(Registries.ITEM, new Identifier("cool-link", "server_rack"),new BlockItem(ServerRack.ENTRY, new FabricItemSettings() ));
 
         Registry.register(Registries.BLOCK, new Identifier("cool-link","satellite_dish"), SatelliteDishBlock.ENTRY);
