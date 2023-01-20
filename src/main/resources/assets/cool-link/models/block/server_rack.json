@@ -4,7 +4,7 @@
 	"textures": {
 		"0": "cool-link:block/server-rack-fraim",
 		"1": "cool-link:block/server-rack-rails",
-		"particle": "cool-link:block/server-rack-fraim"
+		"particle": "cool-link:block/server-rack-paricles"
 	},
 	"elements": [
 		{
@@ -88,7 +88,7 @@
 				"south": {"uv": [10.25, 5.5, 10.5, 5.75], "texture": "#1"},
 				"west": {"uv": [1, 1.25, 5, 1.5], "texture": "#1"},
 				"up": {"uv": [1.25, 5.5, 1, 1.5], "texture": "#1"},
-				"down": {"uv": [1.5, 1.5, 1.25, 5.5], "texture": "#0"}
+				"down": {"uv": [1.5, 1.5, 1.25, 5.5], "texture": "#1"}
 			}
 		},
 		{

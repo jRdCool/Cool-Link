@@ -1,5 +1,7 @@
 {
   "variants": {
-    "half=bottom": { "model": "cool-link:block/server_rack" }
+    "half=bottom,direction=north_south": { "model": "cool-link:block/server_rack" },
+    "half=bottom,direction=east_west": { "model": "cool-link:block/server_rack","y": 90 },
+    "half=top": { "model": "cool-link:block/server_rack_blank" }
   }
 }

@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "cool-link:block/satellite_dish_blank",
+    "particle": "cool-link:block/server-rack-paricles"
+  }
+}
