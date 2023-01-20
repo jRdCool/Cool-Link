@@ -64,6 +64,12 @@ public class Main implements ModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(SatelliteDishBlock.ENTRY, RenderLayer.getCutout());
         Registry.register(Registries.ITEM, new Identifier("cool-link", "satellite_dish"),new BlockItem(SatelliteDishBlock.ENTRY, new FabricItemSettings()));
 
+        Registry.register(Registries.BLOCK, new Identifier("cool-link","small_conduit"),SmallConduit.ENTRY);
+        Registry.register(Registries.ITEM, new Identifier("cool-link", "small_conduit"),new BlockItem(SmallConduit.ENTRY, new FabricItemSettings()));
+
+        Registry.register(Registries.BLOCK, new Identifier("cool-link","medium_conduit"),MediumConduit.ENTRY);
+        Registry.register(Registries.ITEM, new Identifier("cool-link", "medium_conduit"),new BlockItem(MediumConduit.ENTRY, new FabricItemSettings()));
+
 
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
@@ -73,6 +79,8 @@ public class Main implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(wireTesterEntry));
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(programingCableEntry));
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(SatelliteDishBlock.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(SmallConduit.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(MediumConduit.ENTRY));
 
 
 
