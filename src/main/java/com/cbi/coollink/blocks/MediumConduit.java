@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -17,15 +18,36 @@ import org.jetbrains.annotations.Nullable;
 import static net.minecraft.state.property.Properties.*;
 
 public class MediumConduit extends Block {
+
+    BooleanProperty north = BooleanProperty.of("north");
+    BooleanProperty east = BooleanProperty.of("east");
+    BooleanProperty south = BooleanProperty.of("south");
+    BooleanProperty west = BooleanProperty.of("west");
+
+
+
+
     public static final MediumConduit ENTRY = new MediumConduit(FabricBlockSettings.of(Material.STONE).hardness(0.5f));
 
     public MediumConduit(Settings settings) {
         super(settings);
+        setDefaultState(getDefaultState()
+                .with(north,false)
+                .with(east,false)
+                .with(south,false)
+                .with(west,false)
+        );
     }
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
         stateManager.add(AXIS);
         stateManager.add(HORIZONTAL_FACING);
+        stateManager.add(this.north);
+        stateManager.add(this.east);
+        stateManager.add(this.south);
+        stateManager.add(this.west);
+
+
     }
 
 

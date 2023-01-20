@@ -1,25 +1,25 @@
 {
   "multipart": [
     { "when": { "OR": [
-      {"north": "none", "east": "none", "south": "none", "west": "none"}
+      {"north": "false", "east": "false", "south": "false", "west": "false"}
     ]},
       "apply": { "model": "cool-link:block/medium_conduit", "uvlock": true }
     },
     { "when": { "OR": [
-      { "north": "side" },
-      { "north": "none", "east": "none", "south": "side", "west": "none" }
+      { "north": "true" },
+      { "north": "false", "east": "false", "south": "true", "west": "false" }
     ]},
       "apply": { "model": "cool-link:block/medium_conduit", "uvlock": true }
     },
     {   "when": { "OR": [
-      { "south": "side|up" },
-      { "north": "side|up", "east": "none", "south": "none", "west": "none" }
+      { "south": "true" },
+      { "north": "true", "east": "false", "south": "false", "west": "false" }
     ]},
       "apply": { "model": "cool-link:block/medium_conduit", "uvlock": true }
     },
     {   "when": { "OR": [
-      { "west": "side|up" },
-      { "north": "none", "east": "side|up", "south": "none", "west": "none" }
+      { "west": "true" },
+      { "north": "false", "east": "true", "south": "false", "west": "false" }
     ]},
       "apply": { "model": "cool-link:block/medium_conduit", "y":  90 }
     }
