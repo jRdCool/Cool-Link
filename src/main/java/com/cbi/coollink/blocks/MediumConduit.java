@@ -96,10 +96,13 @@ public class MediumConduit extends Block {
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        BlockPos neighbor;
 
+        BlockPos neighbor= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//the location of the nigher block you want to check this should be reassigned for every block you want to check
 
-        world.getBlockState(pos.getX()+1);
+        if(world.getBlockState(neighbor).getBlock().equals(this)){//check if the neighbor block is medium conduit
+            world.setBlockState(pos,state.with(HORIZONTAL_FACING,Direction.EAST),NOTIFY_ALL);//set this block as connecting to that neighbor block
+            world.setBlockState(neighbor,world.getBlockState(neighbor).with(HORIZONTAL_FACING,Direction.WEST),NOTIFY_ALL);//set the neighbor block to point to this block
+        }
     }
 
 }
