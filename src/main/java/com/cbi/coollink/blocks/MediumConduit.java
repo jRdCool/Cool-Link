@@ -97,12 +97,29 @@ public class MediumConduit extends Block {
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
 
-        BlockPos neighbor= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//the location of the nigher block you want to check this should be reassigned for every block you want to check
+        BlockPos neighbor1= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//the location of the nigher block you want to check this should be reassigned for every block you want to check
+        BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());
+        BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);
+        BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);
 
-        if(world.getBlockState(neighbor).getBlock().equals(this)){//check if the neighbor block is medium conduit
+
+        if(world.getBlockState(neighbor1).getBlock().equals(this)){//check if the neighbor block is medium conduit
             world.setBlockState(pos,state.with(HORIZONTAL_FACING,Direction.EAST),NOTIFY_ALL);//set this block as connecting to that neighbor block
-            world.setBlockState(neighbor,world.getBlockState(neighbor).with(HORIZONTAL_FACING,Direction.WEST),NOTIFY_ALL);//set the neighbor block to point to this block
+            world.setBlockState(neighbor1,world.getBlockState(neighbor1).with(HORIZONTAL_FACING,Direction.WEST),NOTIFY_ALL);//set the neighbor block to point to this block
         }
+        if(world.getBlockState(neighbor2).getBlock().equals(this)){//check if the neighbor block is medium conduit
+            world.setBlockState(pos,state.with(HORIZONTAL_FACING,Direction.WEST),NOTIFY_ALL);//set this block as connecting to that neighbor block
+            world.setBlockState(neighbor2,world.getBlockState(neighbor2).with(HORIZONTAL_FACING,Direction.EAST),NOTIFY_ALL);//set the neighbor block to point to this block
+        }
+        if(world.getBlockState(neighbor3).getBlock().equals(this)){//check if the neighbor block is medium conduit
+            world.setBlockState(pos,state.with(HORIZONTAL_FACING,Direction.NORTH),NOTIFY_ALL);//set this block as connecting to that neighbor block
+            world.setBlockState(neighbor3,world.getBlockState(neighbor3).with(HORIZONTAL_FACING,Direction.SOUTH),NOTIFY_ALL);//set the neighbor block to point to this block
+        }
+        if(world.getBlockState(neighbor4).getBlock().equals(this)){//check if the neighbor block is medium conduit
+            world.setBlockState(pos,state.with(HORIZONTAL_FACING,Direction.SOUTH),NOTIFY_ALL);//set this block as connecting to that neighbor block
+            world.setBlockState(neighbor4,world.getBlockState(neighbor4).with(HORIZONTAL_FACING,Direction.NORTH),NOTIFY_ALL);//set the neighbor block to point to this block
+        }
+
     }
 
 }
