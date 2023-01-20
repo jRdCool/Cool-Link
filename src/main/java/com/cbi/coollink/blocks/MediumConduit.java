@@ -2,16 +2,20 @@ package com.cbi.coollink.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
-//import net.minecraft.block.BlockWithEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-import static net.minecraft.state.property.Properties.AXIS;
+import static net.minecraft.state.property.Properties.*;
+
 public class MediumConduit extends Block {
     public static final MediumConduit ENTRY = new MediumConduit(FabricBlockSettings.of(Material.STONE).hardness(0.5f));
 
@@ -21,6 +25,7 @@ public class MediumConduit extends Block {
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
         stateManager.add(AXIS);
+        stateManager.add(HORIZONTAL_FACING);
     }
 
 
@@ -76,15 +81,25 @@ public class MediumConduit extends Block {
     @Override
     @SuppressWarnings("all")
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction.Axis facing;
+
+
+
         switch (ctx.getPlayerFacing()){
             case NORTH:
             case SOUTH:
-                return this.getDefaultState().with(AXIS, Direction.Axis.Z);
+                return this.getDefaultState().with(AXIS, Direction.Axis.Z).with(HORIZONTAL_FACING, ctx.getPlayerFacing());
             case EAST:
             default:
-                return this.getDefaultState().with(AXIS, Direction.Axis.X);
+                return this.getDefaultState().with(AXIS, Direction.Axis.X).with(HORIZONTAL_FACING, ctx.getPlayerFacing());
         }
+    }
+
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        BlockPos neighbor;
+
+
+        world.getBlockState(pos.getX()+1);
     }
 
 }

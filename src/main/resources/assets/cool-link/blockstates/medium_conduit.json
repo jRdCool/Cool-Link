@@ -1,7 +1,28 @@
 {
-  "variants": {
-    "axis=z": { "model": "cool-link:block/medium_conduit", "uvlock": true },
-    "axis=x":  { "model": "cool-link:block/medium_conduit", "y":  90}
+  "multipart": [
+    { "when": { "OR": [
+      {"north": "none", "east": "none", "south": "none", "west": "none"}
+    ]},
+      "apply": { "model": "cool-link:block/medium_conduit", "uvlock": true }
+    },
+    { "when": { "OR": [
+      { "north": "side" },
+      { "north": "none", "east": "none", "south": "side", "west": "none" }
+    ]},
+      "apply": { "model": "cool-link:block/medium_conduit", "uvlock": true }
+    },
+    {   "when": { "OR": [
+      { "south": "side|up" },
+      { "north": "side|up", "east": "none", "south": "none", "west": "none" }
+    ]},
+      "apply": { "model": "cool-link:block/medium_conduit", "uvlock": true }
+    },
+    {   "when": { "OR": [
+      { "west": "side|up" },
+      { "north": "none", "east": "side|up", "south": "none", "west": "none" }
+    ]},
+      "apply": { "model": "cool-link:block/medium_conduit", "y":  90 }
+    }
 
-  }
+  ]
 }
