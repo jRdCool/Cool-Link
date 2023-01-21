@@ -22,6 +22,12 @@
       { "north": "false", "east": "true", "south": "false", "west": "false" }
     ]},
       "apply": { "model": "cool-link:block/medium_conduit", "y":  90 }
+    },
+    {   "when": { "OR": [
+      { "east": "true" },
+      { "north": "false", "east": "false", "south": "false", "west": "true" }
+    ]},
+      "apply": { "model": "cool-link:block/medium_conduit", "y":  90 }
     }
 
   ]
