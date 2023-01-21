@@ -40,12 +40,17 @@ public class MediumConduit extends Block {
     }
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
-        stateManager.add(AXIS);
-        stateManager.add(HORIZONTAL_FACING);
-        stateManager.add(this.north);
-        stateManager.add(this.east);
-        stateManager.add(this.south);
-        stateManager.add(this.west);
+        north = BooleanProperty.of("north");
+        east = BooleanProperty.of("east");
+        south = BooleanProperty.of("south");
+        west = BooleanProperty.of("west");
+            stateManager.add(AXIS);
+            stateManager.add(HORIZONTAL_FACING);
+            stateManager.add(this.north);
+            stateManager.add(this.east);
+            stateManager.add(this.south);
+            stateManager.add(this.west);
+
 
 
     }
