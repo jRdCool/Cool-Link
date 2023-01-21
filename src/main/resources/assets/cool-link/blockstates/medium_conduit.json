@@ -28,7 +28,37 @@
       { "north": "false", "east": "false", "south": "false", "west": "true" }
     ]},
       "apply": { "model": "cool-link:block/medium_conduit", "y":  90 }
+    },
+
+
+
+    {   "when": { "OR": [
+      {"north": "true", "east": "true", "south": "true", "west": "false"}
+
+    ]},
+      "apply": { "model": "cool-link:block/conduit_junction_box", "uvlock": true }
+    },
+    {   "when": { "OR": [
+      {"north": "false", "east": "true", "south": "true", "west": "true"}
+    ]},
+      "apply": { "model": "cool-link:block/conduit_junction_box", "uvlock": true }
+    },
+    {   "when": { "OR": [
+      {"north": "true", "east": "false", "south": "true", "west": "true"}
+    ]},
+      "apply": { "model": "cool-link:block/conduit_junction_box", "uvlock": true }
+    },
+    {   "when": { "OR": [
+      {"north": "true", "east": "true", "south": "false", "west": "true"}
+    ]},
+      "apply": { "model": "cool-link:block/conduit_junction_box", "uvlock": true }
+    },
+    {   "when": { "OR": [
+      {"north": "true", "east": "true", "south": "true", "west": "True"}
+    ]},
+      "apply": { "model": "cool-link:block/conduit_junction_box", "uvlock": true }
     }
+
 
   ]
 }
