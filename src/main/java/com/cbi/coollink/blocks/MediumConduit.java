@@ -14,16 +14,18 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.state.property.Properties.*;
 
 public class MediumConduit extends Block {
 
-    BooleanProperty north = BooleanProperty.of("north");
-    BooleanProperty east = BooleanProperty.of("east");
-    BooleanProperty south = BooleanProperty.of("south");
-    BooleanProperty west = BooleanProperty.of("west");
+    static BooleanProperty north = BooleanProperty.of("north");
+    static BooleanProperty east = BooleanProperty.of("east");
+    static BooleanProperty south = BooleanProperty.of("south");
+    static BooleanProperty west = BooleanProperty.of("west");
+    static BooleanProperty junctionBox = BooleanProperty.of("junctionbox");
 
 
 
@@ -37,6 +39,7 @@ public class MediumConduit extends Block {
                 .with(east,false)
                 .with(south,false)
                 .with(west,false)
+                .with(junctionBox,false)
         );
     }
 
@@ -45,12 +48,14 @@ public class MediumConduit extends Block {
         east = BooleanProperty.of("east");
         south = BooleanProperty.of("south");
         west = BooleanProperty.of("west");
+        junctionBox = BooleanProperty.of("junctionbox");
             stateManager.add(AXIS);
             stateManager.add(HORIZONTAL_FACING);
             stateManager.add(this.north);
             stateManager.add(this.east);
             stateManager.add(this.south);
             stateManager.add(this.west);
+            stateManager.add(this.junctionBox);
 
 
 
@@ -70,6 +75,7 @@ public class MediumConduit extends Block {
         }
         if (shape.isEmpty())
             shape=makeShapeNS();
+
 
         return shape;
     }
@@ -143,6 +149,27 @@ public class MediumConduit extends Block {
             world.setBlockState(pos,state.with(north,true),NOTIFY_ALL);//set this block as connecting to that neighbor block
             world.setBlockState(neighbor4,world.getBlockState(neighbor4).with(south,true),NOTIFY_ALL);//set the neighbor block to point to this block
         }
+        state=world.getBlockState(pos);
+        world.setBlockState(pos,state.with(junctionBox,junctionBoxCheck(state)),NOTIFY_ALL);
+
     }
+
+    public void onBroken(WorldAccess world, BlockPos pos, BlockState state){
+
+
+
+    }
+
+    public boolean junctionBoxCheck(BlockState state){
+      boolean box=false;
+      if((state.get(north) && state.get(south) && state.get(east))
+      ||(state.get(north) && state.get(south) && state.get(west))
+      ||(state.get(north) && state.get(west) && state.get(east))
+      ||(state.get(south) && state.get(west) && state.get(east))){
+          box=true;
+      }
+      return box;
+    }
+
 
 }
