@@ -8,6 +8,8 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -26,6 +28,16 @@ public class MediumConduit extends Block {
     static BooleanProperty south = BooleanProperty.of("south");
     static BooleanProperty west = BooleanProperty.of("west");
     static BooleanProperty junctionBox = BooleanProperty.of("junctionbox");
+    static IntProperty cableShape = IntProperty.of("cableshape",0,7);
+    //cableShape is an integer that is used to switch between the models
+    //  0 = NS
+    //  1 = EW
+    //  2 = Junction Box (3 or 4 directions)
+    //  3 = Vertical Transition Box
+    //  4 = NE
+    //  5 = SE
+    //  6 = SW
+    //  7 = NW
 
 
 
@@ -40,6 +52,7 @@ public class MediumConduit extends Block {
                 .with(south,false)
                 .with(west,false)
                 .with(junctionBox,false)
+                .with(cableShape,0)
         );
     }
 
@@ -56,9 +69,7 @@ public class MediumConduit extends Block {
             stateManager.add(this.south);
             stateManager.add(this.west);
             stateManager.add(this.junctionBox);
-
-
-
+            stateManager.add(this.cableShape);
     }
 
 
