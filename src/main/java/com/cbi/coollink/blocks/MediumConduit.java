@@ -1,15 +1,12 @@
 package com.cbi.coollink.blocks;
 
-import com.cbi.coollink.Main;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -47,29 +44,30 @@ public class MediumConduit extends Block {
     public MediumConduit(Settings settings) {
         super(settings);
         setDefaultState(getDefaultState()
-                //.with(north,false)
-               // .with(east,false)
-               // .with(south,false)
-                //.with(west,false)
-               // .with(junctionBox,false)
+                // .with(north,false)
+                // .with(east,false)
+                // .with(south,false)
+                // .with(west,false)
+                // .with(junctionBox,false)
                 .with(cableShape,0)
         );
     }
 
+    @SuppressWarnings({"deprecation","all"})
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
         north = BooleanProperty.of("north");
         east = BooleanProperty.of("east");
         south = BooleanProperty.of("south");
         west = BooleanProperty.of("west");
         junctionBox = BooleanProperty.of("junctionbox");
-            //stateManager.add(AXIS);
-           // stateManager.add(HORIZONTAL_FACING);
-           // stateManager.add(this.north);
-            //stateManager.add(this.east);
-            //stateManager.add(this.south);
-            //stateManager.add(this.west);
-            //stateManager.add(this.junctionBox);
-            stateManager.add(this.cableShape);
+        //stateManager.add(AXIS);
+        //stateManager.add(HORIZONTAL_FACING);
+        //stateManager.add(this.north);
+        //stateManager.add(this.east);
+        //stateManager.add(this.south);
+        //stateManager.add(this.west);
+        //stateManager.add(this.junctionBox);
+        stateManager.add(this.cableShape);
     }
 
 
@@ -86,8 +84,6 @@ public class MediumConduit extends Block {
         }
         if (shape.isEmpty())
             shape=makeShapeNS();
-
-
         return shape;
     }
 
@@ -119,8 +115,6 @@ public class MediumConduit extends Block {
     @Override
     @SuppressWarnings("all")
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-
-
 
         switch (ctx.getPlayerFacing()){
             case NORTH:
@@ -165,22 +159,60 @@ public class MediumConduit extends Block {
 
     }
 
+    @SuppressWarnings({"deprecation","all"})
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        world.setBlockState(pos,state.with(junctionBox,junctionBoxCheck(state)),NOTIFY_ALL);
+        if(state.get(junctionBox))
+        {
+            state=world.getBlockState(pos);
+            world.setBlockState(pos,state.with(cableShape,2),NOTIFY_ALL);
+        }
+        else if(state.get(north) && state.get(east)){
+            state=world.getBlockState(pos);
+            world.setBlockState(pos,state.with(cableShape,4),NOTIFY_ALL);
+        }
+        else if(state.get(south) && state.get(east)){
+            state=world.getBlockState(pos);
+            world.setBlockState(pos,state.with(cableShape,5),NOTIFY_ALL);
+        }
+        else if(state.get(south) && state.get(west)){
+            state=world.getBlockState(pos);
+            world.setBlockState(pos,state.with(cableShape,6),NOTIFY_ALL);
+        }
+        else if(state.get(north) && state.get(west)){
+            state=world.getBlockState(pos);
+            world.setBlockState(pos,state.with(cableShape,7),NOTIFY_ALL);
+        }
+        else if(state.get(north) || state.get(south)){
+            state=world.getBlockState(pos);
+            world.setBlockState(pos,state.with(cableShape,0),NOTIFY_ALL);
+        }
+        else if(state.get(west) || state.get(east)){
+            state=world.getBlockState(pos);
+            world.setBlockState(pos,state.with(cableShape,1),NOTIFY_ALL);
+        }
+
+
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+    }
+
     public void onBroken(WorldAccess world, BlockPos pos, BlockState state){
 
 
 
     }
 
+    @SuppressWarnings({"all"})
     public boolean junctionBoxCheck(BlockState state){
       boolean box=false;
       if((state.get(north) && state.get(south) && state.get(east))
       ||(state.get(north) && state.get(south) && state.get(west))
       ||(state.get(north) && state.get(west) && state.get(east))
-      ||(state.get(south) && state.get(west) && state.get(east))){
+      ||(state.get(south) && state.get(west) && state.get(east)))
+      {
           box=true;
       }
       return box;
     }
-
-
 }
