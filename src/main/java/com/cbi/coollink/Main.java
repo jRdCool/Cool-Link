@@ -70,6 +70,9 @@ public class Main implements ModInitializer {
         Registry.register(Registries.BLOCK, new Identifier("cool-link","medium_conduit"),MediumConduit.ENTRY);
         Registry.register(Registries.ITEM, new Identifier("cool-link", "medium_conduit"),new BlockItem(MediumConduit.ENTRY, new FabricItemSettings()));
 
+        Registry.register(Registries.BLOCK, new Identifier("cool-link","large_conduit"),LargeConduit.ENTRY);
+        Registry.register(Registries.ITEM, new Identifier("cool-link", "large_conduit"),new BlockItem(LargeConduit.ENTRY, new FabricItemSettings()));
+
 
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
@@ -81,6 +84,7 @@ public class Main implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(SatelliteDishBlock.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(SmallConduit.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(MediumConduit.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(LargeConduit.ENTRY));
 
 
 
