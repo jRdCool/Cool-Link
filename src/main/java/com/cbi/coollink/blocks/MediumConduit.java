@@ -44,11 +44,11 @@ public class MediumConduit extends Block {
     public MediumConduit(Settings settings) {
         super(settings);
         setDefaultState(getDefaultState()
-                // .with(north,false)
-                // .with(east,false)
-                // .with(south,false)
-                // .with(west,false)
-                // .with(junctionBox,false)
+                .with(north,false)
+                .with(east,false)
+                .with(south,false)
+                .with(west,false)
+                .with(junctionBox,false)
                 .with(cableShape,0)
         );
     }
@@ -60,13 +60,13 @@ public class MediumConduit extends Block {
         south = BooleanProperty.of("south");
         west = BooleanProperty.of("west");
         junctionBox = BooleanProperty.of("junctionbox");
-        //stateManager.add(AXIS);
-        //stateManager.add(HORIZONTAL_FACING);
-        //stateManager.add(this.north);
-        //stateManager.add(this.east);
-        //stateManager.add(this.south);
-        //stateManager.add(this.west);
-        //stateManager.add(this.junctionBox);
+        stateManager.add(AXIS);
+        stateManager.add(HORIZONTAL_FACING);
+        stateManager.add(this.north);
+        stateManager.add(this.east);
+        stateManager.add(this.south);
+        stateManager.add(this.west);
+        stateManager.add(this.junctionBox);
         stateManager.add(this.cableShape);
     }
 
@@ -79,9 +79,9 @@ public class MediumConduit extends Block {
         if(state.get(north)||state.get(south)){
             shape=VoxelShapes.union(shape,makeShapeNS());
         }
-        if(state.get(east)||state.get(west)){
+       /* if(state.get(east)||state.get(west)){
             shape=VoxelShapes.union(shape,makeShapeEW());
-        }
+        }*/
         if (shape.isEmpty())
             shape=makeShapeNS();
         return shape;
@@ -163,7 +163,7 @@ public class MediumConduit extends Block {
     @Override
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         world.setBlockState(pos,state.with(junctionBox,junctionBoxCheck(state)),NOTIFY_ALL);
-        if(state.get(junctionBox))
+        if(junctionBoxCheck(state))
         {
             state=world.getBlockState(pos);
             world.setBlockState(pos,state.with(cableShape,2),NOTIFY_ALL);
@@ -192,7 +192,6 @@ public class MediumConduit extends Block {
             state=world.getBlockState(pos);
             world.setBlockState(pos,state.with(cableShape,1),NOTIFY_ALL);
         }
-
 
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
     }
