@@ -1,34 +1,12 @@
 {
-  "multipart": [
-    { "when": { "OR": [
-      {"north": "false", "east": "false", "south": "false", "west": "false"}
-    ]},
-      "apply": { "model": "cool-link:block/small_conduit", "uvlock": true }
-    },
-    { "when": { "OR": [
-      { "north": "true" },
-      { "north": "false", "east": "false", "south": "true", "west": "false" }
-    ]},
-      "apply": { "model": "cool-link:block/small_conduit", "uvlock": true }
-    },
-    {   "when": { "OR": [
-      { "south": "true" },
-      { "north": "true", "east": "false", "south": "false", "west": "false" }
-    ]},
-      "apply": { "model": "cool-link:block/small_conduit", "uvlock": true }
-    },
-    {   "when": { "OR": [
-      { "west": "true" },
-      { "north": "false", "east": "true", "south": "false", "west": "false" }
-    ]},
-      "apply": { "model": "cool-link:block/small_conduit", "y":  90 }
-    },
-    {   "when": { "OR": [
-      { "east": "true" },
-      { "north": "false", "east": "false", "south": "false", "west": "true" }
-    ]},
-      "apply": { "model": "cool-link:block/small_conduit", "y":  90 }
-    }
-
-  ]
+  "variants": {
+    "cableshape=0":{ "model": "cool-link:block/small_conduit", "uvlock": true },
+    "cableshape=1":{ "model": "cool-link:block/small_conduit", "y":  90 },
+    "cableshape=2":{ "model": "cool-link:block/conduit_junction_box", "uvlock": true },
+    "cableshape=3":{ "model": "cool-link:block/null", "uvlock": true },
+    "cableshape=4":{ "model": "cool-link:block/small_conduit_l", "uvlock": true },
+    "cableshape=5":{ "model": "cool-link:block/small_conduit_l", "y":  90 },
+    "cableshape=6":{ "model": "cool-link:block/small_conduit_l", "y": 180 },
+    "cableshape=7":{ "model": "cool-link:block/small_conduit_l", "y": 270 }
+  }
 }
