@@ -61,26 +61,55 @@ public class LargeConduit extends Conduit {
 
     public VoxelShape makeShapeNS() {
         VoxelShape shape = VoxelShapes.empty();
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.0625, 0, 0, 0.9375, 0.25, 1));
         return shape;
     }
     public VoxelShape makeShapeEW() {
         VoxelShape shape = VoxelShapes.empty();
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.9375, 1, 0.25, 0.94375));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.05625, 1, 0.25, 0.0625));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.0625, 1, 0.25, 0.9375));
         return shape;
     }
     public VoxelShape makeShapeNE() {
         VoxelShape shape = VoxelShapes.empty();
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.9375, 0, 0, 0.94375, 0.25, 0.0625));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.0625, 0, 0.9375, 1, 0.25, 0.94375));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.9375, 0, 0.05625, 1, 0.25, 0.0625));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.05625, 0, 0, 0.0625, 0.25, 0.9375));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.0625, 0, 0, 0.9375, 0.25, 0.9375));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.9375, 0, 0.0625, 1, 0.25, 0.9375));
         return shape;
     }
     public VoxelShape makeShapeSE() {
         VoxelShape shape = VoxelShapes.empty();
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.9375, 0, 0.9375, 1, 0.25, 0.94375));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.05625, 0, 0.0625, 0.0625, 0.25, 1));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.9375, 0, 0.9375, 0.94375, 0.25, 1));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.0625, 0, 0.05625, 1, 0.25, 0.0625));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.0625, 0, 0.0625, 1, 0.25, 0.9375));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.0625, 0, 0.9375, 0.9375, 0.25, 1));
+
         return shape;
     }
     public VoxelShape makeShapeSW() {
         VoxelShape shape = VoxelShapes.empty();
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.05625, 0, 0.9375, 0.0625, 0.25, 1));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.05625, 0.9375, 0.25, 0.0625));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.9375, 0.0625, 0.25, 0.94375));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.9375, 0, 0.0625, 0.94375, 0.25, 1));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.0625, 0, 0.0625, 0.9375, 0.25, 1));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.0625, 0.0625, 0.25, 0.9375));
         return shape;
     }
     public VoxelShape makeShapeNW() {
         VoxelShape shape = VoxelShapes.empty();
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.05625, 0.0625, 0.25, 0.0625));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.9375, 0, 0, 0.94375, 0.25, 0.9375));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.05625, 0, 0, 0.0625, 0.25, 0.0625));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.9375, 0.9375, 0.25, 0.94375));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.0625, 0.9375, 0.25, 0.9375));
+        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.0625, 0, 0, 0.9375, 0.25, 0.0625));
         return shape;
     }
 

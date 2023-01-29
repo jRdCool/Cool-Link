@@ -1,6 +1,7 @@
 package com.cbi.coollink.blocks;
 
 import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.state.property.Properties.*;
 
-public class Conduit extends Block {
+public class Conduit extends BlockWithEntity {
     static BooleanProperty north = BooleanProperty.of("north");
     static BooleanProperty east = BooleanProperty.of("east");
     static BooleanProperty south = BooleanProperty.of("south");
@@ -215,5 +216,11 @@ public class Conduit extends Block {
             state=world.getBlockState(pos);
             world.setBlockState(pos,state.with(cableShape,1),NOTIFY_ALL);
         }
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return null;
     }
 }

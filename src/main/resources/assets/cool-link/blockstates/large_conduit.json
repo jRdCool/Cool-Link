@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "cableshape=0":{ "model": "cool-link:block/large_conduit", "uvlock": true },
+    "cableshape=1":{ "model": "cool-link:block/large_conduit", "y":  90 },
+    "cableshape=2":{ "model": "cool-link:block/conduit_junction_box", "uvlock": true },
+    "cableshape=3":{ "model": "cool-link:block/null", "uvlock": true },
+    "cableshape=4":{ "model": "cool-link:block/large_conduit_l", "uvlock": true },
+    "cableshape=5":{ "model": "cool-link:block/large_conduit_l", "y":  90 },
+    "cableshape=6":{ "model": "cool-link:block/large_conduit_l", "y": 180 },
+    "cableshape=7":{ "model": "cool-link:block/large_conduit_l", "y": 270 }
+  }
+}
