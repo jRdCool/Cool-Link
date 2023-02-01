@@ -23,6 +23,9 @@ public class Conduit extends BlockWithEntity {
     static BooleanProperty west = BooleanProperty.of("west");
     static BooleanProperty junctionBox = BooleanProperty.of("junctionbox");
     static IntProperty cableShape = IntProperty.of("cableshape",0,7);
+    static IntProperty cableLevel = IntProperty.of("cablelevel",1,3);
+    static BooleanProperty neighborLarger = BooleanProperty.of("largerneighbor");
+
     //cableShape is an integer that is used to switch between the models
     //  0 = NS
     //  1 = EW
@@ -35,9 +38,6 @@ public class Conduit extends BlockWithEntity {
 
 
 
-
-
-
     public Conduit(AbstractBlock.Settings settings) {
         super(settings);
         setDefaultState(getDefaultState()
@@ -47,6 +47,7 @@ public class Conduit extends BlockWithEntity {
                 .with(west,false)
                 .with(junctionBox,false)
                 .with(cableShape,0)
+                .with(neighborLarger,false)
         );
     }
 
@@ -65,6 +66,8 @@ public class Conduit extends BlockWithEntity {
         stateManager.add(this.west);
         stateManager.add(this.junctionBox);
         stateManager.add(this.cableShape);
+        stateManager.add(this.cableLevel);
+        stateManager.add(this.neighborLarger);
     }
 
 
@@ -92,25 +95,49 @@ public class Conduit extends BlockWithEntity {
 
 
 
-        if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit){//check if the neighbor block is medium conduit
+        if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            if(state.get(cableLevel) > world.getBlockState(neighbor1).get(cableLevel)) {
+                world.setBlockState(neighbor1, world.getBlockState(neighbor1).with(neighborLarger,true), NOTIFY_ALL);//set the neighbor block to point to this block
+            }
+            else if(state.get(cableLevel) < world.getBlockState(neighbor1).get(cableLevel)){
+                state.with(neighborLarger,true);
+            }
             world.setBlockState(pos,state.with(east,true),NOTIFY_ALL);//set this block as connecting to that neighbor block
             world.setBlockState(neighbor1,world.getBlockState(neighbor1).with(west,true),NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor1),world,neighbor1);
         }
         state=world.getBlockState(pos);
-        if(world.getBlockState(neighbor2).getBlock() instanceof  Conduit){//check if the neighbor block is medium conduit
+        if(world.getBlockState(neighbor2).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            if(state.get(cableLevel) > world.getBlockState(neighbor2).get(cableLevel)) {
+                world.setBlockState(neighbor2, world.getBlockState(neighbor2).with(neighborLarger,true), NOTIFY_ALL);//set the neighbor block to point to this block
+            }
+            else if(state.get(cableLevel) < world.getBlockState(neighbor2).get(cableLevel)){
+                state.with(neighborLarger,true);
+            }
             world.setBlockState(pos,state.with(west,true),NOTIFY_ALL);//set this block as connecting to that neighbor block
             world.setBlockState(neighbor2,world.getBlockState(neighbor2).with(east,true),NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor2),world,neighbor2);
         }
         state=world.getBlockState(pos);
-        if(world.getBlockState(neighbor3).getBlock() instanceof  Conduit){//check if the neighbor block is medium conduit
+        if(world.getBlockState(neighbor3).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            if(state.get(cableLevel) > world.getBlockState(neighbor3).get(cableLevel)) {
+                world.setBlockState(neighbor3, world.getBlockState(neighbor3).with(neighborLarger,true), NOTIFY_ALL);//set the neighbor block to point to this block
+            }
+            else if(state.get(cableLevel) < world.getBlockState(neighbor3).get(cableLevel)){
+                state.with(neighborLarger,true);
+            }
             world.setBlockState(pos,state.with(south,true),NOTIFY_ALL);//set this block as connecting to that neighbor block
             world.setBlockState(neighbor3,world.getBlockState(neighbor3).with(north,true),NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor3),world,neighbor3);
         }
         state=world.getBlockState(pos);
-        if(world.getBlockState(neighbor4).getBlock() instanceof  Conduit){//check if the neighbor block is medium conduit
+        if(world.getBlockState(neighbor4).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            if(state.get(cableLevel) > world.getBlockState(neighbor4).get(cableLevel)) {
+                world.setBlockState(neighbor4, world.getBlockState(neighbor4).with(neighborLarger,true), NOTIFY_ALL);//set the neighbor block to point to this block
+            }
+            else if(state.get(cableLevel) < world.getBlockState(neighbor3).get(cableLevel)){
+                state.with(neighborLarger,true);
+            }
             world.setBlockState(pos,state.with(north,true),NOTIFY_ALL);//set this block as connecting to that neighbor block
             world.setBlockState(neighbor4,world.getBlockState(neighbor4).with(south,true),NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor4),world,neighbor4);
@@ -131,6 +158,30 @@ public class Conduit extends BlockWithEntity {
         BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());
         BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);
         BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);
+
+        if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+            if (state.get(cableLevel) < world.getBlockState(neighbor1).get(cableLevel)) {
+                state.with(neighborLarger, true);
+            }
+        }
+        else if(world.getBlockState(neighbor2).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+            if (state.get(cableLevel) < world.getBlockState(neighbor2).get(cableLevel)) {
+                state.with(neighborLarger, true);
+            }
+        }
+        else if(world.getBlockState(neighbor3).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+            if (state.get(cableLevel) < world.getBlockState(neighbor3).get(cableLevel)) {
+                state.with(neighborLarger, true);
+            }
+        }
+        else if(world.getBlockState(neighbor4).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+            if (state.get(cableLevel) < world.getBlockState(neighbor4).get(cableLevel)) {
+                state.with(neighborLarger, true);
+            }
+        }
+        else {
+
+        }
         onUpdate(state,world,pos);
         state=world.getBlockState(pos);
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
@@ -143,23 +194,23 @@ public class Conduit extends BlockWithEntity {
         BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);
 
 
-        if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit){//check if the neighbor block is same conduit
-            world.setBlockState(neighbor1,world.getBlockState(neighbor1).with(west,false),NOTIFY_ALL);//set the neighbor block to point to this block
+        if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            world.setBlockState(neighbor1, world.getBlockState(neighbor1).with(west, false), NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor1),world,neighbor1);
         }
 
-        if(world.getBlockState(neighbor2).getBlock() instanceof  Conduit){//check if the neighbor block is same conduit
-            world.setBlockState(neighbor2,world.getBlockState(neighbor2).with(east,false),NOTIFY_ALL);//set the neighbor block to point to this block
+        if(world.getBlockState(neighbor2).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            world.setBlockState(neighbor2, world.getBlockState(neighbor2).with(east, false), NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor2),world,neighbor2);
         }
 
-        if(world.getBlockState(neighbor3).getBlock() instanceof  Conduit){//check if the neighbor block is same conduit
-            world.setBlockState(neighbor3,world.getBlockState(neighbor3).with(north,false),NOTIFY_ALL);//set the neighbor block to point to this block
+        if(world.getBlockState(neighbor3).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            world.setBlockState(neighbor3, world.getBlockState(neighbor3).with(north, false), NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor3),world,neighbor3);
         }
 
-        if(world.getBlockState(neighbor4).getBlock() instanceof  Conduit){//check if the neighbor block is same conduit
-            world.setBlockState(neighbor4,world.getBlockState(neighbor4).with(south,false),NOTIFY_ALL);//set the neighbor block to point to this block
+        if(world.getBlockState(neighbor4).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            world.setBlockState(neighbor4, world.getBlockState(neighbor4).with(south, false), NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor4),world,neighbor4);
         }
     }
@@ -170,7 +221,8 @@ public class Conduit extends BlockWithEntity {
         if((state.get(north) && state.get(south) && state.get(east))
                 ||(state.get(north) && state.get(south) && state.get(west))
                 ||(state.get(north) && state.get(west) && state.get(east))
-                ||(state.get(south) && state.get(west) && state.get(east)))
+                ||(state.get(south) && state.get(west) && state.get(east))
+                ||state.get(neighborLarger))
         {
             box=true;
         }
@@ -216,6 +268,12 @@ public class Conduit extends BlockWithEntity {
             state=world.getBlockState(pos);
             world.setBlockState(pos,state.with(cableShape,1),NOTIFY_ALL);
         }
+    }
+
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
+        return BlockRenderType.MODEL;
     }
 
     @Nullable
