@@ -53,7 +53,7 @@ public class SmartPhone extends Item {
                 Main.LOGGER.error("attempted to open phone GUI when no phone was held in hand");
                 return super.use(world, user, hand);
             }
-            BlockPos blockEntityPos = null;
+            BlockPos blockEntityPos;
             boolean noBLockEntity;
             if(usedBlockEntity!=null){
                 blockEntityPos=usedBlockEntity.getPos();
@@ -62,7 +62,6 @@ public class SmartPhone extends Item {
                 noBLockEntity = true;
                 blockEntityPos = new BlockPos(0,0,0);
             }
-
 
             //open the phone screen
             OpenPhoneGuiPacket packet = new OpenPhoneGuiPacket(world.getRegistryKey(),blockEntityPos,heldItem,noBLockEntity);

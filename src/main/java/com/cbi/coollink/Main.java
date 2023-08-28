@@ -149,7 +149,6 @@ public class Main implements ModInitializer {
 
             NbtCompound nbt=buf.readNbt();
             ItemStack itemFromClient = buf.readItemStack();
-
             server.execute(() -> {
                 ItemStack heldItem = null;
                 for (ItemStack itemStack : player.getHandItems()) {
@@ -160,6 +159,7 @@ public class Main implements ModInitializer {
                 }
                 if(heldItem!=null)
                   heldItem.setNbt(nbt);
+
 
             });
         });

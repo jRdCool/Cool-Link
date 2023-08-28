@@ -120,13 +120,14 @@ public class PhoneGui extends LightweightGuiDescription {
         root.add(notchAndTimePanel,0,0,1,1);
 
         //open a specific app based on the block that was clicked on
-        if(clickedOnBLockEntity!=null)
+        if(clickedOnBLockEntity!=null) {
             for (AbstractPhoneApp app : apps) {
                 if (app.openOnBlockEntity(clickedOnBLockEntity)) {
                     openApp(app);
                     break;
                 }
             }
+        }
 
         saveData();
     }
