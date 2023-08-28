@@ -1,5 +1,6 @@
 package com.cbi.coollink.blocks;
 
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
@@ -16,7 +17,9 @@ import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.state.property.Properties.*;
 
-public class Conduit extends BlockWithEntity {
+public class Conduit extends BlockWithEntity implements BlockEntityProvider {
+
+    public static final Conduit ENTRY = new Conduit(FabricBlockSettings.create().hardness(0.5f));
     static BooleanProperty north = BooleanProperty.of("north");
     static BooleanProperty east = BooleanProperty.of("east");
     static BooleanProperty south = BooleanProperty.of("south");
