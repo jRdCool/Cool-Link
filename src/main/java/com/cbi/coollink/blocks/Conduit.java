@@ -135,7 +135,7 @@ public class Conduit extends BlockWithEntity {
             if(state.get(cableLevel) > world.getBlockState(neighbor4).get(cableLevel)) {
                 world.setBlockState(neighbor4, world.getBlockState(neighbor4).with(neighborLarger,true), NOTIFY_ALL);//set the neighbor block to point to this block
             }
-            else if(state.get(cableLevel) < world.getBlockState(neighbor3).get(cableLevel)){
+            else if(state.get(cableLevel) < world.getBlockState(neighbor4).get(cableLevel)){
                 state.with(neighborLarger,true);
             }
             world.setBlockState(pos,state.with(north,true),NOTIFY_ALL);//set this block as connecting to that neighbor block
