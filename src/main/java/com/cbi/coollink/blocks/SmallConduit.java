@@ -3,6 +3,7 @@ package com.cbi.coollink.blocks;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -24,7 +25,9 @@ public class SmallConduit extends Conduit {
 
     public SmallConduit(Settings settings) {
         super(settings);
-
+        setDefaultState(getDefaultState()
+                .with(cableLevel,1)
+        );
     }
 
     @SuppressWarnings("deprecation")
@@ -39,7 +42,7 @@ public class SmallConduit extends Conduit {
             shape=VoxelShapes.union(shape,makeShapeEW());
         }
         if(state.get(cableShape)==2){
-            junctionBoxVoxel();
+            shape=junctionBoxVoxel();
         }
         if(state.get(cableShape)==4){
             shape=VoxelShapes.union(shape,makeShapeNE());

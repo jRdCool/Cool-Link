@@ -2,6 +2,7 @@ package com.cbi.coollink.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -11,6 +12,7 @@ import net.minecraft.world.BlockView;
 public class MediumConduit extends Conduit {
 
     public static final MediumConduit ENTRY = new MediumConduit(FabricBlockSettings.create().hardness(0.5f));
+
 
     //cableShape is an integer that is used to switch between the models
     //  0 = NS
@@ -25,6 +27,7 @@ public class MediumConduit extends Conduit {
 
     public MediumConduit(Settings settings) {
         super(settings);
+        setDefaultState(getDefaultState().with(cableLevel,2));
     }
 
 
