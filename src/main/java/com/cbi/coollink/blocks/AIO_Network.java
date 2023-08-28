@@ -21,7 +21,7 @@ import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 
 public class AIO_Network extends BlockWithEntity implements BlockEntityProvider {
-	public static final AIO_Network ENTRY = new AIO_Network(FabricBlockSettings.of(Material.CARPET).hardness(0.5f));
+	public static final AIO_Network ENTRY = new AIO_Network(FabricBlockSettings.create().hardness(0.5f));
 	public AIO_Network(Settings settings) {
 		super(settings);
 	}
@@ -129,7 +129,7 @@ public class AIO_Network extends BlockWithEntity implements BlockEntityProvider 
 
 	@Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return this.getDefaultState().with(HORIZONTAL_FACING, ctx.getPlayerFacing());
+		return this.getDefaultState().with(HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing());
 	}
 
 	@Override

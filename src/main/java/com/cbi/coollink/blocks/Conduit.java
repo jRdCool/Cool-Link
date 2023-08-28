@@ -72,13 +72,13 @@ public class Conduit extends BlockWithEntity {
     @SuppressWarnings("all")
     public BlockState getPlacementState(ItemPlacementContext ctx) {
 
-        switch (ctx.getPlayerFacing()){
+        switch (ctx.getHorizontalPlayerFacing()){
             case NORTH:
             case SOUTH:
-                return this.getDefaultState().with(HORIZONTAL_FACING, ctx.getPlayerFacing());
+                return this.getDefaultState().with(HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing());
             case EAST:
             default:
-                return this.getDefaultState().with(HORIZONTAL_FACING, ctx.getPlayerFacing());
+                return this.getDefaultState().with(HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing());
         }
     }
 

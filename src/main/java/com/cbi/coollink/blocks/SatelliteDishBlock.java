@@ -3,7 +3,6 @@ package com.cbi.coollink.blocks;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -30,7 +29,7 @@ public class SatelliteDishBlock extends Block {
                 .with(multiBlockPose, MultiBlockPartStates.NONE)
         );
     }
-    public static final SatelliteDishBlock ENTRY = new SatelliteDishBlock(FabricBlockSettings.of(Material.CARPET).hardness(0.5f));
+    public static final SatelliteDishBlock ENTRY = new SatelliteDishBlock(FabricBlockSettings.create().hardness(0.5f));
     public enum MultiBlockPartStates implements StringIdentifiable {
         D1("d1"),
         D2("d2"),

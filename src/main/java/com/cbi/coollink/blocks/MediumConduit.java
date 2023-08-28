@@ -10,7 +10,7 @@ import net.minecraft.world.BlockView;
 
 public class MediumConduit extends Conduit {
 
-    public static final MediumConduit ENTRY = new MediumConduit(FabricBlockSettings.of(Material.STONE).hardness(0.5f));
+    public static final MediumConduit ENTRY = new MediumConduit(FabricBlockSettings.create().hardness(0.5f));
 
     //cableShape is an integer that is used to switch between the models
     //  0 = NS

@@ -2,7 +2,6 @@ package com.cbi.coollink.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -11,7 +10,7 @@ import net.minecraft.world.BlockView;
 
 public class LargeConduit extends Conduit {
 
-    public static final LargeConduit ENTRY = new LargeConduit(FabricBlockSettings.of(Material.STONE).hardness(0.5f));
+    public static final LargeConduit ENTRY = new LargeConduit(FabricBlockSettings.create().hardness(0.5f));
 
     //cableShape is an integer that is used to switch between the models
     //  0 = NS

@@ -3,6 +3,7 @@ package com.cbi.coollink.mic;
 import io.github.cottonmc.cotton.gui.widget.WTextField;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
@@ -18,45 +19,45 @@ public class WPasswordField extends WTextField {
 
     @Override
     @Environment(EnvType.CLIENT)
-    protected void renderText(MatrixStack matrices, int x, int y, String visibleText) {
+    protected void renderText(DrawContext context, int x, int y, String visibleText) {
         if(!textVisible) {
             String hiddenText = "";
             for (int i = 0; i < visibleText.length(); i++) {
                 hiddenText += "*";
             }
 
-            super.renderText(matrices, x, y, hiddenText);
+            super.renderText(context, x, y, hiddenText);
         }else{
-            super.renderText(matrices, x, y, visibleText);
+            super.renderText(context, x, y, visibleText);
         }
     }
 
     @Override
     @Environment(EnvType.CLIENT)
-    protected void renderCursor(MatrixStack matrices, int x, int y, String visibleText) {
+    protected void renderCursor(DrawContext context, int x, int y, String visibleText) {
         if(!textVisible) {
             String hiddenText="";
             for(int i=0;i<visibleText.length();i++){
                 hiddenText+="*";
             }
-            super.renderCursor(matrices,x,y,hiddenText);
+            super.renderCursor(context,x,y,hiddenText);
         }else{
-            super.renderCursor(matrices,x,y,visibleText);
+            super.renderCursor(context,x,y,visibleText);
         }
 
     }
 
     @Override
     @Environment(EnvType.CLIENT)
-    protected void renderSelection(MatrixStack matrices, int x, int y, String visibleText) {
+    protected void renderSelection(DrawContext context, int x, int y, String visibleText) {
         if(!textVisible) {
             String hiddenText = "";
             for (int i = 0; i < visibleText.length(); i++) {
                 hiddenText += "*";
             }
-            super.renderSelection(matrices, x, y, hiddenText);
+            super.renderSelection(context, x, y, hiddenText);
         }else{
-            super.renderSelection(matrices, x, y, visibleText);
+            super.renderSelection(context, x, y, visibleText);
         }
     }
 
