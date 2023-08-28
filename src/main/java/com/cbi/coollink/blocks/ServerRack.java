@@ -21,7 +21,7 @@ import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
 import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 public class ServerRack extends Block {
-    public static final ServerRack ENTRY = new ServerRack(FabricBlockSettings.of(Material.STONE).hardness(0.5f));
+    public static final ServerRack ENTRY = new ServerRack(FabricBlockSettings.create().hardness(0.5f));
 
     public enum Half implements StringIdentifiable{
         TOP("top"),
@@ -108,7 +108,7 @@ public class ServerRack extends Block {
 
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        switch (ctx.getPlayerFacing()){
+        switch (ctx.getHorizontalPlayerFacing()){
             case NORTH:
             case SOUTH:
                 return this.getDefaultState().with(direction, Direction.NORTH_SOUTH);
@@ -116,7 +116,7 @@ public class ServerRack extends Block {
             case WEST:
                 return this.getDefaultState().with(direction,Direction.EAST_WEST);
             default:
-                Main.LOGGER.error("placement with non XZ direction: "+ctx.getPlayerFacing());
+                Main.LOGGER.error("placement with non XZ direction: "+ctx.getHorizontalPlayerFacing());
         }
         return null;
     }

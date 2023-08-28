@@ -21,6 +21,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -35,13 +36,18 @@ public class Main implements ModInitializer {
 
     public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
 
-    public static final ItemGroup COOL_LINK_ITEM_GROUP = FabricItemGroup.builder(
-                    new Identifier("cool-link", "cool-link"))
+    public static final ItemGroup COOL_LINK_ITEM_GROUP = FabricItemGroup.builder()
             .icon(() -> new ItemStack(AIO_Network.ENTRY))
+            .displayName(Text.of("Cool Link"))
             .build();
+
+
+    private static final RegistryKey<ItemGroup> ITEM_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, new Identifier("cool-link", "cool-link"));
     @Override
     public void onInitialize() {
         LOGGER.info("loading cool link");
+
+        Registry.register(Registries.ITEM_GROUP, ITEM_GROUP, COOL_LINK_ITEM_GROUP);//post 1.20 changes to item groups
 
 
 
@@ -74,17 +80,18 @@ public class Main implements ModInitializer {
         Registry.register(Registries.ITEM, new Identifier("cool-link", "large_conduit"),new BlockItem(LargeConduit.ENTRY, new FabricItemSettings()));
 
 
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(smartPhoneEntry));
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(cat6CableEntry));
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(coaxialCableEntry));
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(wireTesterEntry));
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(programingCableEntry));
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(SatelliteDishBlock.ENTRY));
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(SmallConduit.ENTRY));
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(MediumConduit.ENTRY));
-        ItemGroupEvents.modifyEntriesEvent(COOL_LINK_ITEM_GROUP).register(entries -> entries.add(LargeConduit.ENTRY));
+
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(smartPhoneEntry));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(cat6CableEntry));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(coaxialCableEntry));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(wireTesterEntry));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(programingCableEntry));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(SatelliteDishBlock.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(SmallConduit.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(MediumConduit.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(LargeConduit.ENTRY));
 
 
 
