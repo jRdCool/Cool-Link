@@ -1,14 +1,51 @@
 package com.cbi.coollink;
 
-import com.cbi.coollink.app.AIOSettingApp;
 import com.cbi.coollink.app.AppRegistry;
 import com.cbi.coollink.app.ExampleApp;
+import com.cbi.coollink.guis.PhoneGui;
+import com.cbi.coollink.guis.PhoneScreen;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+
+import java.util.Objects;
 
 public class ClientEntryPoint implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         //register client things here
         AppRegistry.registerApp(new ExampleApp());
+
+        ClientPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","open-phone-gui"),(client,handler,buf,responseSender) -> {
+            RegistryKey<World> wrk = buf.readRegistryKey(RegistryKeys.WORLD);
+            World world = client.world;
+            if(world==null){
+                Main.LOGGER.error("Something has gon massively wrong client is not in a world");
+                return;
+            }
+            if(!world.getRegistryKey().equals(wrk)){
+                Main.LOGGER.error("Something has gon massively wrong client world does not match");
+                return;
+            }
+            BlockPos blockEntityPos =buf.readBlockPos();
+            boolean noBLockEntity = buf.readBoolean();
+            BlockEntity usedBlockEntity;
+            if(!noBLockEntity)
+                usedBlockEntity = Objects.requireNonNull(world).getBlockEntity(buf.readBlockPos());
+            else {
+                usedBlockEntity = null;
+            }
+            ItemStack heldItem = buf.readItemStack();
+
+            client.execute( () -> {
+                client.setScreen(new PhoneScreen(new PhoneGui(world, usedBlockEntity, heldItem)));
+            });
+        });
     }
 }

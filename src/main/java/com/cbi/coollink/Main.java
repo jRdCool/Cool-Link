@@ -80,6 +80,7 @@ public class Main implements ModInitializer {
         Registry.register(Registries.ITEM, new Identifier("cool-link", "large_conduit"),new BlockItem(LargeConduit.ENTRY, new FabricItemSettings()));
 
 
+
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(smartPhoneEntry));
