@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.state.property.Properties.*;
 
-public class Conduit extends BlockWithEntity implements BlockEntityProvider {
+public class Conduit extends BlockWithEntity {
 
 
     static BooleanProperty north = BooleanProperty.of("north");
@@ -30,7 +30,7 @@ public class Conduit extends BlockWithEntity implements BlockEntityProvider {
     static IntProperty cableLevel = IntProperty.of("cablelevel",1,3);
     static BooleanProperty neighborLarger = BooleanProperty.of("largerneighbor");
 
-    public static final Conduit ENTRY = new Conduit(FabricBlockSettings.create().hardness(0.5f));//must be ;ast static var
+
     //cableShape is an integer that is used to switch between the models
     //  0 = NS
     //  1 = EW

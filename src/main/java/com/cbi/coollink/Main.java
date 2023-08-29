@@ -34,7 +34,9 @@ import org.slf4j.LoggerFactory;
 public class Main implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("cool-link");
     public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "aio_block_entity"), FabricBlockEntityTypeBuilder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
-    public static final BlockEntityType<ConduitBlockEntity> CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, Conduit.ENTRY).build());
+    public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "small_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, SmallConduit.ENTRY).build());
+    public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "medium_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, MediumConduit.ENTRY).build());
+    public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "large_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, LargeConduit.ENTRY).build());
 
     public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
 
