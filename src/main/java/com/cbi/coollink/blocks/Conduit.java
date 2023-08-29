@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.state.property.Properties.*;
 
-public class Conduit extends BlockWithEntity {
+public abstract class Conduit extends BlockWithEntity {
 
 
     static BooleanProperty north = BooleanProperty.of("north");
@@ -282,9 +282,5 @@ public class Conduit extends BlockWithEntity {
         return BlockRenderType.MODEL;
     }
 
-    @Nullable
-    @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return null;
-    }
+
 }
