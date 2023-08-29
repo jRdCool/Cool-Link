@@ -1,5 +1,6 @@
 package com.cbi.coollink.blocks;
 
+import com.cbi.coollink.Main;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -19,7 +20,7 @@ import static net.minecraft.state.property.Properties.*;
 
 public class Conduit extends BlockWithEntity implements BlockEntityProvider {
 
-    public static final Conduit ENTRY = new Conduit(FabricBlockSettings.create().hardness(0.5f));
+
     static BooleanProperty north = BooleanProperty.of("north");
     static BooleanProperty east = BooleanProperty.of("east");
     static BooleanProperty south = BooleanProperty.of("south");
@@ -29,6 +30,7 @@ public class Conduit extends BlockWithEntity implements BlockEntityProvider {
     static IntProperty cableLevel = IntProperty.of("cablelevel",1,3);
     static BooleanProperty neighborLarger = BooleanProperty.of("largerneighbor");
 
+    public static final Conduit ENTRY = new Conduit(FabricBlockSettings.create().hardness(0.5f));//must be ;ast static var
     //cableShape is an integer that is used to switch between the models
     //  0 = NS
     //  1 = EW
@@ -68,6 +70,7 @@ public class Conduit extends BlockWithEntity implements BlockEntityProvider {
         stateManager.add(this.south);
         stateManager.add(this.west);
         stateManager.add(this.junctionBox);
+
         stateManager.add(this.cableShape);
         stateManager.add(this.cableLevel);
         stateManager.add(this.neighborLarger);
