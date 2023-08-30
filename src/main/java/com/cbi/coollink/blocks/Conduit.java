@@ -94,60 +94,71 @@ public abstract class Conduit extends BlockWithEntity {
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
 
-        BlockPos neighbor1= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//the location of the nigher block you want to check this should be reassigned for every block you want to check
-        BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());
-        BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);
-        BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);
+        BlockPos neighbor1= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//E //the location of the nigher block you want to check this should be reassigned for every block you want to check
+        BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());//W
+        BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);//S
+        BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);//N
 
-
-
+        neighborSizeCheck(neighbor4,neighbor3,neighbor2,neighbor1,state,world,pos);
+        //---------- East Neighbor
+        state=world.getBlockState(pos);
         if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
-            if(state.get(cableLevel) > world.getBlockState(neighbor1).get(cableLevel)) {
+            /*if(state.get(cableLevel) > world.getBlockState(neighbor1).get(cableLevel)) {
                 world.setBlockState(neighbor1, world.getBlockState(neighbor1).with(neighborLarger,true), NOTIFY_ALL);//set the neighbor block to point to this block
             }
             else if(state.get(cableLevel) < world.getBlockState(neighbor1).get(cableLevel)){
                 state.with(neighborLarger,true);
-            }
+            }*/
             world.setBlockState(pos,state.with(east,true),NOTIFY_ALL);//set this block as connecting to that neighbor block
             world.setBlockState(neighbor1,world.getBlockState(neighbor1).with(west,true),NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor1),world,neighbor1);
         }
+
+        //---------- West Neighbor
         state=world.getBlockState(pos);
         if(world.getBlockState(neighbor2).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
-            if(state.get(cableLevel) > world.getBlockState(neighbor2).get(cableLevel)) {
+            /*if(state.get(cableLevel) > world.getBlockState(neighbor2).get(cableLevel)) {
                 world.setBlockState(neighbor2, world.getBlockState(neighbor2).with(neighborLarger,true), NOTIFY_ALL);//set the neighbor block to point to this block
             }
             else if(state.get(cableLevel) < world.getBlockState(neighbor2).get(cableLevel)){
                 state.with(neighborLarger,true);
-            }
+            }*/
             world.setBlockState(pos,state.with(west,true),NOTIFY_ALL);//set this block as connecting to that neighbor block
             world.setBlockState(neighbor2,world.getBlockState(neighbor2).with(east,true),NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor2),world,neighbor2);
         }
+
+        //---------- South Neighbor
         state=world.getBlockState(pos);
         if(world.getBlockState(neighbor3).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
-            if(state.get(cableLevel) > world.getBlockState(neighbor3).get(cableLevel)) {
+            /*if(state.get(cableLevel) > world.getBlockState(neighbor3).get(cableLevel)) {
                 world.setBlockState(neighbor3, world.getBlockState(neighbor3).with(neighborLarger,true), NOTIFY_ALL);//set the neighbor block to point to this block
             }
             else if(state.get(cableLevel) < world.getBlockState(neighbor3).get(cableLevel)){
                 state.with(neighborLarger,true);
-            }
+            }*/
             world.setBlockState(pos,state.with(south,true),NOTIFY_ALL);//set this block as connecting to that neighbor block
             world.setBlockState(neighbor3,world.getBlockState(neighbor3).with(north,true),NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor3),world,neighbor3);
         }
+
+        //---------- North Neighbor
         state=world.getBlockState(pos);
         if(world.getBlockState(neighbor4).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
-            if(state.get(cableLevel) > world.getBlockState(neighbor4).get(cableLevel)) {
+            /*if(state.get(cableLevel) > world.getBlockState(neighbor4).get(cableLevel)) {
                 world.setBlockState(neighbor4, world.getBlockState(neighbor4).with(neighborLarger,true), NOTIFY_ALL);//set the neighbor block to point to this block
+                //System.out.println("placed block is larger");
             }
             else if(state.get(cableLevel) < world.getBlockState(neighbor4).get(cableLevel)){
-                state.with(neighborLarger,true);
-            }
+                //System.out.println(state.get(neighborLarger));
+                state=state.with(neighborLarger,true);
+                Main.LOGGER.info("north is larger "+state.get(neighborLarger));
+            }*/
             world.setBlockState(pos,state.with(north,true),NOTIFY_ALL);//set this block as connecting to that neighbor block
             world.setBlockState(neighbor4,world.getBlockState(neighbor4).with(south,true),NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor4),world,neighbor4);
         }
+
         state=world.getBlockState(pos);
         world.setBlockState(pos,state.with(junctionBox,junctionBoxCheck(state)),NOTIFY_ALL);
 
@@ -160,14 +171,17 @@ public abstract class Conduit extends BlockWithEntity {
     @SuppressWarnings({"deprecation","all"})
     @Override
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        BlockPos neighbor1= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//the location of the nigher block you want to check this should be reassigned for every block you want to check
-        BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());
-        BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);
-        BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);
+        BlockPos neighbor1= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//E//the location of the nigher block you want to check this should be reassigned for every block you want to check
+        BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());//W
+        BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);//S
+        BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);//N
 
-        if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+        neighborSizeCheck(neighbor4,neighbor3,neighbor2,neighbor1,state,world,pos);
+
+        /*if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
             if (state.get(cableLevel) < world.getBlockState(neighbor1).get(cableLevel)) {
                 state.with(neighborLarger, true);
+
             }
         }
         else if(world.getBlockState(neighbor2).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
@@ -186,19 +200,21 @@ public abstract class Conduit extends BlockWithEntity {
             }
         }
         else {
+            state.with(neighborLarger, false);
+        }*/
 
-        }
         onUpdate(state,world,pos);
         state=world.getBlockState(pos);
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
     }
 
     public void onBroken(WorldAccess world, BlockPos pos, BlockState state){
-        BlockPos neighbor1= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//the location of the nigher block you want to check this should be reassigned for every block you want to check
-        BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());
-        BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);
-        BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);
+        BlockPos neighbor1= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//E//the location of the nigher block you want to check this should be reassigned for every block you want to check
+        BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());//W
+        BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);//S
+        BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);//N
 
+        //neighborSizeCheck(neighbor4,neighbor3,neighbor2,neighbor1,state,world,pos);
 
         if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
             world.setBlockState(neighbor1, world.getBlockState(neighbor1).with(west, false), NOTIFY_ALL);//set the neighbor block to point to this block
@@ -283,4 +299,64 @@ public abstract class Conduit extends BlockWithEntity {
     }
 
 
+    public void neighborSizeCheck(BlockPos north,BlockPos south, BlockPos east, BlockPos west,BlockState state, World world, BlockPos pos){
+        boolean nL=false, sL=false, eL=false, wL=false;
+        state=world.getBlockState(pos);
+        if(world.getBlockState(north).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+            if (state.get(cableLevel) > world.getBlockState(north).get(cableLevel)) {
+                world.setBlockState(north, world.getBlockState(north).with(neighborLarger, true), NOTIFY_ALL);//set the neighbor block to point to this block
+                //System.out.println("placed block is larger");
+            } else if (state.get(cableLevel) < world.getBlockState(north).get(cableLevel)) {
+                //System.out.println(state.get(neighborLarger));
+                state = state.with(neighborLarger, true);
+                nL=true;
+                //Main.LOGGER.info("north is larger " + state.get(neighborLarger));
+            }
+        }
+
+        state=world.getBlockState(pos);
+        if(world.getBlockState(south).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+            if (state.get(cableLevel) > world.getBlockState(south).get(cableLevel)) {
+                world.setBlockState(south, world.getBlockState(south).with(neighborLarger, true), NOTIFY_ALL);//set the neighbor block to point to this block
+                //System.out.println("placed block is larger");
+            } else if (state.get(cableLevel) < world.getBlockState(south).get(cableLevel)) {
+                //System.out.println(state.get(neighborLarger));
+                state = state.with(neighborLarger, true);
+                sL=true;
+                //Main.LOGGER.info("north is larger " + state.get(neighborLarger));
+            }
+        }
+
+        state=world.getBlockState(pos);
+        if(world.getBlockState(east).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+            if (state.get(cableLevel) > world.getBlockState(east).get(cableLevel)) {
+                world.setBlockState(east, world.getBlockState(east).with(neighborLarger, true), NOTIFY_ALL);//set the neighbor block to point to this block
+                //System.out.println("placed block is larger");
+            } else if (state.get(cableLevel) < world.getBlockState(east).get(cableLevel)) {
+                //System.out.println(state.get(neighborLarger));
+                state = state.with(neighborLarger, true);
+                eL=true;
+                //Main.LOGGER.info("north is larger " + state.get(neighborLarger));
+            }
+        }
+
+        state=world.getBlockState(pos);
+        if(world.getBlockState(west).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+            if (state.get(cableLevel) > world.getBlockState(west).get(cableLevel)) {
+                world.setBlockState(west, world.getBlockState(west).with(neighborLarger, true), NOTIFY_ALL);//set the neighbor block to point to this block
+                //System.out.println("placed block is larger");
+            } else if (state.get(cableLevel) < world.getBlockState(west).get(cableLevel)) {
+                //System.out.println(state.get(neighborLarger));
+                state = state.with(neighborLarger, true);
+                wL=true;
+                //Main.LOGGER.info("north is larger " + state.get(neighborLarger));
+            }
+        }
+
+        state=world.getBlockState(pos);
+        if(!(nL||sL||eL||wL))
+        {
+            state=state.with(neighborLarger, false);
+        }
+    }
 }
