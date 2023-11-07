@@ -64,12 +64,13 @@ public abstract class Conduit extends BlockWithEntity {
         west = BooleanProperty.of("west");
         junctionBox = BooleanProperty.of("junctionbox");
         stateManager.add(AXIS);
-        stateManager.add(HORIZONTAL_FACING);
+        //stateManager.add(HORIZONTAL_FACING);
         stateManager.add(this.north);
         stateManager.add(this.east);
         stateManager.add(this.south);
         stateManager.add(this.west);
         stateManager.add(this.junctionBox);
+        stateManager.add(FACING);
 
         stateManager.add(this.cableShape);
         stateManager.add(this.cableLevel);
@@ -81,13 +82,16 @@ public abstract class Conduit extends BlockWithEntity {
     @SuppressWarnings("all")
     public BlockState getPlacementState(ItemPlacementContext ctx) {
 
+        //Main.LOGGER.info("PlaceState: "+ctx.getHorizontalPlayerFacing());
+        //this.getDefaultState().with(HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing());
+        //Main.LOGGER.info("PlaceState: "+this.getDefaultState().get(HORIZONTAL_FACING));
         switch (ctx.getHorizontalPlayerFacing()){
             case NORTH:
             case SOUTH:
-                return this.getDefaultState().with(HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing());
+                return this.getDefaultState();//.with(HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing());
             case EAST:
             default:
-                return this.getDefaultState().with(HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing());
+                return this.getDefaultState();//.with(HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing());
         }
     }
 
@@ -99,7 +103,7 @@ public abstract class Conduit extends BlockWithEntity {
         BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);//S
         BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);//N
 
-        neighborSizeCheck(neighbor4,neighbor3,neighbor2,neighbor1,state,world,pos);
+        neighborSizeCheck(state,world,pos);
         //---------- East Neighbor
         state=world.getBlockState(pos);
         if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
@@ -176,7 +180,7 @@ public abstract class Conduit extends BlockWithEntity {
         BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);//S
         BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);//N
 
-        neighborSizeCheck(neighbor4,neighbor3,neighbor2,neighbor1,state,world,pos);
+        neighborSizeCheck(state,world,pos);
 
         /*if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
             if (state.get(cableLevel) < world.getBlockState(neighbor1).get(cableLevel)) {
@@ -213,25 +217,32 @@ public abstract class Conduit extends BlockWithEntity {
         BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());//W
         BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);//S
         BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);//N
+        //Main.LOGGER.info(world.toString());
 
-        //neighborSizeCheck(neighbor4,neighbor3,neighbor2,neighbor1,state,world,pos);
 
         if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            //Main.LOGGER.info("west neighbor is conduit");
+            //System.out.println("west neighbor is conduit");
+            neighborSizeCheck(state,world,neighbor1);//have neighbor check it's neighbors
             world.setBlockState(neighbor1, world.getBlockState(neighbor1).with(west, false), NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor1),world,neighbor1);
         }
+        //else Main.LOGGER.info("check failed");
 
         if(world.getBlockState(neighbor2).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            neighborSizeCheck(state,world,neighbor2);//have neighbor check it's neighbors
             world.setBlockState(neighbor2, world.getBlockState(neighbor2).with(east, false), NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor2),world,neighbor2);
         }
 
         if(world.getBlockState(neighbor3).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            neighborSizeCheck(state,world,neighbor3);//have neighbor check it's neighbors
             world.setBlockState(neighbor3, world.getBlockState(neighbor3).with(north, false), NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor3),world,neighbor3);
         }
 
         if(world.getBlockState(neighbor4).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
+            neighborSizeCheck(state,world,neighbor4);//have neighbor check it's neighbors
             world.setBlockState(neighbor4, world.getBlockState(neighbor4).with(south, false), NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor4),world,neighbor4);
         }
@@ -261,6 +272,7 @@ public abstract class Conduit extends BlockWithEntity {
 
     public void onUpdate (BlockState state, WorldAccess world, BlockPos pos){
         world.setBlockState(pos,state.with(junctionBox,junctionBoxCheck(state)),NOTIFY_ALL);
+
         if(junctionBoxCheck(state))
         {
             state=world.getBlockState(pos);
@@ -290,6 +302,20 @@ public abstract class Conduit extends BlockWithEntity {
             state=world.getBlockState(pos);
             world.setBlockState(pos,state.with(cableShape,1),NOTIFY_ALL);
         }
+        else{
+            Main.LOGGER.info("Update: "+this.getDefaultState().get(FACING));
+            switch(this.getDefaultState().get(FACING)){
+                case NORTH,SOUTH -> {
+                    state=world.getBlockState(pos);
+                    world.setBlockState(pos,state.with(cableShape,0),NOTIFY_ALL);
+
+                }
+                case EAST,WEST -> {
+                    state=world.getBlockState(pos);
+                    world.setBlockState(pos,state.with(cableShape,1),NOTIFY_ALL);
+                }
+            }
+        }
     }
 
     @Override
@@ -299,9 +325,16 @@ public abstract class Conduit extends BlockWithEntity {
     }
 
 
-    public void neighborSizeCheck(BlockPos north,BlockPos south, BlockPos east, BlockPos west,BlockState state, World world, BlockPos pos){
+    public void neighborSizeCheck(BlockState state, WorldAccess world, BlockPos pos){
+
         boolean nL=false, sL=false, eL=false, wL=false;
-        state=world.getBlockState(pos);
+
+        BlockPos east= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//E//the location of the nigher block you want to check this should be reassigned for every block you want to check
+        BlockPos west= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());//W
+        BlockPos south= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);//S
+        BlockPos north= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);//N
+
+        //state=world.getBlockState(pos);
         if(world.getBlockState(north).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
             if (state.get(cableLevel) > world.getBlockState(north).get(cableLevel)) {
                 world.setBlockState(north, world.getBlockState(north).with(neighborLarger, true), NOTIFY_ALL);//set the neighbor block to point to this block
@@ -314,7 +347,7 @@ public abstract class Conduit extends BlockWithEntity {
             }
         }
 
-        state=world.getBlockState(pos);
+        //state=world.getBlockState(pos);
         if(world.getBlockState(south).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
             if (state.get(cableLevel) > world.getBlockState(south).get(cableLevel)) {
                 world.setBlockState(south, world.getBlockState(south).with(neighborLarger, true), NOTIFY_ALL);//set the neighbor block to point to this block
@@ -327,8 +360,9 @@ public abstract class Conduit extends BlockWithEntity {
             }
         }
 
-        state=world.getBlockState(pos);
+        //state=world.getBlockState(pos);
         if(world.getBlockState(east).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+            Main.LOGGER.info(state.get(cableLevel)+"");
             if (state.get(cableLevel) > world.getBlockState(east).get(cableLevel)) {
                 world.setBlockState(east, world.getBlockState(east).with(neighborLarger, true), NOTIFY_ALL);//set the neighbor block to point to this block
                 //System.out.println("placed block is larger");
@@ -340,8 +374,10 @@ public abstract class Conduit extends BlockWithEntity {
             }
         }
 
-        state=world.getBlockState(pos);
+        //state=world.getBlockState(pos);
+        Main.LOGGER.info((world.getBlockState(west).getBlock() instanceof  Conduit) +"");
         if(world.getBlockState(west).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
+            Main.LOGGER.info("west neighbor is conduit");
             if (state.get(cableLevel) > world.getBlockState(west).get(cableLevel)) {
                 world.setBlockState(west, world.getBlockState(west).with(neighborLarger, true), NOTIFY_ALL);//set the neighbor block to point to this block
                 //System.out.println("placed block is larger");
@@ -352,11 +388,14 @@ public abstract class Conduit extends BlockWithEntity {
                 //Main.LOGGER.info("north is larger " + state.get(neighborLarger));
             }
         }
-
-        state=world.getBlockState(pos);
+        Main.LOGGER.info("any larger " + !(nL||sL||eL||wL));
+        //state=world.getBlockState(pos);
         if(!(nL||sL||eL||wL))
         {
+            //world.setBlockState(pos, world.getBlockState(pos).with(neighborLarger, false), NOTIFY_ALL);
             state=state.with(neighborLarger, false);
         }
+
     }
+
 }
