@@ -3,14 +3,6 @@
     {
       "apply": {
         "model": "cool-link:block/coax_cable_nc"
-      },
-      "when": {
-        "east": "false",
-        "north": "false",
-        "south": "false",
-        "west": "false",
-        "up": "false",
-        "down": "false"
       }
     },
     {

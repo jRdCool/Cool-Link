@@ -39,7 +39,7 @@ public class CoaxialCable extends Item {
                 player.swingHand(context.getHand());
             }
         }
-
+        CoaxCable.ENTRY.onPlaced(world,placedPos,CoaxCable.ENTRY.getDefaultState(),context.getPlayer(), context.getStack());
         return super.useOnBlock(context);
     }
 }
