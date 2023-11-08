@@ -1,0 +1,70 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "cool-link:block/coax_cable_nc"
+      },
+      "when": {
+        "east": "false",
+        "north": "false",
+        "south": "false",
+        "west": "false",
+        "up": "false",
+        "down": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/coax_cable"
+      },
+      "when": {
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/coax_cable",
+        "y": 180
+      },
+      "when": {
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/coax_cable",
+        "y": 90
+      },
+      "when": {
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/coax_cable",
+        "y": 270
+      },
+      "when": {
+        "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/coax_cable",
+        "x": 90
+      },
+      "when": {
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/coax_cable",
+        "x": 270
+      },
+      "when": {
+        "down": "true"
+      }
+    }
+  ]
+}

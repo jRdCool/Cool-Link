@@ -64,16 +64,16 @@ public abstract class Conduit extends BlockWithEntity {
         junctionBox = BooleanProperty.of("junctionbox");
         stateManager.add(AXIS);
         //stateManager.add(HORIZONTAL_FACING);
-        stateManager.add(this.north);
-        stateManager.add(this.east);
-        stateManager.add(this.south);
-        stateManager.add(this.west);
-        stateManager.add(this.junctionBox);
+        stateManager.add(north);
+        stateManager.add(east);
+        stateManager.add(south);
+        stateManager.add(west);
+        stateManager.add(junctionBox);
         stateManager.add(FACING);
 
-        stateManager.add(this.cableShape);
-        stateManager.add(this.cableLevel);
-        stateManager.add(this.neighborLarger);
+        stateManager.add(cableShape);
+        stateManager.add(cableLevel);
+        stateManager.add(neighborLarger);
     }
 
 

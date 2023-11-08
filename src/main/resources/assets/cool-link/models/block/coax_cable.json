@@ -1,0 +1,21 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "cool-link:block/coax_cable",
+		"particle": "cool-link:block/coax_cable"
+	},
+	"elements": [
+		{
+			"from": [7, 8, 0],
+			"to": [9, 10, 9],
+			"faces": {
+				"north": {"uv": [2, 2, 4, 4], "texture": "#0"},
+				"east": {"uv": [2, 4, 11, 6], "texture": "#0"},
+				"south": {"uv": [2, 2, 4, 4], "texture": "#0"},
+				"west": {"uv": [2, 4, 11, 6], "texture": "#0"},
+				"up": {"uv": [4, 15, 2, 6], "texture": "#0"},
+				"down": {"uv": [4, 6, 2, 15], "texture": "#0"}
+			}
+		}
+	]
+}

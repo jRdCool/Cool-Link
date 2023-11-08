@@ -6,4 +6,5 @@ public class Cat6Cable extends Item {
     public Cat6Cable(Settings settings) {
         super(settings);
     }
+
 }
