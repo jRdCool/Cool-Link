@@ -23,18 +23,7 @@ public class CoaxialCable extends Item {
         BlockPos pos=context.getBlockPos();
         BlockPos placedPos;
         Direction dir=context.getSide();
-        switch (dir){
-            case NORTH -> {placedPos=pos.add(0,0,-1);}
-            case SOUTH -> {placedPos=pos.add(0,0,1);}
-            case EAST -> {placedPos=pos.add(1,0,0);}
-            case WEST -> {placedPos=pos.add(-1,0,0);}
-            case UP -> {placedPos=pos.add(0,1,0);}
-            case DOWN -> {placedPos=pos.add(0,-1,0);}
-            default -> {
-                placedPos=pos;
-                Main.LOGGER.error("Failed to get placed direction");
-            }
-        }
+        placedPos=pos.add(dir.getOffsetX(),dir.getOffsetY(),dir.getOffsetZ());
         World world=context.getWorld();
         world.setBlockState(placedPos, CoaxCable.ENTRY.getDefaultState());
 
