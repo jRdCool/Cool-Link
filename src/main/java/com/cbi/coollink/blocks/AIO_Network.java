@@ -144,6 +144,6 @@ public class AIO_Network extends BlockWithEntity implements BlockEntityProvider 
 	}
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-		return checkType(type, Main.AIO_BLOCK_ENTITY, (world1, pos, state1, be) -> AIOBlockEntity.tick(world1, pos, state1, be));
+		return validateTicker(type, Main.AIO_BLOCK_ENTITY, AIOBlockEntity::tick);
 	}
 }
