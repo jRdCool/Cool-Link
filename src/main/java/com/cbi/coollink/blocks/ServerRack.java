@@ -4,6 +4,7 @@ import com.cbi.coollink.Main;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
@@ -95,7 +96,19 @@ public class ServerRack extends Block {
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        world.setBlockState(new BlockPos(pos.getX(),pos.getY()+1,pos.getZ()),state.with(half,Half.TOP));
+        if(world.getBlockState(pos.up()).isAir()) {
+            world.setBlockState(new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ()), state.with(half, Half.TOP));
+        }else{
+            if(placer!=null) {
+                if(placer instanceof PlayerEntity player){
+                    if(!player.isCreative()) {
+                        placer.dropItem(ServerRack.ENTRY);
+                    }
+                }
+
+            }
+            world.setBlockState(pos,Blocks.AIR.getDefaultState());
+        }
     }
 
     @Override
