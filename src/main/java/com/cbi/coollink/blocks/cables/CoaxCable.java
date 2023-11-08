@@ -34,6 +34,8 @@ public class CoaxCable extends Block {
         stateManager.add(east);
         stateManager.add(south);
         stateManager.add(west);
+        stateManager.add(up);
+        stateManager.add(down);
 
     }
 }
