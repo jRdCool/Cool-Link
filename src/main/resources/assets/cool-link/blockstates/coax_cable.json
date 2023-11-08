@@ -51,7 +51,7 @@
     {
       "apply": {
         "model": "cool-link:block/coax_cable",
-        "x": 90
+        "x": 270
       },
       "when": {
         "up": "true"
@@ -60,7 +60,7 @@
     {
       "apply": {
         "model": "cool-link:block/coax_cable",
-        "x": 270
+        "x": 90
       },
       "when": {
         "down": "true"

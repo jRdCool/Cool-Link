@@ -97,7 +97,7 @@ public abstract class Conduit extends BlockWithEntity {
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
 
-        Main.LOGGER.info("2 ");
+        //Main.LOGGER.info("2 ");
         BlockPos neighbor1= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//E //the location of the nigher block you want to check this should be reassigned for every block you want to check
         BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());//W
         BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);//S
@@ -313,7 +313,7 @@ public abstract class Conduit extends BlockWithEntity {
 
         //state=world.getBlockState(pos);
         if(world.getBlockState(east).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
-            Main.LOGGER.info(state.get(cableLevel)+"");
+            //Main.LOGGER.info(state.get(cableLevel)+"");
             if (state.get(cableLevel) > world.getBlockState(east).get(cableLevel)) {
                 world.setBlockState(east, world.getBlockState(east).with(neighborLarger, true), NOTIFY_ALL);//set the neighbor block to point to this block
                 //System.out.println("placed block is larger");
@@ -326,9 +326,9 @@ public abstract class Conduit extends BlockWithEntity {
         }
 
         //state=world.getBlockState(pos);
-        Main.LOGGER.info((world.getBlockState(west).getBlock() instanceof  Conduit) +"");
+        //Main.LOGGER.info((world.getBlockState(west).getBlock() instanceof  Conduit) +"");
         if(world.getBlockState(west).getBlock() instanceof  Conduit) {//check if the neighbor block is a conduit
-            Main.LOGGER.info("west neighbor is conduit");
+            //Main.LOGGER.info("west neighbor is conduit");
             if (state.get(cableLevel) > world.getBlockState(west).get(cableLevel)) {
                 world.setBlockState(west, world.getBlockState(west).with(neighborLarger, true), NOTIFY_ALL);//set the neighbor block to point to this block
                 //System.out.println("placed block is larger");
@@ -339,7 +339,7 @@ public abstract class Conduit extends BlockWithEntity {
                 //Main.LOGGER.info("north is larger " + state.get(neighborLarger));
             }
         }
-        Main.LOGGER.info("any larger " + !(nL||sL||eL||wL));
+        //Main.LOGGER.info("any larger " + !(nL||sL||eL||wL));
         //state=world.getBlockState(pos);
         if(!(nL||sL||eL||wL))
         {
