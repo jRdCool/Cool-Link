@@ -36,6 +36,7 @@ public class CoaxialCable extends Item {
                     ItemStack item = context.getStack();
                     item.decrement(1);
                 }
+                player.swingHand(context.getHand());
             }
         }
 
