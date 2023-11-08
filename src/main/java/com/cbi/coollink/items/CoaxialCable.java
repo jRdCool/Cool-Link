@@ -26,7 +26,7 @@ public class CoaxialCable extends Item {
         if(world.getBlockState(placedPos).isAir()){
             world.setBlockState(placedPos, CoaxCable.ENTRY.getDefaultState());
         }
-
+        CoaxCable.ENTRY.onPlaced(world,placedPos,CoaxCable.ENTRY.getDefaultState(),context.getPlayer(), context.getStack());
         return super.useOnBlock(context);
     }
 }
