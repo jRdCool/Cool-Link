@@ -86,6 +86,7 @@ public class Main implements ModInitializer {
 
         Registry.register(Registries.BLOCK,new Identifier("cool-link","coax_cable"), CoaxCable.ENTRY);
 
+        Registry.register(Registries.BLOCK,new Identifier("cool-link","coax_wall_port"),CoaxWallPort.ENTRY);
 
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
@@ -98,6 +99,7 @@ public class Main implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(SmallConduit.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(MediumConduit.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(LargeConduit.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(CoaxWallPort.ENTRY));
 
 
 

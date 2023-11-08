@@ -1,6 +1,5 @@
 package com.cbi.coollink.blocks;
 
-import com.cbi.coollink.Main;
 import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -14,7 +13,6 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
-
 import static net.minecraft.state.property.Properties.*;
 
 public abstract class Conduit extends BlockWithEntity {
