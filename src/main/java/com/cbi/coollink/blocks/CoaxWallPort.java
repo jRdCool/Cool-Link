@@ -1,8 +1,7 @@
 package com.cbi.coollink.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -19,26 +18,17 @@ public class CoaxWallPort extends Block {
 
     public static final CoaxWallPort ENTRY = new CoaxWallPort(FabricBlockSettings.create().hardness(0.5f));
 
-
-    static BooleanProperty north = BooleanProperty.of("north");
-    static BooleanProperty east = BooleanProperty.of("east");
-    static BooleanProperty south = BooleanProperty.of("south");
-    static BooleanProperty west = BooleanProperty.of("west");
     public CoaxWallPort(Settings settings){
         super(settings);
         setDefaultState(getDefaultState()
-                .with(north,true)
-                .with(south,false)
-                .with(east,false)
-                .with(west,false)
+                .with(FACING,Direction.NORTH)
         );
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
-        north=BooleanProperty.of("north");
-
+    protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
+        super.appendProperties(stateManager);
+        stateManager.add(FACING);
     }
 
     @Nullable
