@@ -2,7 +2,7 @@
 	"credit": "Made with Blockbench",
 	"textures": {
 		"0": "cool-link:block/coax_cable",
-		"particle": "cool-link:block/coax_cable"
+		"particle": "minecraft:block/black_wool"
 	},
 	"elements": [
 		{
