@@ -355,15 +355,18 @@ public abstract class Conduit extends BlockWithEntity {
 
     @SuppressWarnings("deprecation")
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand , BlockHitResult bhr){
-        String currentThread = Thread.currentThread().getName();
-        //check witch thread the code is being executed on the server
-        if(currentThread.equals("Server thread")) {//if the code is being executed on the server thread
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand , BlockHitResult bhr) {
+        if (state.get(junctionBox)) {
+            String currentThread = Thread.currentThread().getName();
+            //check witch thread the code is being executed on the server
+            if (currentThread.equals("Server thread")) {//if the code is being executed on the server thread
 
-            OpenConduitGuiPacket packet = new OpenConduitGuiPacket();//add data to send to GUI here
-            ServerPlayNetworking.send((ServerPlayerEntity)player,packet);
+                OpenConduitGuiPacket packet = new OpenConduitGuiPacket();//add data to send to GUI here
+                ServerPlayNetworking.send((ServerPlayerEntity) player, packet);
+            }
+
         }
-        return super.onUse(state,world,pos,player,hand,bhr);
+        return super.onUse(state, world, pos, player, hand, bhr);
     }
 
 }
