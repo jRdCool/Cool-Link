@@ -1,18 +1,23 @@
 package com.cbi.coollink.blocks;
 
+import com.cbi.coollink.Main;
+import com.cbi.coollink.blocks.cables.CoaxCable;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import static net.minecraft.state.property.Properties.FACING;
+import static com.cbi.coollink.blocks.cables.CoaxCable.*;
+import static net.minecraft.state.property.Properties.*;
 
 public class CoaxWallPort extends Block {
 
@@ -47,5 +52,18 @@ public class CoaxWallPort extends Block {
         super.onPlaced(world, pos, state, placer, itemStack);
 
 
+    }
+
+    @Override
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        switch (state.get(FACING)){
+            case NORTH -> {
+                if (world.getBlockState(pos.north()).getBlock() instanceof CoaxCable) {//check if the neighbor block is a coax cable
+                    //Main.LOGGER.info("Neighbor to north is coax");
+                    world.setBlockState(pos.north(), world.getBlockState(pos.north()).with(south, false), NOTIFY_ALL);//set the neighbor block to point to this block
+                }
+            }
+            case SOUTH -> {}
+        }
     }
 }

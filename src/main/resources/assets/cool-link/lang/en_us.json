@@ -11,5 +11,6 @@
   "block.cool-link.satellite_dish": "Satellite Dish",
   "block.cool-link.medium_conduit": "Medium Conduit",
   "block.cool-link.small_conduit": "Small Conduit",
-  "block.cool-link.large_conduit": "Large Conduit"
+  "block.cool-link.large_conduit": "Large Conduit",
+  "block.cool-link.coax_wall_port": "Coax Wall Port"
 }
