@@ -6,9 +6,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +29,14 @@ public class AIOWallPort extends Block {
         stateManager.add(FACING);
     }
 
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        switch (ctx.getHorizontalPlayerFacing()){
+            case NORTH -> {return this.getDefaultState().with(FACING, Direction.SOUTH);}
+            case EAST -> {return this.getDefaultState().with(FACING, Direction.WEST);}
+            case WEST -> {return this.getDefaultState().with(FACING, Direction.EAST);}
+            default -> {return this.getDefaultState().with(FACING, Direction.NORTH);}
+        }
+    }
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {

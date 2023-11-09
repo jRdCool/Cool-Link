@@ -100,6 +100,9 @@ public class Main implements ModInitializer {
             Registry.register(Registries.ITEM, new Identifier("cool-link", "wall_ports/coax_wall_port_"+wood), new BlockItem(block, new FabricItemSettings()));
         }
 
+        Registry.register(Registries.BLOCK,new Identifier("cool-link","aio_wall_port"),AIOWallPort.ENTRY);
+        Registry.register(Registries.ITEM,new Identifier("cool-link","aio_wall_port"),new BlockItem(AIOWallPort.ENTRY,new FabricItemSettings()));
+
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(smartPhoneEntry));
@@ -114,6 +117,7 @@ public class Main implements ModInitializer {
         for(String wood:woodTypes) {
             ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(coaxWallPortVarients.get(wood)));
         }
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIOWallPort.ENTRY));
 
 
 
