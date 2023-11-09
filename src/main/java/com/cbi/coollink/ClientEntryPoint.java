@@ -2,6 +2,8 @@ package com.cbi.coollink;
 
 import com.cbi.coollink.app.AppRegistry;
 import com.cbi.coollink.app.ExampleApp;
+import com.cbi.coollink.guis.ConduitGUI;
+import com.cbi.coollink.guis.ConduitScreen;
 import com.cbi.coollink.guis.PhoneGui;
 import com.cbi.coollink.guis.PhoneScreen;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
@@ -51,6 +53,12 @@ public class ClientEntryPoint implements ClientModInitializer {
 
             client.execute( () -> {
                 client.setScreen(new PhoneScreen(new PhoneGui(world, usedBlockEntity, heldItem)));
+            });
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(new Identifier("cool-link", "open-conduit-gui"),(client,handler,buf,responseSender) -> {
+            client.execute( ()->{
+                client.setScreen(new ConduitScreen(new ConduitGUI()));
             });
         });
     }

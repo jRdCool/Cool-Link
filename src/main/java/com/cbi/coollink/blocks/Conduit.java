@@ -1,11 +1,18 @@
 package com.cbi.coollink.blocks;
 
+import com.cbi.coollink.net.OpenConduitGuiPacket;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -344,6 +351,19 @@ public abstract class Conduit extends BlockWithEntity {
             state=state.with(neighborLarger, false);
         }
 
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand , BlockHitResult bhr){
+        String currentThread = Thread.currentThread().getName();
+        //check witch thread the code is being executed on the server
+        if(currentThread.equals("Server thread")) {//if the code is being executed on the server thread
+
+            OpenConduitGuiPacket packet = new OpenConduitGuiPacket();//add data to send to GUI here
+            ServerPlayNetworking.send((ServerPlayerEntity)player,packet);
+        }
+        return super.onUse(state,world,pos,player,hand,bhr);
     }
 
 }
