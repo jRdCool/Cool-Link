@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "facing=north": {"model": "cool-link:block/coax_wall_port_dark_oak", "uvlock": true},
+    "facing=east": {"model": "cool-link:block/coax_wall_port_dark_oak","y": 90,"uvlock": true},
+    "facing=south": {"model": "cool-link:block/coax_wall_port_dark_oak","y": 180,"uvlock": true},
+    "facing=west": {"model": "cool-link:block/coax_wall_port_dark_oak","y": 270,"uvlock": true},
+    "facing=up": {"model": "cool-link:block/coax_wall_port_dark_oak","y": 0},
+    "facing=down": {"model": "cool-link:block/coax_wall_port_dark_oak","y": 0}
+  }
+}

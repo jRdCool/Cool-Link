@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -30,10 +31,13 @@ import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 
 
 public class Main implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("cool-link");
+
+    public static final String[] woodTypes = {"oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry","bamboo","crimson","warped"};
     public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "aio_block_entity"), FabricBlockEntityTypeBuilder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "small_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, SmallConduit.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "medium_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, MediumConduit.ENTRY).build());
@@ -48,6 +52,8 @@ public class Main implements ModInitializer {
 
 
     private static final RegistryKey<ItemGroup> ITEM_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, new Identifier("cool-link", "cool-link"));
+
+    static HashMap<String,CoaxWallPort> coaxWallPortVarients = new HashMap<>();
     @Override
     public void onInitialize() {
         LOGGER.info("loading cool link");
@@ -85,9 +91,14 @@ public class Main implements ModInitializer {
         Registry.register(Registries.ITEM, new Identifier("cool-link", "large_conduit"),new BlockItem(LargeConduit.ENTRY, new FabricItemSettings()));
 
         Registry.register(Registries.BLOCK,new Identifier("cool-link","coax_cable"), CoaxCable.ENTRY);
+        BlockRenderLayerMap.INSTANCE.putBlock(CoaxCable.ENTRY, RenderLayer.getCutout());
 
-        Registry.register(Registries.BLOCK,new Identifier("cool-link","coax_wall_port"),CoaxWallPort.ENTRY);
-        Registry.register(Registries.ITEM, new Identifier("cool-link", "coax_wall_port"),new BlockItem(CoaxWallPort.ENTRY, new FabricItemSettings()));
+        for(String wood:woodTypes) {
+            CoaxWallPort block = new CoaxWallPort(FabricBlockSettings.create().hardness(0.5f));
+            coaxWallPortVarients.put(wood,block);
+            Registry.register(Registries.BLOCK, new Identifier("cool-link", "coax_wall_port_"+wood), block);
+            Registry.register(Registries.ITEM, new Identifier("cool-link", "coax_wall_port_"+wood), new BlockItem(block, new FabricItemSettings()));
+        }
 
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
@@ -100,7 +111,9 @@ public class Main implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(SmallConduit.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(MediumConduit.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(LargeConduit.ENTRY));
-        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(CoaxWallPort.ENTRY));
+        for(String wood:woodTypes) {
+            ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(coaxWallPortVarients.get(wood)));
+        }
 
 
 

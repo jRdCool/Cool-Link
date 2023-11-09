@@ -2,7 +2,6 @@ package com.cbi.coollink.blocks;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.CoaxCable;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,7 +17,7 @@ import static net.minecraft.state.property.Properties.*;
 
 public class CoaxWallPort extends Block {
 
-    public static final CoaxWallPort ENTRY = new CoaxWallPort(FabricBlockSettings.create().hardness(0.5f));
+    //public static final CoaxWallPort ENTRY = new CoaxWallPort(FabricBlockSettings.create().hardness(0.5f));
 
     public CoaxWallPort(Settings settings){
         super(settings);
