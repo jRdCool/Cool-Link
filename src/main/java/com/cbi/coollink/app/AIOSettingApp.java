@@ -119,7 +119,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
             adminPasswordField.setShown(on);
             //Main.LOGGER.info("on="+on);
         });
-        logInPanel.add(checkPassB, 180, 120,40,1);
+        logInPanel.add(checkPassB, 180, 120,40,20);
         //Main.LOGGER.info(blockA.password);
         checkPassB.setOnClick(() -> {
 //
