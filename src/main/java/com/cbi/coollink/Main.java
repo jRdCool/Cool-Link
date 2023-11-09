@@ -96,8 +96,8 @@ public class Main implements ModInitializer {
         for(String wood:woodTypes) {
             CoaxWallPort block = new CoaxWallPort(FabricBlockSettings.create().hardness(0.5f));
             coaxWallPortVarients.put(wood,block);
-            Registry.register(Registries.BLOCK, new Identifier("cool-link", "coax_wall_port_"+wood), block);
-            Registry.register(Registries.ITEM, new Identifier("cool-link", "coax_wall_port_"+wood), new BlockItem(block, new FabricItemSettings()));
+            Registry.register(Registries.BLOCK, new Identifier("cool-link", "wall_ports/coax_wall_port_"+wood), block);
+            Registry.register(Registries.ITEM, new Identifier("cool-link", "wall_ports/coax_wall_port_"+wood), new BlockItem(block, new FabricItemSettings()));
         }
 
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));

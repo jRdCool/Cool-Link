@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "facing=north": {"model": "cool-link:block/wall_ports/coax_wall_port_spruce", "uvlock": true},
+    "facing=east": {"model": "cool-link:block/wall_ports/coax_wall_port_spruce","y": 90,"uvlock": true},
+    "facing=south": {"model": "cool-link:block/wall_ports/coax_wall_port_spruce","y": 180,"uvlock": true},
+    "facing=west": {"model": "cool-link:block/wall_ports/coax_wall_port_spruce","y": 270,"uvlock": true},
+    "facing=up": {"model": "cool-link:block/wall_ports/coax_wall_port_spruce","y": 0},
+    "facing=down": {"model": "cool-link:block/wall_ports/coax_wall_port_spruce","y": 0}
+  }
+}
