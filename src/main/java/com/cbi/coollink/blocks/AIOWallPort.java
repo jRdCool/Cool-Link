@@ -54,27 +54,35 @@ public class AIOWallPort extends Block {
         switch (state.get(FACING)){
             case NORTH -> {
                 if (world.getBlockState(pos.north()).getBlock() instanceof AIOCableBundle) {//check if the neighbor block is a coax cable
-                    //Main.LOGGER.info("Neighbor to north is coax");
-                    world.setBlockState(pos.north(), world.getBlockState(pos.north()).with(AIOCableBundle.south, create), NOTIFY_ALL);//set the neighbor block to point to this block
+                    if(!((AIOCableBundle) world.getBlockState(pos.north()).getBlock()).isFacingMultiDirection(world,pos)) {
+                        //Main.LOGGER.info("Neighbor to north is coax");
+                        world.setBlockState(pos.north(), world.getBlockState(pos.north()).with(AIOCableBundle.south, create), NOTIFY_ALL);//set the neighbor block to point to this block
+                    }
                 }
             }
             case SOUTH -> {
                 if (world.getBlockState(pos.south()).getBlock() instanceof AIOCableBundle) {//check if the neighbor block is a coax cable
-                    //Main.LOGGER.info("Neighbor to north is coax");
-                    world.setBlockState(pos.south(), world.getBlockState(pos.south()).with(AIOCableBundle.north, create), NOTIFY_ALL);//set the neighbor block to point to this block
+                    if(!((AIOCableBundle) world.getBlockState(pos.south()).getBlock()).isFacingMultiDirection(world,pos)) {
+                        //Main.LOGGER.info("Neighbor to north is coax");
+                        world.setBlockState(pos.south(), world.getBlockState(pos.south()).with(AIOCableBundle.north, create), NOTIFY_ALL);//set the neighbor block to point to this block
+                    }
                 }
             }
             case WEST -> {
                 if (world.getBlockState(pos.west()).getBlock() instanceof AIOCableBundle) {//check if the neighbor block is a coax cable
-                    //Main.LOGGER.info("Neighbor to north is coax");
-                    world.setBlockState(pos.west(), world.getBlockState(pos.west()).with(AIOCableBundle.east, create), NOTIFY_ALL);//set the neighbor block to point to this block
+                    if(!((AIOCableBundle) world.getBlockState(pos.west()).getBlock()).isFacingMultiDirection(world,pos)) {
+                        //Main.LOGGER.info("Neighbor to north is coax");
+                        world.setBlockState(pos.west(), world.getBlockState(pos.west()).with(AIOCableBundle.east, create), NOTIFY_ALL);//set the neighbor block to point to this block
+                    }
                 }
             }
             case EAST -> {
-                if (world.getBlockState(pos.east()).getBlock() instanceof AIOCableBundle) {//check if the neighbor block is a coax cable
-                    //Main.LOGGER.info("Neighbor to north is coax");
-                    world.setBlockState(pos.east(), world.getBlockState(pos.east()).with(AIOCableBundle.west, create), NOTIFY_ALL);//set the neighbor block to point to this block
 
+                if (world.getBlockState(pos.east()).getBlock() instanceof AIOCableBundle) {//check if the neighbor block is a coax cable
+                    if(!((AIOCableBundle) world.getBlockState(pos.east()).getBlock()).isFacingMultiDirection(world,pos)) {
+                        //Main.LOGGER.info("Neighbor to north is coax");
+                        world.setBlockState(pos.east(), world.getBlockState(pos.east()).with(AIOCableBundle.west, create), NOTIFY_ALL);//set the neighbor block to point to this block
+                    }
                 }
             }
         }
