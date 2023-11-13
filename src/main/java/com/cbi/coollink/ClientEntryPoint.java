@@ -2,6 +2,7 @@ package com.cbi.coollink;
 
 import com.cbi.coollink.app.AppRegistry;
 import com.cbi.coollink.app.ExampleApp;
+import com.cbi.coollink.app.SnakeGameApp;
 import com.cbi.coollink.guis.ConduitGUI;
 import com.cbi.coollink.guis.ConduitScreen;
 import com.cbi.coollink.guis.PhoneGui;
@@ -24,6 +25,7 @@ public class ClientEntryPoint implements ClientModInitializer {
     public void onInitializeClient() {
         //register client things here
         AppRegistry.registerApp(new ExampleApp());
+        AppRegistry.registerApp(new SnakeGameApp());
 
         ClientPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","open-phone-gui"),(client,handler,buf,responseSender) -> {
             OpenPhoneGuiPacket packet = new OpenPhoneGuiPacket(buf);

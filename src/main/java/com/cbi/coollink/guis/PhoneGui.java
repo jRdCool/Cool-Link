@@ -217,6 +217,14 @@ public class PhoneGui extends LightweightGuiDescription {
 
     }
 
+    public void keyPressed(int ch,int keyCode,int modifiers){
+
+    }
+
+    public void keyReleased(int ch,int keyCode,int modifiers){
+
+    }
+
     /**saves the data of the phone to the world
      *
      */
