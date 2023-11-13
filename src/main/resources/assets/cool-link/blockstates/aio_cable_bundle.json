@@ -111,7 +111,7 @@
     {
       "apply": {
         "model": "cool-link:block/aio_cable_bundle",
-        "z": 180,
+        "y": 180,
         "x": 270
       },
       "when": {
