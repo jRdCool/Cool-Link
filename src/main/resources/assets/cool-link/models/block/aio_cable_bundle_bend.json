@@ -1,13 +1,13 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "block/aio_cable_bundle_bend",
-		"particle": "block/aio_cable_bundle_bend"
+		"0": "cool-link:block/aio_cable_bundle_bend",
+		"particle": "minecraft:block/white_wool"
 	},
 	"elements": [
 		{
-			"from": [6, 6, 6],
-			"to": [10, 10, 10],
+			"from": [5.9, 5.9, 5.9],
+			"to": [10.1, 10.1, 10.1],
 			"faces": {
 				"north": {"uv": [0, 4, 4, 8], "texture": "#0"},
 				"east": {"uv": [0, 4, 4, 8], "texture": "#0"},
