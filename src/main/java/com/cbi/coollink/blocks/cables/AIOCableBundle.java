@@ -1,5 +1,7 @@
 package com.cbi.coollink.blocks.cables;
 
+import com.cbi.coollink.Main;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.state.StateManager;
@@ -12,6 +14,8 @@ import net.minecraft.world.World;
 public class AIOCableBundle extends Block {
 
 
+
+
     public static BooleanProperty north=BooleanProperty.of("north");
     public static BooleanProperty south=BooleanProperty.of("south");
     public static BooleanProperty east=BooleanProperty.of("east");
@@ -20,16 +24,28 @@ public class AIOCableBundle extends Block {
     public static BooleanProperty down=BooleanProperty.of("down");
     public static IntProperty shape=IntProperty.of("shape",1,16);
 
+    public static final AIOCableBundle ENTRY = new AIOCableBundle(FabricBlockSettings.create().hardness(0.5f));
 
     public AIOCableBundle(Settings settings){
         super(settings);
+        setDefaultState(getDefaultState()
+                .with(north,false)
+                .with(south,false)
+                .with(east,false)
+                .with(west,false)
+                .with(up,false)
+                .with(down,false)
+        );
     }
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
+        Main.LOGGER.info(north.toString());
         stateManager.add(north)
                 .add(south)
                 .add(east)
-                .add(west);
+                .add(west)
+                .add(up)
+                .add(down);
     }
 
 
@@ -45,5 +61,7 @@ public class AIOCableBundle extends Block {
         }
         return false;
     }
+
+
 
 }

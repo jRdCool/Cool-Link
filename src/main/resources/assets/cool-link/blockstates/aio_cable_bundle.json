@@ -1,0 +1,122 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "cool-link:block/aio_cable_bundle_bend"
+      },
+      "when": {
+        "OR": [
+          {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "west": "false",
+            "up": "false",
+            "down": "false"
+          },
+          {
+            "east": "true",
+            "north": "true"
+          },
+          {
+            "east": "true",
+            "south": "true"
+          },
+          {
+            "south": "true",
+            "west": "true"
+          },
+          {
+            "north": "true",
+            "west": "true"
+          },
+          {
+            "north": "true",
+            "up": "true"
+          },
+          {
+            "south": "true",
+            "up": "true"
+          },
+          {
+            "east": "true",
+            "up": "true"
+          },
+          {
+            "west": "true",
+            "up": "true"
+          },
+          {
+            "north": "true",
+            "down": "true"
+          },
+          {
+            "south": "true",
+            "down": "true"
+          },
+          {
+            "east": "true",
+            "down": "true"
+          },
+          {
+            "west": "true",
+            "down": "true"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/aio_cable_bundle"
+      },
+      "when": {
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/aio_cable_bundle"
+      },
+      "when": {
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/aio_cable_bundle",
+        "y": 270
+      },
+      "when": {
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/aio_cable_bundle",
+        "y": 270
+      },
+      "when": {
+        "west": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/aio_cable_bundle",
+        "x": 90
+      },
+      "when": {
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "cool-link:block/aio_cable_bundle",
+        "z": 180,
+        "x": 270
+      },
+      "when": {
+        "down": "true"
+      }
+    }
+  ]
+}

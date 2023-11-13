@@ -1,6 +1,7 @@
 package com.cbi.coollink;
 
 import com.cbi.coollink.blocks.*;
+import com.cbi.coollink.blocks.cables.AIOCableBundle;
 import com.cbi.coollink.blocks.cables.CoaxCable;
 import com.cbi.coollink.items.*;
 import net.fabricmc.api.ModInitializer;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 public class Main implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("cool-link");
 
+    public static final String namespace = "cool-link";
     public static final String[] woodTypes = {"oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry","bamboo","crimson","warped"};
     public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "aio_block_entity"), FabricBlockEntityTypeBuilder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "small_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, SmallConduit.ENTRY).build());
@@ -92,6 +94,9 @@ public class Main implements ModInitializer {
 
         Registry.register(Registries.BLOCK,new Identifier("cool-link","coax_cable"), CoaxCable.ENTRY);
         BlockRenderLayerMap.INSTANCE.putBlock(CoaxCable.ENTRY, RenderLayer.getCutout());
+
+        Registry.register(Registries.BLOCK, new  Identifier(namespace,"aio_cable_bundle"), AIOCableBundle.ENTRY);
+        Registry.register(Registries.ITEM,new Identifier(namespace,"aio_cable_bundle"),new BlockItem(AIOCableBundle.ENTRY,new FabricItemSettings()));
 
         for(String wood:woodTypes) {
             CoaxWallPort block = new CoaxWallPort(FabricBlockSettings.create().hardness(0.5f));
