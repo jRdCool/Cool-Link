@@ -3,20 +3,23 @@ package com.cbi.coollink.app;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class SnakeGameApp extends AbstractPhoneApp{
     static final Identifier appID = new Identifier("cool-link","snake-app");
 
-    ArrayList<int[]> snake = new ArrayList<>();
+    ArrayList<SnakePart> snake = new ArrayList<>();
     ArrayList<int[]> apples = new ArrayList<>();
     int directionOfTravel,nextDirection;
     int tickNum;
+    Random r = new Random();
 
     boolean gameOver =false;
     public SnakeGameApp() {//constructor used to create a dummy instance of the class used for app registration
@@ -33,16 +36,22 @@ public class SnakeGameApp extends AbstractPhoneApp{
         super(appID);//the id of the app
         root=new WPlainPanel();//create the panel witch all widget will sit on
         timeColor=TIME_COLOR_BLACK;//set the color of the clock if necessary
-        snake.add(new int[]{7,7});
+        snake.add(new SnakePart());
+        apples.add(new int[]{r.nextInt(0,14),r.nextInt(0,14)});
+        apples.add(new int[]{r.nextInt(0,14),r.nextInt(0,14)});
+        apples.add(new int[]{r.nextInt(0,14),r.nextInt(0,14)});
 
     }
     @Override
     public void tick() {
         tickNum++;
         if(!gameOver) {
-            if (tickNum % 10 == 0) {
+            if (tickNum % 5 == 0) {
                 directionOfTravel=nextDirection;
                 move1();
+                if(apples.isEmpty()){
+                    addApple();
+                }
             }
         }
     }
@@ -65,8 +74,13 @@ public class SnakeGameApp extends AbstractPhoneApp{
                 }
             }
 
-            for (int[] pos : snake) {
-                ScreenDrawing.coloredRect(matrices,left+pos[0]*cellSize+start,top+pos[1]*cellSize,cellSize,cellSize,0xFF_00A0FF);
+            for (SnakePart s : snake) {
+                //ScreenDrawing.coloredRect(matrices,left+pos[0]*cellSize+start,top+pos[1]*cellSize,cellSize,cellSize,0xFF_00A0FF);
+                s.draw(matrices,left+start,top,cellSize);
+            }
+            Identifier apple = new Identifier("minecraft","textures/item/apple.png");
+            for(int[] pos:apples){
+                ScreenDrawing.texturedRect(matrices,left+pos[0]*cellSize+start,top+pos[1]*cellSize,cellSize,cellSize,apple,0,0,1,1,0xFF_FFFFFF);
             }
         });
     }
@@ -78,22 +92,74 @@ public class SnakeGameApp extends AbstractPhoneApp{
 
      */
     void move1(){
-        int[] curPos = snake.get(snake.size()-1);
+        SnakePart curPart = snake.get(snake.size()-1);
+        int[] curPos = curPart.pos();
+        SnakePart newPart;
         int[] newPos;
         switch (directionOfTravel){
-            case 0 -> newPos = new int[]{curPos[0],curPos[1]-1};
-            case 1 -> newPos = new int[]{curPos[0]-1,curPos[1]};
-            case 2 -> newPos = new int[]{curPos[0],curPos[1]+1};
-            case 3 -> newPos = new int[]{curPos[0]+1,curPos[1]};
-            default -> newPos = new int[]{0,0};
+            case 0 -> newPart = curPart.newUp();
+            case 1 -> newPart = curPart.newLeft();
+            case 2 -> newPart = curPart.newDown();
+            case 3 -> newPart = curPart.newRight();
+            default -> newPart = new SnakePart();
         }
+        newPos = newPart.pos();
         if(newPos[0] < 0 || newPos[0]>14 || newPos[1] < 0 || newPos[1]>14){
             gameOver = true;
             return;
         }
-        snake.add(newPos);
-        snake.remove(0);
+        if(snakeAtPos(newPos)){
+            gameOver = true;
+            return;
+        }
+        int appleID = isPosApple(newPos);
+        snake.add(newPart);
+
+        if(appleID==-1)
+            snake.remove(0);
+        else {
+            apples.remove(appleID);
+            addApple();
+        }
     }
+
+    int isPosApple(int[] pos){
+        for(int i=0;i<apples.size();i++){
+            int[] a = apples.get(i);
+            if(a[0]==pos[0]&&a[1]==pos[1]){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    void addApple(){
+        int[] pos = new int[0];
+        int iteration =0;
+        boolean posValid=false;
+        while(!posValid&&iteration<10){
+            posValid=true;
+            iteration++;
+            pos = new int[]{r.nextInt(0,14),r.nextInt(0,14)};
+            if (snakeAtPos(pos)) {
+                posValid = false;
+            }
+
+        }
+        if(posValid)
+            apples.add(pos);
+    }
+
+    boolean snakeAtPos(int[] pos){
+        for(SnakePart s:snake){
+            int[] sPart = s.pos();
+            if ((sPart[0] == pos[0] && sPart[1] == pos[1])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /*
     265         328        UP
@@ -116,5 +182,54 @@ public class SnakeGameApp extends AbstractPhoneApp{
             if(directionOfTravel!=1)
                nextDirection=3;
         }
+    }
+
+    static class SnakePart{
+        private int[] data;
+        public SnakePart(){
+            data = new int[]{7,7,-1,-1};
+        }
+        private SnakePart(int x,int y,int in,int out){
+            data = new int[]{x,y,in,out};
+        }
+
+        public void draw(DrawContext matrices,int left,int top,int celWidth){
+            ScreenDrawing.coloredRect(matrices,(int)Math.round(left+celWidth*0.1+celWidth*data[0]),(int)Math.round(top+celWidth*0.1+celWidth*data[1]),(int)Math.round(celWidth*0.8),(int)Math.round(celWidth*0.8),0xFF_00A0FF);
+            if(data[2]==0||data[3]==0){//up
+                ScreenDrawing.coloredRect(matrices,(int)Math.round(left+celWidth*0.1+celWidth*data[0]),top+celWidth*data[1],(int)Math.round(celWidth*0.8),(int)(celWidth*0.1),0xFF_00A0FF);
+            }
+            if(data[2]==1||data[3]==1){//left
+                ScreenDrawing.coloredRect(matrices,left+celWidth*data[0],(int)Math.round(top+celWidth*0.1+celWidth*data[1]),(int)Math.round(celWidth*0.1),(int)Math.round(celWidth*0.8),0xFF_00A0FF);
+            }
+            if(data[2]==2||data[3]==2){//down
+                ScreenDrawing.coloredRect(matrices,(int)Math.round(left+celWidth*0.1+celWidth*data[0]),(int)Math.round(top+celWidth*0.9+celWidth*data[1]),(int)Math.round(celWidth*0.8),(int)Math.round(celWidth*0.1),0xFF_00A0FF);
+            }
+            if(data[2]==3||data[3]==3){//right
+                ScreenDrawing.coloredRect(matrices,(int)Math.round(left+celWidth*0.9+celWidth*data[0]),(int)Math.round(top+celWidth*0.1+celWidth*data[1]),(int)Math.round(celWidth*0.1),(int)Math.round(celWidth*0.8),0xFF_00A0FF);
+            }
+        }
+
+        public SnakePart newUp(){
+            data[3]=0;
+            return new SnakePart(data[0], data[1] - 1, 2, -1);
+        }
+        public SnakePart newLeft(){
+            data[3]=1;
+            return new SnakePart(data[0] - 1, data[1], 3, -1);
+        }
+        public SnakePart newDown(){
+            data[3]=2;
+            return new SnakePart(data[0], data[1] + 1, 0, -1);
+        }
+
+        public SnakePart newRight(){
+            data[3]=3;
+            return new SnakePart(data[0] + 1, data[1], 1, -1);
+        }
+
+        public int[] pos(){
+            return new int[]{data[0],data[1]};
+        }
+
     }
 }

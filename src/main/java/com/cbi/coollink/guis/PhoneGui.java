@@ -113,6 +113,7 @@ public class PhoneGui extends LightweightGuiDescription {
             }
             currentApp=null;
         });
+        homeButtonPanel.setHost(this);
 
 
         time = new WLabel(MutableText.of(new LiteralTextContent(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
@@ -130,6 +131,7 @@ public class PhoneGui extends LightweightGuiDescription {
         }
 
         saveData();
+        root.setHost(this);
     }
 
     /**
@@ -218,11 +220,15 @@ public class PhoneGui extends LightweightGuiDescription {
     }
 
     public void keyPressed(int ch,int keyCode,int modifiers){
-
+        if(currentApp!=null) {
+            currentApp.keyPressed(ch,keyCode,modifiers);
+        }
     }
 
     public void keyReleased(int ch,int keyCode,int modifiers){
-
+        if(currentApp!=null) {
+            currentApp.keyReleased(ch,keyCode,modifiers);
+        }
     }
 
     /**saves the data of the phone to the world
