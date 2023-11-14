@@ -69,6 +69,22 @@ public abstract class AbstractPhoneApp {
         return null;
     }
 
+    /**called by the phone when a key is pressed on the user's keyboard
+     * useful for being able to control an app from the keyboard
+     * @param ch the char ID of the key pressed (letter typed)
+     * @param keyCode the ID of they key Pressed
+     * @param modifiers modifier keys held down when the key was pressed(Shift Ctl ...)
+     */
+    public void keyPressed(int ch,int keyCode,int modifiers){}
+
+    /**called by the phone when a key is released on the user's keyboard
+     * useful for being able to control an app from the keyboard
+     * @param ch the char ID of the key released (letter typed)
+     * @param keyCode the ID of they key released
+     * @param modifiers modifier keys held down when the key was released(Shift Ctl ...)
+     */
+    public void keyReleased(int ch,int keyCode,int modifiers){}
+
 
 
 }
