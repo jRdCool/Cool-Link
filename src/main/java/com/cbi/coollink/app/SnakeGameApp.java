@@ -1,11 +1,14 @@
 package com.cbi.coollink.app;
 
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
+import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
+import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
+import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -21,12 +24,13 @@ public class SnakeGameApp extends AbstractPhoneApp{
     int tickNum;
     Random r = new Random();
 
-    boolean gameOver =false;
+    WLabel gameOverText = new WLabel(MutableText.of(new LiteralTextContent("Game OVER")).setStyle(Style.EMPTY.withBold(true).withUnderline(true).withColor(0xFFFF0000)));
+    boolean gameOver =false,gameOverShown=false;
     public SnakeGameApp() {//constructor used to create a dummy instance of the class used for app registration
         super(appID);//the id of the app
 
         //set app icon here
-
+        icon = new Identifier("cool-link","textures/gui/app_snake_game.png");
         //set app description here (this will be displayed in the app shop)
         description= Text.of("Snake Game!");
 
@@ -40,6 +44,8 @@ public class SnakeGameApp extends AbstractPhoneApp{
         apples.add(new int[]{r.nextInt(0,14),r.nextInt(0,14)});
         apples.add(new int[]{r.nextInt(0,14),r.nextInt(0,14)});
         apples.add(new int[]{r.nextInt(0,14),r.nextInt(0,14)});
+        gameOverText.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        gameOverText.setVerticalAlignment(VerticalAlignment.CENTER);
 
     }
     @Override
@@ -52,6 +58,11 @@ public class SnakeGameApp extends AbstractPhoneApp{
                 if(apples.isEmpty()){
                     addApple();
                 }
+            }
+        }else{
+            if(!gameOverShown) {
+                ((WPlainPanel) root).add(gameOverText, phoneWidth / 2, phoneHeight / 2);
+                gameOverShown = true;
             }
         }
     }
@@ -78,6 +89,35 @@ public class SnakeGameApp extends AbstractPhoneApp{
                 //ScreenDrawing.coloredRect(matrices,left+pos[0]*cellSize+start,top+pos[1]*cellSize,cellSize,cellSize,0xFF_00A0FF);
                 s.draw(matrices,left+start,top,cellSize);
             }
+            int[] headPos = snake.get(snake.size()-1).pos();
+            //ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start,top+headPos[1]*cellSize,2,2,0xFF_FFFFFF);
+            switch(nextDirection){
+                case 0 ->{
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+2,top+headPos[1]*cellSize+1,3,4,0xFF_FFFFFF);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+7,top+headPos[1]*cellSize+1,3,4,0xFF_FFFFFF);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+3,top+headPos[1]*cellSize+1,1,3,0xFF_000000);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+8,top+headPos[1]*cellSize+1,1,3,0xFF_000000);
+                }
+                case 1 ->{
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+1,top+headPos[1]*cellSize+3,4,3,0xFF_FFFFFF);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+1,top+headPos[1]*cellSize+7,4,3,0xFF_FFFFFF);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+1,top+headPos[1]*cellSize+4,3,1,0xFF_000000);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+1,top+headPos[1]*cellSize+8,3,1,0xFF_000000);
+                }
+                case 2 -> {
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+2,top+headPos[1]*cellSize+7,3,4,0xFF_FFFFFF);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+7,top+headPos[1]*cellSize+7,3,4,0xFF_FFFFFF);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+3,top+headPos[1]*cellSize+8,1,3,0xFF_000000);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+8,top+headPos[1]*cellSize+8,1,3,0xFF_000000);
+                }
+                case 3 -> {
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+7,top+headPos[1]*cellSize+3,4,3,0xFF_FFFFFF);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+7,top+headPos[1]*cellSize+7,4,3,0xFF_FFFFFF);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+8,top+headPos[1]*cellSize+4,3,1,0xFF_000000);
+                    ScreenDrawing.coloredRect(matrices,left+headPos[0]*cellSize+start+8,top+headPos[1]*cellSize+8,3,1,0xFF_000000);
+                }
+            }
+
             Identifier apple = new Identifier("minecraft","textures/item/apple.png");
             for(int[] pos:apples){
                 ScreenDrawing.texturedRect(matrices,left+pos[0]*cellSize+start,top+pos[1]*cellSize,cellSize,cellSize,apple,0,0,1,1,0xFF_FFFFFF);
