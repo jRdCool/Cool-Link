@@ -2,6 +2,7 @@ package com.cbi.coollink.blocks.cables;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.CoaxWallPort;
+import com.cbi.coollink.blocks.SatelliteDishBlock;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -21,6 +22,9 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 
 
+import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
+import static com.cbi.coollink.blocks.SatelliteDishBlock.MultiBlockPartStates.D1;
+import static com.cbi.coollink.blocks.SatelliteDishBlock.multiBlockPose;
 import static net.minecraft.state.property.Properties.FACING;
 
 public class CoaxCable extends Block {
@@ -85,6 +89,9 @@ public class CoaxCable extends Block {
                 //Main.LOGGER.info("Neighbor to east is coax");
                 world.setBlockState(pos, state.with(east, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
             }
+            if(s.getBlock() instanceof SatelliteDishBlock && s.get(ASSEMBLED_BOOLEAN_PROPERTY) && s.get(SatelliteDishBlock.multiBlockPose) == D1){
+                world.setBlockState(pos, state.with(east, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
+            }
         }
 
         //---------- West Neighbor
@@ -114,6 +121,9 @@ public class CoaxCable extends Block {
             //Main.LOGGER.info(""+((world.getBlockState(pos.south()).getBlock() instanceof CoaxWallPort)+" | "+(s.get(FACING).equals(Direction.NORTH))));// && Objects.equals(CoaxWallPort.ENTRY.isFacing(), DirectionProperty.of("north"))));
             if (world.getBlockState(pos.south()).getBlock() instanceof CoaxWallPort && (s.get(FACING).equals(Direction.NORTH))) {//check if the neighbor block is a coax cable
                 //Main.LOGGER.info("Neighbor to east is coax port");
+                world.setBlockState(pos, state.with(south, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
+            }
+            if(s.getBlock() instanceof SatelliteDishBlock && s.get(ASSEMBLED_BOOLEAN_PROPERTY) && s.get(SatelliteDishBlock.multiBlockPose) == D1){
                 world.setBlockState(pos, state.with(south, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
             }
         }

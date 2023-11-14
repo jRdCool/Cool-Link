@@ -57,7 +57,7 @@ public class SatelliteDishBlock extends Block {
         }
     }
 
-    static EnumProperty<MultiBlockPartStates> multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
+    public static EnumProperty<MultiBlockPartStates> multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
         assignStates();
