@@ -240,4 +240,33 @@ public class CoaxCable extends Block {
         }
         return shape;
     }
+
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        {
+            BlockState s = world.getBlockState(pos.east());
+            if (state.get(east)) {
+                if (!(s.getBlock() instanceof SatelliteDishBlock && s.get(ASSEMBLED_BOOLEAN_PROPERTY) && s.get(SatelliteDishBlock.multiBlockPose) == D1) && !(s.getBlock() instanceof CoaxCable)) {
+                    world.setBlockState(pos, state.with(east, false), NOTIFY_ALL);//set this block as connecting to that neighbor block
+                }
+            } else {
+                if (s.getBlock() instanceof SatelliteDishBlock && s.get(ASSEMBLED_BOOLEAN_PROPERTY) && s.get(SatelliteDishBlock.multiBlockPose) == D1) {
+                    world.setBlockState(pos, state.with(east, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
+                }
+            }
+        }
+        {
+            BlockState s = world.getBlockState(pos.south());
+            if (state.get(south)) {
+                if (!(s.getBlock() instanceof SatelliteDishBlock && s.get(ASSEMBLED_BOOLEAN_PROPERTY) && s.get(SatelliteDishBlock.multiBlockPose) == D1) && !(s.getBlock() instanceof CoaxCable)) {
+                    world.setBlockState(pos, state.with(south, false), NOTIFY_ALL);//set this block as connecting to that neighbor block
+                }
+            } else {
+                if (s.getBlock() instanceof SatelliteDishBlock && s.get(ASSEMBLED_BOOLEAN_PROPERTY) && s.get(SatelliteDishBlock.multiBlockPose) == D1) {
+                    world.setBlockState(pos, state.with(south, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
+                }
+            }
+        }
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+    }
 }
