@@ -59,9 +59,8 @@ public class SmartPhone extends Item {
 
             //open the phone screen
             OpenPhoneGuiPacket packet = new OpenPhoneGuiPacket(world.getRegistryKey(),blockEntityPos,heldItem,noBLockEntity);
-            //TODO fix networking
-            Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
-            //ServerPlayNetworking.send((ServerPlayerEntity) user,packet);
+
+            ServerPlayNetworking.send((ServerPlayerEntity) user,packet);
 
 
             //reset the used block entity

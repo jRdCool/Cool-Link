@@ -27,25 +27,24 @@ public class ClientEntryPoint implements ClientModInitializer {
         AppRegistry.registerApp(new ExampleApp());
         AppRegistry.registerApp(new SnakeGameApp());
 
-        /*TODO networking shit
-        ClientPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","open-phone-gui"),(client,handler,buf,responseSender) -> {
-            OpenPhoneGuiPacket packet = new OpenPhoneGuiPacket(buf);
-            RegistryKey<World> wrk = packet.world();
-            World world = handler.getWorld();
+
+        ClientPlayNetworking.registerGlobalReceiver(OpenPhoneGuiPacket.ID,(payload,context) -> {
+            RegistryKey<World> wrk = payload.world();
+            World world = context.client().world;
 
             if(world==null){
-                Main.LOGGER.error("Something has gon massively wrong client is not in a world");
+                Main.LOGGER.error("Something has gon massively wrong client is not in a world 💀");
                 return;
             }
             if(!world.getRegistryKey().equals(wrk)){
-                Main.LOGGER.error("Something has gon massively wrong client world does not match");
+                Main.LOGGER.error("Something has gon massively wrong client world does not match 💀");
                 return;
             }
-            BlockPos blockEntityPos = packet.block();
+            BlockPos blockEntityPos = payload.block();
 
-            ItemStack heldItem = packet.heldItem();
+            ItemStack heldItem = payload.heldItem();
 
-            boolean noBLockEntity = packet.noBlockEntity();
+            boolean noBLockEntity = payload.noBlockEntity();
             BlockEntity usedBlockEntity;
             if(!noBLockEntity)
                 usedBlockEntity = Objects.requireNonNull(world).getBlockEntity(blockEntityPos);
@@ -54,17 +53,17 @@ public class ClientEntryPoint implements ClientModInitializer {
             }
 
 
-            client.execute( () -> {
-                client.setScreen(new PhoneScreen(new PhoneGui(world, usedBlockEntity, heldItem)));
+            context.client().execute( () -> {
+                context.client().setScreen(new PhoneScreen(new PhoneGui(world, usedBlockEntity, heldItem)));
             });
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link", "open-conduit-gui"),(client,handler,buf,responseSender) -> {
-            client.execute( ()->{
-                client.setScreen(new ConduitScreen(new ConduitGUI()));
-            });
-        });
-        */
+        //ClientPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link", "open-conduit-gui"),(client,handler,buf,responseSender) -> {
+        //    client.execute( ()->{
+        //        client.setScreen(new ConduitScreen(new ConduitGUI()));
+        //    });
+        //});
+
 
     }
 }
