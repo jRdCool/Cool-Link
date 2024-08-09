@@ -220,22 +220,22 @@ public class CoaxCable extends Block {
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
         VoxelShape shape = VoxelShapes.empty();
         shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.4375,0.4375,0.4375,0.5625,0.5625,0.5625));
-        if(state.get(north)){
+        if(state.contains(north) &&state.get(north)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.4375,0.4375,0,0.5625,0.5625,0.4375));
         }
-        if(state.get(south)){
+        if(state.contains(south)&&state.get(south)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.4375,0.4375,0.5625,0.5625,0.5625,1));
         }
-        if(state.get(east)){
+        if(state.contains(east)&&state.get(east)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.5625,0.4375,0.4375,1,0.5625,0.5625));
         }
-        if(state.get(west)){
+        if(state.contains(west)&&state.get(west)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0,0.4375,0.4375,0.4375,0.5625,0.5625));
         }
-        if(state.get(up)){
+        if(state.contains(up)&&state.get(up)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.4375,0.5625,0.4375,0.5625,1,0.5625));
         }
-        if(state.get(down)){
+        if(state.contains(down)&&state.get(down)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.4375,0,0.4375,0.5625,0.4375,0.5625));
         }
         return shape;

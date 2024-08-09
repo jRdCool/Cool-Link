@@ -17,6 +17,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
 
 
@@ -71,20 +73,41 @@ public class SatelliteDishBlock extends Block {
 
     @SuppressWarnings("deprecation")
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
-        MultiBlockPartStates s=  state.get(multiBlockPose);
-        switch (s){
-            case D1 -> {return voxelD1();}
-            case D2 -> {return voxelD2();}
-            case D3 -> {return voxelD3();}
-            case D4 -> {return voxelD4();}
+        Optional<MultiBlockPartStates> om = state.getOrEmpty(multiBlockPose);
+        if(om.isPresent()) {
+            MultiBlockPartStates s = om.get();
+            switch (s) {
+                case D1 -> {
+                    return voxelD1();
+                }
+                case D2 -> {
+                    return voxelD2();
+                }
+                case D3 -> {
+                    return voxelD3();
+                }
+                case D4 -> {
+                    return voxelD4();
+                }
 
-            case U1 -> {return voxelU1();}
-            case U2 -> {return voxelU2();}
-            case U3 -> {return voxelU3();}
-            case U4 -> {return voxelU4();}
+                case U1 -> {
+                    return voxelU1();
+                }
+                case U2 -> {
+                    return voxelU2();
+                }
+                case U3 -> {
+                    return voxelU3();
+                }
+                case U4 -> {
+                    return voxelU4();
+                }
 
+            }
+            return VoxelShapes.union(VoxelShapes.empty(), VoxelShapes.cuboid(0, 0, 0, 1, 1, 1));
+        }else{
+            return VoxelShapes.cuboid(0,0,0,1,1,1);
         }
-        return VoxelShapes.union(VoxelShapes.empty(), VoxelShapes.cuboid(0, 0, 0, 1, 1, 1));
     }
 
     @Override

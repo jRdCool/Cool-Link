@@ -1,7 +1,6 @@
 package com.cbi.coollink.blocks;
 
 import com.cbi.coollink.Main;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,6 +8,7 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -18,11 +18,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
-import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
-import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
+import java.util.Optional;
 
 public class ServerRack extends Block {
-    public static final ServerRack ENTRY = new ServerRack(FabricBlockSettings.create().hardness(0.5f));
+    public static final ServerRack ENTRY = new ServerRack(AbstractBlock.Settings.create().hardness(0.5f));
 
     public enum Half implements StringIdentifiable{
         TOP("top"),
@@ -62,6 +61,7 @@ public class ServerRack extends Block {
                 .with(half,Half.BOTTOM)
                 .with(direction,Direction.NORTH_SOUTH)
         );
+
     }
 
     static EnumProperty<ServerRack.Half> half = EnumProperty.of("half", ServerRack.Half.class);
@@ -72,25 +72,42 @@ public class ServerRack extends Block {
         direction = EnumProperty.of("direction", ServerRack.Direction.class);
     }
 
+
+
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
         assignStates();
-        stateManager.add(half);
-        stateManager.add(direction);
+        //stateManager.add(half);
+        //stateManager.add(direction);
+        stateManager.add(half,direction);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
-        return switch (state.get(half)) {
-            case TOP -> switch (state.get(direction)) {
-                case EAST_WEST -> voxelTEW();
-                case NORTH_SOUTH -> voxelTNS();
+
+        Optional<Half> op = state.getOrEmpty(half);
+        if(op.isPresent()) {
+            return switch (op.get()) {
+                case TOP -> switch (state.get(direction)) {
+                    case EAST_WEST -> voxelTEW();
+                    case NORTH_SOUTH -> voxelTNS();
+                };
+                case BOTTOM -> switch (state.get(direction)) {
+                    case EAST_WEST -> voxelBEW();
+                    case NORTH_SOUTH -> voxelBNS();
+                };
             };
-            case BOTTOM -> switch (state.get(direction)) {
-                case EAST_WEST -> voxelBEW();
-                case NORTH_SOUTH -> voxelBNS();
-            };
-        };
+        }else{
+            //Main.LOGGER.info("SERVER RACK BLOCK STATE INFO");
+            //Main.LOGGER.info(state.toString());
+            //Main.LOGGER.info(half.toString());
+            //for(Property<?> p : state.getProperties()){
+            //    String toLog = p.getClass()+" "+ p+" contains this prop: "+state.contains(p);
+            //    Main.LOGGER.info(toLog);
+            //}
+            return VoxelShapes.cuboid(0,0,0,1,1,1);
+        }
+
     }
 
 
