@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -33,8 +34,8 @@ public class AIOBlockEntity extends BlockEntity {
 	public ArrayList<String> deviceIP=new ArrayList<>();
 
 	// Serialize the BlockEntity
-	//@Override
-	public void writeNbt(NbtCompound nbt) {
+	@Override
+	public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
 		// Save the current value of the number to the nbt
 		nbt.putInt("number", 89);
 		//Main.LOGGER.info("password is: "+password);
@@ -57,13 +58,13 @@ public class AIOBlockEntity extends BlockEntity {
 		else{
 			nbt.putString("Wireless_Password", netPass);
 		}
-		//super.writeNbt(nbt);
+		super.writeNbt(nbt,registryLookup);
 	}
 
 	// Deserialize the BlockEntity
-	//@Override
-	public void readNbt(NbtCompound nbt) {
-		//super.readNbt(nbt);
+	@Override
+	public void readNbt(NbtCompound nbt,RegistryWrapper.WrapperLookup registryLookup) {
+		super.readNbt(nbt,registryLookup);
 		password=nbt.getString("password");
 		number = nbt.getInt("number");
 		ssid = nbt.getString("ssid");
@@ -76,10 +77,10 @@ public class AIOBlockEntity extends BlockEntity {
 		return BlockEntityUpdateS2CPacket.create(this);
 	}
 
-	/*@Override
-	public NbtCompound toInitialChunkDataNbt() {
-		return createNbt();
-	}*/
+	@Override
+	public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
+		return createNbt(registryLookup);
+	}
 
 	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//Main.LOGGER.info(be.password);
