@@ -182,6 +182,8 @@ public class AIOSettingApp extends AbstractPhoneApp{
         passwordVisibleButton = new WToggleButton();
         sSIDName=new WTextField(MutableText.of(new Literal(netName)));
         WButton setSSID=new WButton(Text.of("set"));
+        WLabel mAC1=new WLabel(Text.of("MAC1: "+blockA.mac1.toString()));
+        WLabel mAC2=new WLabel(Text.of("MAC2: "+blockA.mac2.toString()));
 
 
 
@@ -205,6 +207,10 @@ public class AIOSettingApp extends AbstractPhoneApp{
         //change admin password button
         aioSettingsPanel.add(changeAdminPass,25,104);
         changeAdminPass.setSize(150,20);
+
+        //Device Mac Address
+        aioSettingsPanel.add(mAC1,25,135);
+        aioSettingsPanel.add(mAC2,25,145);
 
         //uplink status
         aioSettingsPanel.add(uLStatus,25,170);
