@@ -1,6 +1,7 @@
 package com.cbi.coollink.blocks;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.net.protocol.Mac;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 public class AIOBlockEntity extends BlockEntity {
 	public AIOBlockEntity(BlockPos pos, BlockState state) {
 		super(Main.AIO_BLOCK_ENTITY, pos, state);
+		mac1=new Mac(deviceID);
+		mac2=new Mac(deviceID);
 	}
 
 	private int number = 0;
@@ -27,6 +30,9 @@ public class AIOBlockEntity extends BlockEntity {
 	public String password;
 	public String ssid;
 	public String netPass;
+
+	private static final int deviceID = 0x11;
+	public Mac mac1,mac2;
 
 	public ArrayList<String> connectedDevices=new ArrayList<>();
 	public ArrayList<String> deviceName=new ArrayList<>();
@@ -57,6 +63,8 @@ public class AIOBlockEntity extends BlockEntity {
 		else{
 			nbt.putString("Wireless_Password", netPass);
 		}
+		nbt.putString("MAC1",mac1.toString());
+		nbt.putString("MAC2",mac2.toString());
 		super.writeNbt(nbt);
 	}
 
@@ -112,7 +120,7 @@ public class AIOBlockEntity extends BlockEntity {
 			for (int i=0;i<deviceName.size();i++)
 			{
 				String space = "  ";
-;				for(int j=16-deviceName.get(i).length();j>0;j--)
+				for(int j=16-deviceName.get(i).length();j>0;j--)
 				{
 					space += " ";
 				}
@@ -120,5 +128,6 @@ public class AIOBlockEntity extends BlockEntity {
 			}
 		}
 	}
+
 
 }

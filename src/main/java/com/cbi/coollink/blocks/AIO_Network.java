@@ -1,6 +1,7 @@
 package com.cbi.coollink.blocks;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.net.protocol.Mac;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -8,6 +9,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -22,9 +24,12 @@ import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 public class AIO_Network extends BlockWithEntity implements BlockEntityProvider {
 	public static final AIO_Network ENTRY = new AIO_Network(FabricBlockSettings.create().hardness(0.5f));
+
+
 	public AIO_Network(Settings settings) {
 		super(settings);
 	}
+
 
 	//this function is used to create the in game hit box of the block. despite the fact that this function is deprecated it still works for now
 	@SuppressWarnings("deprecation")
@@ -129,6 +134,7 @@ public class AIO_Network extends BlockWithEntity implements BlockEntityProvider 
 
 	@Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
+
 		return this.getDefaultState().with(HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing());
 	}
 
@@ -146,4 +152,6 @@ public class AIO_Network extends BlockWithEntity implements BlockEntityProvider 
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
 		return validateTicker(type, Main.AIO_BLOCK_ENTITY, AIOBlockEntity::tick);
 	}
+
+
 }

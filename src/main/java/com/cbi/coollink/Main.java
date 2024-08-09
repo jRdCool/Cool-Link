@@ -4,6 +4,7 @@ import com.cbi.coollink.blocks.*;
 import com.cbi.coollink.blocks.cables.AIOCableBundle;
 import com.cbi.coollink.blocks.cables.CoaxCable;
 import com.cbi.coollink.items.*;
+import com.cbi.coollink.net.protocol.Mac;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -197,5 +198,14 @@ public class Main implements ModInitializer {
         });
 
 
+    }
+
+    public static boolean macDNE(int[] mac){
+        //todo
+        return true;
+    }
+
+    public static void setKnownMacs(int[] mac){
+        //todo
     }
 }
