@@ -1,6 +1,7 @@
 package com.cbi.coollink.blocks;
 
 import com.cbi.coollink.net.OpenConduitGuiPacket;
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
@@ -353,20 +354,28 @@ public abstract class Conduit extends BlockWithEntity {
 
     }
 
+
+
     @SuppressWarnings("deprecation")
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand , BlockHitResult bhr) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult bhr) {
         if (state.get(junctionBox)) {
             String currentThread = Thread.currentThread().getName();
             //check witch thread the code is being executed on the server
             if (currentThread.equals("Server thread")) {//if the code is being executed on the server thread
 
                 OpenConduitGuiPacket packet = new OpenConduitGuiPacket();//add data to send to GUI here
-                ServerPlayNetworking.send((ServerPlayerEntity) player, packet);
+                com.cbi.coollink.Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
+                //ServerPlayNetworking.send((ServerPlayerEntity) player, packet);
             }
 
         }
-        return super.onUse(state, world, pos, player, hand, bhr);
+        return super.onUse(state, world, pos, player, bhr);
     }
 
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        //TODO figure out what goes here
+        return null;
+    }
 }

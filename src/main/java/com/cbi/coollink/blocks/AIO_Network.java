@@ -1,6 +1,7 @@
 package com.cbi.coollink.blocks;
 
 import com.cbi.coollink.Main;
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -24,6 +25,12 @@ public class AIO_Network extends BlockWithEntity implements BlockEntityProvider 
 	public static final AIO_Network ENTRY = new AIO_Network(FabricBlockSettings.create().hardness(0.5f));
 	public AIO_Network(Settings settings) {
 		super(settings);
+	}
+
+	@Override
+	protected MapCodec<? extends BlockWithEntity> getCodec() {
+		//TODO figure out what this needs (I think it is related to networking)
+		return null;
 	}
 
 	//this function is used to create the in game hit box of the block. despite the fact that this function is deprecated it still works for now

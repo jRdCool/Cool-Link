@@ -29,12 +29,12 @@ public class SettingsPhoneApp extends AbstractRootApp{
      * only use to get an instance of this app
      */
     private SettingsPhoneApp(){
-        super(new Identifier("cool-link","settings"));
-        icon=new Identifier("cool-link","textures/gui/setting_app_icon.png");
+        super(Identifier.of("cool-link","settings"));
+        icon=Identifier.of("cool-link","textures/gui/setting_app_icon.png");
     }
     public SettingsPhoneApp(World world, BlockEntity clickedOnBlockEntity,PhoneGui phone){
-        super(new Identifier("cool-link","settings"));
-        icon=new Identifier("cool-link","textures/gui/setting_app_icon.png");
+        super(Identifier.of("cool-link","settings"));
+        icon=Identifier.of("cool-link","textures/gui/setting_app_icon.png");
         root=new WPlainPanel();
         root.setSize(phoneWidth,phoneHeight);
         timeColor=TIME_COLOR_BLACK;

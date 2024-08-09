@@ -31,7 +31,7 @@ public class CoaxialCable extends Item {
             PlayerEntity player  = context.getPlayer();
             if(player!=null) {
                 //block placement sound
-                player.playSoundToPlayer(SoundEvent.of(new Identifier("minecraft:block.wool.place")), SoundCategory.BLOCKS, 1, 1);
+                player.playSoundToPlayer(SoundEvent.of(Identifier.of("minecraft:block.wool.place")), SoundCategory.BLOCKS, 1, 1);
                 if(!player.isCreative()){
                     ItemStack item = context.getStack();
                     item.decrement(1);

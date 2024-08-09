@@ -1,6 +1,5 @@
 package com.cbi.coollink.blocks;
 
-import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.CoaxCable;
 import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
@@ -50,8 +49,9 @@ public class CoaxWallPort extends Block {
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         editOtherBlock(world,pos,state,false);
+        return state;
     }
 
     private void editOtherBlock(World world, BlockPos pos, BlockState state,Boolean create){

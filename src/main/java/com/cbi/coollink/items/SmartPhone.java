@@ -1,19 +1,13 @@
 package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.guis.PhoneGui;
-import com.cbi.coollink.guis.PhoneScreen;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -65,7 +59,9 @@ public class SmartPhone extends Item {
 
             //open the phone screen
             OpenPhoneGuiPacket packet = new OpenPhoneGuiPacket(world.getRegistryKey(),blockEntityPos,heldItem,noBLockEntity);
-            ServerPlayNetworking.send((ServerPlayerEntity) user,packet);
+            //TODO fix networking
+            Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
+            //ServerPlayNetworking.send((ServerPlayerEntity) user,packet);
 
 
             //reset the used block entity

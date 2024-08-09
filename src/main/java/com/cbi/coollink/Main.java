@@ -6,7 +6,6 @@ import com.cbi.coollink.blocks.cables.CoaxCable;
 import com.cbi.coollink.items.*;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -17,6 +16,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ConduitBlockEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -40,10 +40,10 @@ public class Main implements ModInitializer {
 
     public static final String namespace = "cool-link";
     public static final String[] woodTypes = {"oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry","bamboo","crimson","warped"};
-    public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "aio_block_entity"), FabricBlockEntityTypeBuilder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
-    public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "small_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, SmallConduit.ENTRY).build());
-    public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "medium_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, MediumConduit.ENTRY).build());
-    public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("cool-link", "large_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, LargeConduit.ENTRY).build());
+    public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "aio_block_entity"), FabricBlockEntityTypeBuilder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
+    public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "small_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, SmallConduit.ENTRY).build());
+    public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "medium_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, MediumConduit.ENTRY).build());
+    public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "large_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, LargeConduit.ENTRY).build());
 
     public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
 
@@ -53,7 +53,7 @@ public class Main implements ModInitializer {
             .build();
 
 
-    private static final RegistryKey<ItemGroup> ITEM_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, new Identifier("cool-link", "cool-link"));
+    private static final RegistryKey<ItemGroup> ITEM_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of("cool-link", "cool-link"));
 
     static HashMap<String,CoaxWallPort> coaxWallPortVarients = new HashMap<>();
     @Override
@@ -64,49 +64,49 @@ public class Main implements ModInitializer {
 
 
 
-        Registry.register(Registries.BLOCK, new Identifier("cool-link","test_block"),TestBlock.ENTRY);
-        Registry.register(Registries.ITEM, new Identifier("cool-link", "test_block"),new BlockItem(TestBlock.ENTRY, new FabricItemSettings()));
-        Registry.register(Registries.BLOCK, new Identifier("cool-link","aio_network"), AIO_Network.ENTRY);
+        Registry.register(Registries.BLOCK, Identifier.of("cool-link","test_block"),TestBlock.ENTRY);
+        Registry.register(Registries.ITEM, Identifier.of("cool-link", "test_block"),new BlockItem(TestBlock.ENTRY, new Item.Settings()));
+        Registry.register(Registries.BLOCK, Identifier.of("cool-link","aio_network"), AIO_Network.ENTRY);
         BlockRenderLayerMap.INSTANCE.putBlock(AIO_Network.ENTRY, RenderLayer.getCutout());
-        Registry.register(Registries.ITEM, new Identifier("cool-link", "aio_network"),new BlockItem(AIO_Network.ENTRY, new FabricItemSettings()));
-        SmartPhone smartPhoneEntry= Registry.register(Registries.ITEM, new Identifier("cool-link", "smart_phone"),new SmartPhone(new FabricItemSettings()));
-        Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, new Identifier("cool-link", "cat6_ethernet_cable"),new Cat6Cable(new FabricItemSettings()));
-        CoaxialCable coaxialCableEntry = Registry.register(Registries.ITEM, new Identifier("cool-link", "coaxial_cable"),new CoaxialCable(new FabricItemSettings()));
-        WireTester wireTesterEntry = Registry.register(Registries.ITEM, new Identifier("cool-link", "wire_tester"),new WireTester(new FabricItemSettings()));
-        ProgramingCable programingCableEntry = Registry.register(Registries.ITEM, new Identifier("cool-link", "programing_cable"),new ProgramingCable(new FabricItemSettings()));
+        Registry.register(Registries.ITEM, Identifier.of("cool-link", "aio_network"),new BlockItem(AIO_Network.ENTRY, new Item.Settings()));
+        SmartPhone smartPhoneEntry= Registry.register(Registries.ITEM, Identifier.of("cool-link", "smart_phone"),new SmartPhone(new Item.Settings()));
+        Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "cat6_ethernet_cable"),new Cat6Cable(new Item.Settings()));
+        CoaxialCable coaxialCableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "coaxial_cable"),new CoaxialCable(new Item.Settings()));
+        WireTester wireTesterEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "wire_tester"),new WireTester(new Item.Settings()));
+        ProgramingCable programingCableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "programing_cable"),new ProgramingCable(new Item.Settings()));
 
-        Registry.register(Registries.BLOCK, new Identifier("cool-link","server_rack"), ServerRack.ENTRY);
+        Registry.register(Registries.BLOCK, Identifier.of("cool-link","server_rack"), ServerRack.ENTRY);
         BlockRenderLayerMap.INSTANCE.putBlock(ServerRack.ENTRY, RenderLayer.getCutout());
-        Registry.register(Registries.ITEM, new Identifier("cool-link", "server_rack"),new BlockItem(ServerRack.ENTRY, new FabricItemSettings() ));
+        Registry.register(Registries.ITEM, Identifier.of("cool-link", "server_rack"),new BlockItem(ServerRack.ENTRY, new Item.Settings() ));
 
-        Registry.register(Registries.BLOCK, new Identifier("cool-link","satellite_dish"), SatelliteDishBlock.ENTRY);
+        Registry.register(Registries.BLOCK, Identifier.of("cool-link","satellite_dish"), SatelliteDishBlock.ENTRY);
         BlockRenderLayerMap.INSTANCE.putBlock(SatelliteDishBlock.ENTRY, RenderLayer.getCutout());
-        Registry.register(Registries.ITEM, new Identifier("cool-link", "satellite_dish"),new BlockItem(SatelliteDishBlock.ENTRY, new FabricItemSettings()));
+        Registry.register(Registries.ITEM, Identifier.of("cool-link", "satellite_dish"),new BlockItem(SatelliteDishBlock.ENTRY, new Item.Settings()));
 
-        Registry.register(Registries.BLOCK, new Identifier("cool-link","small_conduit"),SmallConduit.ENTRY);
-        Registry.register(Registries.ITEM, new Identifier("cool-link", "small_conduit"),new BlockItem(SmallConduit.ENTRY, new FabricItemSettings()));
+        Registry.register(Registries.BLOCK, Identifier.of("cool-link","small_conduit"),SmallConduit.ENTRY);
+        Registry.register(Registries.ITEM, Identifier.of("cool-link", "small_conduit"),new BlockItem(SmallConduit.ENTRY, new Item.Settings()));
 
-        Registry.register(Registries.BLOCK, new Identifier("cool-link","medium_conduit"),MediumConduit.ENTRY);
-        Registry.register(Registries.ITEM, new Identifier("cool-link", "medium_conduit"),new BlockItem(MediumConduit.ENTRY, new FabricItemSettings()));
+        Registry.register(Registries.BLOCK, Identifier.of("cool-link","medium_conduit"),MediumConduit.ENTRY);
+        Registry.register(Registries.ITEM, Identifier.of("cool-link", "medium_conduit"),new BlockItem(MediumConduit.ENTRY, new Item.Settings()));
 
-        Registry.register(Registries.BLOCK, new Identifier("cool-link","large_conduit"),LargeConduit.ENTRY);
-        Registry.register(Registries.ITEM, new Identifier("cool-link", "large_conduit"),new BlockItem(LargeConduit.ENTRY, new FabricItemSettings()));
+        Registry.register(Registries.BLOCK, Identifier.of("cool-link","large_conduit"),LargeConduit.ENTRY);
+        Registry.register(Registries.ITEM, Identifier.of("cool-link", "large_conduit"),new BlockItem(LargeConduit.ENTRY, new Item.Settings()));
 
-        Registry.register(Registries.BLOCK,new Identifier("cool-link","coax_cable"), CoaxCable.ENTRY);
+        Registry.register(Registries.BLOCK,Identifier.of("cool-link","coax_cable"), CoaxCable.ENTRY);
         BlockRenderLayerMap.INSTANCE.putBlock(CoaxCable.ENTRY, RenderLayer.getCutout());
 
-        Registry.register(Registries.BLOCK, new  Identifier(namespace,"aio_cable_bundle"), AIOCableBundle.ENTRY);
-        Registry.register(Registries.ITEM,new Identifier(namespace,"aio_cable_bundle"),new BlockItem(AIOCableBundle.ENTRY,new FabricItemSettings()));
+        Registry.register(Registries.BLOCK, Identifier.of(namespace,"aio_cable_bundle"), AIOCableBundle.ENTRY);
+        Registry.register(Registries.ITEM,Identifier.of(namespace,"aio_cable_bundle"),new BlockItem(AIOCableBundle.ENTRY,new Item.Settings()));
 
         for(String wood:woodTypes) {
             CoaxWallPort block = new CoaxWallPort(FabricBlockSettings.create().hardness(0.5f));
             coaxWallPortVarients.put(wood,block);
-            Registry.register(Registries.BLOCK, new Identifier("cool-link", "wall_ports/coax_wall_port_"+wood), block);
-            Registry.register(Registries.ITEM, new Identifier("cool-link", "wall_ports/coax_wall_port_"+wood), new BlockItem(block, new FabricItemSettings()));
+            Registry.register(Registries.BLOCK, Identifier.of("cool-link", "wall_ports/coax_wall_port_"+wood), block);
+            Registry.register(Registries.ITEM, Identifier.of("cool-link", "wall_ports/coax_wall_port_"+wood), new BlockItem(block, new Item.Settings()));
         }
 
-        Registry.register(Registries.BLOCK,new Identifier("cool-link","aio_wall_port"),AIOWallPort.ENTRY);
-        Registry.register(Registries.ITEM,new Identifier("cool-link","aio_wall_port"),new BlockItem(AIOWallPort.ENTRY,new FabricItemSettings()));
+        Registry.register(Registries.BLOCK,Identifier.of("cool-link","aio_wall_port"),AIOWallPort.ENTRY);
+        Registry.register(Registries.ITEM,Identifier.of("cool-link","aio_wall_port"),new BlockItem(AIOWallPort.ENTRY,new Item.Settings()));
 
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
@@ -126,9 +126,9 @@ public class Main implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIOWallPort.ENTRY));
 
 
-
+/*
         //register a packet listener to listen for the aio-set-password packet
-        ServerPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","aio-set-password"), (server, player, handler, buf, responseSender) -> {
+        ServerPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","aio-set-password"), (server, player, handler, buf, responseSender) -> {
             BlockPos pos = buf.readBlockPos();
             String password=buf.readString();
             RegistryKey<World> wrk=buf.readRegistryKey(RegistryKeys.WORLD);
@@ -144,7 +144,7 @@ public class Main implements ModInitializer {
             });
         });
 
-        ServerPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","aio-set-ssid"), (server, player, handler, buf, responseSender) -> {
+        ServerPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","aio-set-ssid"), (server, player, handler, buf, responseSender) -> {
             BlockPos pos = buf.readBlockPos();
             String ssid=buf.readString();
             RegistryKey<World> wrk=buf.readRegistryKey(RegistryKeys.WORLD);
@@ -160,7 +160,7 @@ public class Main implements ModInitializer {
             });
         });
 
-        ServerPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","aio-set-net-password"), (server, player, handler, buf, responseSender) -> {
+        ServerPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","aio-set-net-password"), (server, player, handler, buf, responseSender) -> {
             BlockPos pos = buf.readBlockPos();
             String netPass=buf.readString();
             RegistryKey<World> wrk=buf.readRegistryKey(RegistryKeys.WORLD);
@@ -177,7 +177,7 @@ public class Main implements ModInitializer {
         });
 
         //receive incoming data from the phone and write it to the server version of the phone object
-        ServerPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","save-phone-data"),(server, player, handler, buf, responseSender) -> {
+        ServerPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","save-phone-data"),(server, player, handler, buf, responseSender) -> {
 
             NbtCompound nbt=buf.readNbt();
             ItemStack itemFromClient = buf.readItemStack();
@@ -194,7 +194,7 @@ public class Main implements ModInitializer {
 
 
             });
-        });
+        });*/
 
 
     }

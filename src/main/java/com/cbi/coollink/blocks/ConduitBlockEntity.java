@@ -31,10 +31,10 @@ public class ConduitBlockEntity extends BlockEntity {
         return BlockEntityUpdateS2CPacket.create(this);
     }
 
-    @Override
+    /*@Override
     public NbtCompound toInitialChunkDataNbt() {
         return createNbt();
-    }
+    }*/
 
 
     public void updateStates(){

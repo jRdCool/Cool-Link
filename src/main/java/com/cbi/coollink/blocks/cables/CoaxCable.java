@@ -1,6 +1,5 @@
 package com.cbi.coollink.blocks.cables;
 
-import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.CoaxWallPort;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
@@ -154,7 +153,7 @@ public class CoaxCable extends Block {
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
 
 
         state=world.getBlockState(pos);
@@ -204,6 +203,7 @@ public class CoaxCable extends Block {
             world.setBlockState(pos.down(),world.getBlockState(pos.down()).with(up,false),NOTIFY_ALL);//set the neighbor block to point to this block
         }
         super.onBreak(world, pos, state, player);
+        return state;
     }
     @SuppressWarnings("deprecation")
     @Override

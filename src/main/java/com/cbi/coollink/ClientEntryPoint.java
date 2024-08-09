@@ -27,7 +27,8 @@ public class ClientEntryPoint implements ClientModInitializer {
         AppRegistry.registerApp(new ExampleApp());
         AppRegistry.registerApp(new SnakeGameApp());
 
-        ClientPlayNetworking.registerGlobalReceiver(new Identifier("cool-link","open-phone-gui"),(client,handler,buf,responseSender) -> {
+        /*TODO networking shit
+        ClientPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","open-phone-gui"),(client,handler,buf,responseSender) -> {
             OpenPhoneGuiPacket packet = new OpenPhoneGuiPacket(buf);
             RegistryKey<World> wrk = packet.world();
             World world = handler.getWorld();
@@ -58,10 +59,12 @@ public class ClientEntryPoint implements ClientModInitializer {
             });
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(new Identifier("cool-link", "open-conduit-gui"),(client,handler,buf,responseSender) -> {
+        ClientPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link", "open-conduit-gui"),(client,handler,buf,responseSender) -> {
             client.execute( ()->{
                 client.setScreen(new ConduitScreen(new ConduitGUI()));
             });
         });
+        */
+
     }
 }

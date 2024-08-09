@@ -16,7 +16,7 @@ public abstract class AbstractPhoneApp {
     public final int phoneWidth=400,phoneHeight=200,TIME_COLOR_WHITE=0xFFFFFF,TIME_COLOR_BLACK=0x0;
     public int timeColor=TIME_COLOR_WHITE;
     public boolean requestSave=false;
-    public Identifier icon = new Identifier("minecraft","textures/misc/unknown_pack.png");
+    public Identifier icon = Identifier.of("minecraft","textures/misc/unknown_pack.png");
     public final Identifier appId;
     public Text description;
 

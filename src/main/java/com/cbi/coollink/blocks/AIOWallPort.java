@@ -46,8 +46,9 @@ public class AIOWallPort extends Block {
 
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         editOtherBlock(world,pos,state,false);
+        return state;
     }
 
     private void editOtherBlock(World world, BlockPos pos, BlockState state,Boolean create){
