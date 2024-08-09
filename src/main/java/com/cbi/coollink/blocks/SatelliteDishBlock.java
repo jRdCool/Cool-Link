@@ -1,6 +1,7 @@
 package com.cbi.coollink.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -23,6 +24,8 @@ import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
 
 
 public class SatelliteDishBlock extends Block {
+    //All property definitions MUST be declared before the entry
+    public static final EnumProperty<MultiBlockPartStates> multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
     public SatelliteDishBlock(Settings settings) {
         super(settings);
 
@@ -31,7 +34,7 @@ public class SatelliteDishBlock extends Block {
                 .with(multiBlockPose, MultiBlockPartStates.NONE)
         );
     }
-    public static final SatelliteDishBlock ENTRY = new SatelliteDishBlock(FabricBlockSettings.create().hardness(0.5f));
+    public static final SatelliteDishBlock ENTRY = new SatelliteDishBlock(AbstractBlock.Settings.create().hardness(0.5f));
     public enum MultiBlockPartStates implements StringIdentifiable {
         D1("d1"),
         D2("d2"),
@@ -59,23 +62,17 @@ public class SatelliteDishBlock extends Block {
         }
     }
 
-    public static EnumProperty<MultiBlockPartStates> multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
+
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
-        assignStates();
         stateManager.add(ASSEMBLED_BOOLEAN_PROPERTY);
         stateManager.add(multiBlockPose);
     }
 
-    static void assignStates(){
-        multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
-    }
-
     @SuppressWarnings("deprecation")
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
-        Optional<MultiBlockPartStates> om = state.getOrEmpty(multiBlockPose);
-        if(om.isPresent()) {
-            MultiBlockPartStates s = om.get();
+        if(state.contains(multiBlockPose)) {
+            MultiBlockPartStates s = state.get(multiBlockPose);
             switch (s) {
                 case D1 -> {
                     return voxelD1();

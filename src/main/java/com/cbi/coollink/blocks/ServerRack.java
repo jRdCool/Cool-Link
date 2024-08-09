@@ -18,9 +18,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
 
 public class ServerRack extends Block {
+    //All property definitions MUST be declared before the entry
+    static final EnumProperty<ServerRack.Half> half = EnumProperty.of("half", ServerRack.Half.class);
+    static final EnumProperty<ServerRack.Direction> direction = EnumProperty.of("direction", ServerRack.Direction.class);
+
     public static final ServerRack ENTRY = new ServerRack(AbstractBlock.Settings.create().hardness(0.5f));
 
     public enum Half implements StringIdentifiable{
@@ -64,18 +67,9 @@ public class ServerRack extends Block {
 
     }
 
-    static EnumProperty<ServerRack.Half> half = EnumProperty.of("half", ServerRack.Half.class);
-    static EnumProperty<ServerRack.Direction> direction = EnumProperty.of("direction", ServerRack.Direction.class);
-
-    static void assignStates(){
-        half = EnumProperty.of("half", ServerRack.Half.class);
-        direction = EnumProperty.of("direction", ServerRack.Direction.class);
-    }
-
 
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
-        assignStates();
         //stateManager.add(half);
         //stateManager.add(direction);
         stateManager.add(half,direction);
@@ -84,32 +78,20 @@ public class ServerRack extends Block {
     @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
-
-        Optional<Half> op = state.getOrEmpty(half);
-        if(op.isPresent()) {
-            return switch (op.get()) {
-                case TOP -> switch (state.get(direction)) {
-                    case EAST_WEST -> voxelTEW();
-                    case NORTH_SOUTH -> voxelTNS();
-                };
-                case BOTTOM -> switch (state.get(direction)) {
-                    case EAST_WEST -> voxelBEW();
-                    case NORTH_SOUTH -> voxelBNS();
-                };
+        return switch (state.get(half)) {
+            case TOP -> switch (state.get(direction)) {
+                case EAST_WEST -> voxelTEW();
+                case NORTH_SOUTH -> voxelTNS();
             };
-        }else{
-            //Main.LOGGER.info("SERVER RACK BLOCK STATE INFO");
-            //Main.LOGGER.info(state.toString());
-            //Main.LOGGER.info(half.toString());
-            //for(Property<?> p : state.getProperties()){
-            //    String toLog = p.getClass()+" "+ p+" contains this prop: "+state.contains(p);
-            //    Main.LOGGER.info(toLog);
-            //}
-            return VoxelShapes.cuboid(0,0,0,1,1,1);
-        }
+            case BOTTOM -> switch (state.get(direction)) {
+                case EAST_WEST -> voxelBEW();
+                case NORTH_SOUTH -> voxelBNS();
+            };
+        };
+
 
     }
-
+static boolean presented = false;
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {

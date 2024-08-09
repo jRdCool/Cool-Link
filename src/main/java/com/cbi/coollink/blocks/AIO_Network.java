@@ -22,7 +22,7 @@ import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 
 public class AIO_Network extends BlockWithEntity implements BlockEntityProvider {
-	public static final AIO_Network ENTRY = new AIO_Network(FabricBlockSettings.create().hardness(0.5f));
+	public static final AIO_Network ENTRY = new AIO_Network(AbstractBlock.Settings.create().hardness(0.5f));
 	public AIO_Network(Settings settings) {
 		super(settings);
 	}

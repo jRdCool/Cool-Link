@@ -3,6 +3,7 @@ package com.cbi.coollink.blocks.cables;
 import com.cbi.coollink.blocks.CoaxWallPort;
 import com.cbi.coollink.blocks.SatelliteDishBlock;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -27,8 +28,7 @@ import static com.cbi.coollink.blocks.SatelliteDishBlock.multiBlockPose;
 import static net.minecraft.state.property.Properties.FACING;
 
 public class CoaxCable extends Block {
-
-    public static final CoaxCable ENTRY =new CoaxCable(FabricBlockSettings.create().hardness(0.5f));
+    //All property definitions MUST be declared before the entry
 
     public static BooleanProperty north = BooleanProperty.of("north");
     public static BooleanProperty east = BooleanProperty.of("east");
@@ -36,6 +36,10 @@ public class CoaxCable extends Block {
     public static BooleanProperty west = BooleanProperty.of("west");
     static BooleanProperty up = BooleanProperty.of("up");
     static BooleanProperty down = BooleanProperty.of("down");
+
+    public static final CoaxCable ENTRY =new CoaxCable(AbstractBlock.Settings.create().hardness(0.5f));
+
+
 
     public CoaxCable(Settings settings){
         super(settings);
@@ -220,22 +224,22 @@ public class CoaxCable extends Block {
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
         VoxelShape shape = VoxelShapes.empty();
         shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.4375,0.4375,0.4375,0.5625,0.5625,0.5625));
-        if(state.contains(north) &&state.get(north)){
+        if(state.get(north)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.4375,0.4375,0,0.5625,0.5625,0.4375));
         }
-        if(state.contains(south)&&state.get(south)){
+        if(state.get(south)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.4375,0.4375,0.5625,0.5625,0.5625,1));
         }
-        if(state.contains(east)&&state.get(east)){
+        if(state.get(east)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.5625,0.4375,0.4375,1,0.5625,0.5625));
         }
-        if(state.contains(west)&&state.get(west)){
+        if(state.get(west)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0,0.4375,0.4375,0.4375,0.5625,0.5625));
         }
-        if(state.contains(up)&&state.get(up)){
+        if(state.get(up)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.4375,0.5625,0.4375,0.5625,1,0.5625));
         }
-        if(state.contains(down)&&state.get(down)){
+        if(state.get(down)){
             shape = VoxelShapes.union(shape,VoxelShapes.cuboid(0.4375,0,0.4375,0.5625,0.4375,0.5625));
         }
         return shape;
