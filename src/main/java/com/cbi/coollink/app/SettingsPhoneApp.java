@@ -16,6 +16,7 @@ import net.minecraft.world.World;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.function.BiConsumer;
 
 public class SettingsPhoneApp extends AbstractRootApp{
 
@@ -118,7 +119,6 @@ public class SettingsPhoneApp extends AbstractRootApp{
         aPSearch=new WButton(Text.of("Search For Networks"));
         panel.add(mac,29, 111);
         panel.add(aPSearch,80,126,150,20);
-        int playerX,playerY,playerZ;
         ArrayList<String> availNets=new ArrayList<>();
 
         aPSearch.setOnClick(()->{
@@ -137,11 +137,16 @@ public class SettingsPhoneApp extends AbstractRootApp{
             }
         });
 
+        BiConsumer<String, AIODeviceList> configurator = (String name, AIODeviceList destination) -> {
+            destination.device.setLabel(Text.literal(name));
+            //destination.sprite.setImage(new Identifier("libgui-test:portal1.png"));
+        };
+
         panel.add(networks,265,30);
-   /*     WListPanel<String,AIODeviceList> accessPoints=new WListPanel<>(availNets, AIODeviceList::new, configurator);
+        WListPanel<String,AIODeviceList> accessPoints=new WListPanel<>(availNets, AIODeviceList::new,configurator);
         accessPoints.setListItemHeight(2*18);
         panel.add(accessPoints,220,40,190,155);
-*/
+
 
     }
 

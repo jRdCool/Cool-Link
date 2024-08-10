@@ -23,10 +23,10 @@ public class AIOBlockEntity extends BlockEntity {
 	public AIOBlockEntity(BlockPos pos, BlockState state) {
 		super(Main.AIO_BLOCK_ENTITY, pos, state);
 		String currentThread = Thread.currentThread().getName();
-		if(currentThread.equals("Server thread")) {
+		//if(currentThread.equals("Server thread")) {
 			mac1 = new Mac(deviceID);
 			mac2 = new Mac(deviceID);
-		}
+		//}
 	}
 
 	private int number = 0;
