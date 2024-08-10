@@ -3,6 +3,9 @@ package com.cbi.coollink.app;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.AIOBlockEntity;
 import com.cbi.coollink.mic.WPasswordField;
+import com.cbi.coollink.net.AioSetAdminPasswordPacket;
+import com.cbi.coollink.net.AioSetNetPasswordPacket;
+import com.cbi.coollink.net.AioSetSSIDPacket;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
@@ -139,8 +142,8 @@ public class AIOSettingApp extends AbstractPhoneApp{
                 /*PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeBlockPos(aio.getPos());
                 buf.writeString(networkPasswordField.getText());
-                buf.writeRegistryKey(world.getRegistryKey());
-                ClientPlayNetworking.send(new Identifier("cool-link", "aio-set-password"), buf);*/
+                buf.writeRegistryKey(world.getRegistryKey());*/
+                ClientPlayNetworking.send(new AioSetAdminPasswordPacket(blockA.getPos(),adminPasswordField.getText(),world.getRegistryKey()));
 //
         });
         errorMsg.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.CENTER);
@@ -235,24 +238,24 @@ public class AIOSettingApp extends AbstractPhoneApp{
             netName=sSIDName.getText();
             blockA.ssid=sSIDName.getText();
             //Main.LOGGER.info("setting SSID to: "+blockA.ssid);
-                PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeBlockPos(blockA.getPos());
-                buf.writeString(sSIDName.getText());
-                buf.writeRegistryKey(world.getRegistryKey());
-                //TODO figure the networking out
-            Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
-                //ClientPlayNetworking.send(Identifier.of("cool-link", "aio-set-ssid"), buf);
+            //    PacketByteBuf buf = PacketByteBufs.create();
+            //    buf.writeBlockPos(blockA.getPos());
+            //    buf.writeString(sSIDName.getText());
+            //    buf.writeRegistryKey(world.getRegistryKey());
+            //
+            //Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
+                ClientPlayNetworking.send(new AioSetSSIDPacket(blockA.getPos(),sSIDName.getText(),world.getRegistryKey()));
         });
         setNetPass.setOnClick(() -> {
             netPassL=netPassField.getText();
             blockA.netPass=netPassField.getText();
             Main.LOGGER.info("setting netPass to:"+blockA.netPass);
-            PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeBlockPos(blockA.getPos());
-            buf.writeString(netPassField.getText());
-            buf.writeRegistryKey(world.getRegistryKey());
-            Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
-            //ClientPlayNetworking.send(Identifier.of("cool-link", "aio-set-net-password"), buf);
+            //PacketByteBuf buf = PacketByteBufs.create();
+            //buf.writeBlockPos(blockA.getPos());
+            //buf.writeString(netPassField.getText());
+            //buf.writeRegistryKey(world.getRegistryKey());
+            //Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
+            ClientPlayNetworking.send(new AioSetNetPasswordPacket(blockA.getPos(),netPassField.getText(),world.getRegistryKey()));
         });
 
         changeAdminPass.setOnClick(() -> {
@@ -292,13 +295,12 @@ public class AIOSettingApp extends AbstractPhoneApp{
             if(adminPasswordField.getText()!=null) {
                 blockA.password = adminPasswordField.getText();
                 Main.LOGGER.info("setting password to: " + blockA.password);
-                PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeBlockPos(blockA.getPos());
-                buf.writeString(adminPasswordField.getText());
-                buf.writeRegistryKey(world.getRegistryKey());
-                //TODO more networking
-                Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
-                //ClientPlayNetworking.send(Identifier.of("cool-link", "aio-set-password"), buf);
+                //PacketByteBuf buf = PacketByteBufs.create();
+                //buf.writeBlockPos(blockA.getPos());
+                //buf.writeString(adminPasswordField.getText());
+                //buf.writeRegistryKey(world.getRegistryKey());
+                //Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
+                ClientPlayNetworking.send(new AioSetAdminPasswordPacket(blockA.getPos(),adminPasswordField.getText(),world.getRegistryKey()));
 
                 root.remove(changeAdminPassPanel);
                 aioSettingsScreen(blockA);

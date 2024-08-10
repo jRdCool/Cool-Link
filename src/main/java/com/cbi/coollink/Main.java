@@ -4,10 +4,8 @@ import com.cbi.coollink.blocks.*;
 import com.cbi.coollink.blocks.cables.AIOCableBundle;
 import com.cbi.coollink.blocks.cables.CoaxCable;
 import com.cbi.coollink.items.*;
-import com.cbi.coollink.net.OpenConduitGuiPacket;
-import com.cbi.coollink.net.SavePhoneDataPacket;
+import com.cbi.coollink.net.*;
 import com.cbi.coollink.net.protocol.Mac;
-import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -133,19 +131,22 @@ public class Main implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIOWallPort.ENTRY));
 
 
-        //register the open phone gui network packet
+        //register network packets
         PayloadTypeRegistry.playS2C().register(OpenPhoneGuiPacket.ID,OpenPhoneGuiPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenConduitGuiPacket.ID,OpenConduitGuiPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(SavePhoneDataPacket.ID,SavePhoneDataPacket.CODEC);
-/*
+        PayloadTypeRegistry.playC2S().register(AioSetSSIDPacket.ID,AioSetSSIDPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(AioSetAdminPasswordPacket.ID,AioSetAdminPasswordPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(AioSetNetPasswordPacket.ID,AioSetNetPasswordPacket.CODEC);
+
         //register a packet listener to listen for the aio-set-password packet
-        ServerPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","aio-set-password"), (server, player, handler, buf, responseSender) -> {
-            BlockPos pos = buf.readBlockPos();
-            String password=buf.readString();
-            RegistryKey<World> wrk=buf.readRegistryKey(RegistryKeys.WORLD);
+        ServerPlayNetworking.registerGlobalReceiver(AioSetAdminPasswordPacket.ID, (payload, context) -> {
+            BlockPos pos = payload.pos();
+            String password=payload.newPassword();
             //execute code on the server thread
-            server.execute(() ->{
-                BlockEntity be =server.getWorld(wrk).getBlockEntity(pos);
+            RegistryKey<World> wrk=payload.world();
+            context.server().execute(() ->{
+                BlockEntity be =context.server().getWorld(wrk).getBlockEntity(pos);
 
                 if(be instanceof AIOBlockEntity aio){
                     aio.password=password;
@@ -155,13 +156,13 @@ public class Main implements ModInitializer {
             });
         });
 
-        ServerPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","aio-set-ssid"), (server, player, handler, buf, responseSender) -> {
-            BlockPos pos = buf.readBlockPos();
-            String ssid=buf.readString();
-            RegistryKey<World> wrk=buf.readRegistryKey(RegistryKeys.WORLD);
+        ServerPlayNetworking.registerGlobalReceiver(AioSetSSIDPacket.ID, (payload, context) -> {
+            BlockPos pos = payload.pos();
+            String ssid=payload.newName();
+            RegistryKey<World> wrk=payload.world();
             //execute code on the server thread
-            server.execute(() ->{
-                BlockEntity be =server.getWorld(wrk).getBlockEntity(pos);
+            context.server().execute(() ->{
+                BlockEntity be =context.server().getWorld(wrk).getBlockEntity(pos);
 
                 if(be instanceof AIOBlockEntity aio){
                     aio.ssid=ssid;
@@ -171,13 +172,13 @@ public class Main implements ModInitializer {
             });
         });
 
-        ServerPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","aio-set-net-password"), (server, player, handler, buf, responseSender) -> {
-            BlockPos pos = buf.readBlockPos();
-            String netPass=buf.readString();
-            RegistryKey<World> wrk=buf.readRegistryKey(RegistryKeys.WORLD);
+        ServerPlayNetworking.registerGlobalReceiver(AioSetNetPasswordPacket.ID, (payload, context) -> {
+            BlockPos pos = payload.pos();
+            String netPass=payload.newPassword();
+            RegistryKey<World> wrk=payload.world();
             //execute code on the server thread
-            server.execute(() ->{
-                BlockEntity be =server.getWorld(wrk).getBlockEntity(pos);
+            context.server().execute(() ->{
+                BlockEntity be = context.server().getWorld(wrk).getBlockEntity(pos);
 
                 if(be instanceof AIOBlockEntity aio){
                     aio.netPass=netPass;
@@ -186,7 +187,7 @@ public class Main implements ModInitializer {
                 }
             });
         });
-    */
+
         //receive incoming data from the phone and write it to the server version of the phone object
         ServerPlayNetworking.registerGlobalReceiver(SavePhoneDataPacket.ID,(payload, context) -> {
 
