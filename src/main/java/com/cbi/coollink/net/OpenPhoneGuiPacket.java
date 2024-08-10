@@ -12,9 +12,10 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public record OpenPhoneGuiPacket(RegistryKey<World> world, BlockPos block, ItemStack heldItem,boolean noBlockEntity) implements CustomPayload {
+public record OpenPhoneGuiPacket(RegistryKey<World> world, BlockPos block, ItemStack heldItem, boolean noBlockEntity, Vec3d playerPos) implements CustomPayload {
     //public static final PacketType<OpenPhoneGuiPacket> TYPE = PacketType.create(new Identifier("cool-link", "open-phone-gui"), OpenPhoneGuiPacket::new);
     public static final Id<OpenPhoneGuiPacket> ID = new CustomPayload.Id<>(Identifier.of("cool-link", "open-phone-gui"));
     public static final PacketCodec<RegistryByteBuf, OpenPhoneGuiPacket> CODEC = PacketCodec.tuple(
@@ -22,6 +23,7 @@ public record OpenPhoneGuiPacket(RegistryKey<World> world, BlockPos block, ItemS
             BlockPos.PACKET_CODEC, OpenPhoneGuiPacket::block,
             ItemStack.PACKET_CODEC, OpenPhoneGuiPacket::heldItem,
             PacketCodecs.BOOL, OpenPhoneGuiPacket::noBlockEntity,
+            PacketCodecs.codec(Vec3d.CODEC), OpenPhoneGuiPacket::playerPos,
             OpenPhoneGuiPacket::new
     );
 

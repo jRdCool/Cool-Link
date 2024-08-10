@@ -55,7 +55,7 @@ public class ClientEntryPoint implements ClientModInitializer {
 
 
             context.client().execute( () -> {
-                context.client().setScreen(new PhoneScreen(new PhoneGui(world, usedBlockEntity, heldItem)));
+                context.client().setScreen(new PhoneScreen(new PhoneGui(world, usedBlockEntity, heldItem,payload.playerPos())));
             });
         });
 

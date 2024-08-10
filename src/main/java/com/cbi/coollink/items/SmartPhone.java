@@ -58,7 +58,7 @@ public class SmartPhone extends Item {
             }
 
             //open the phone screen
-            OpenPhoneGuiPacket packet = new OpenPhoneGuiPacket(world.getRegistryKey(),blockEntityPos,heldItem,noBLockEntity);
+            OpenPhoneGuiPacket packet = new OpenPhoneGuiPacket(world.getRegistryKey(),blockEntityPos,heldItem,noBLockEntity,user.getPos());
 
             ServerPlayNetworking.send((ServerPlayerEntity) user,packet);
 

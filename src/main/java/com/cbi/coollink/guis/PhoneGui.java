@@ -19,6 +19,7 @@ import net.minecraft.text.PlainTextContent.Literal;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.time.LocalDateTime;
@@ -49,7 +50,9 @@ public class PhoneGui extends LightweightGuiDescription {
     public ClockTimeType clockTimeType = ClockTimeType.AMPM;
     public String phoneName;
 
-    public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance) {
+    public Vec3d playerPosition;
+
+    public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance, Vec3d playerPosition) {
         apps.add(SettingsPhoneApp.getDummyInstance());
         apps.add(AIOSettingApp.getDummyInstance());
         apps.add(new AppStore());
@@ -58,6 +61,7 @@ public class PhoneGui extends LightweightGuiDescription {
         this.world=world;
         this.clickedOnBLockEntity=clickedOnBLockEntity;
         this.phoneInstance=phoneInstance;
+        this.playerPosition = playerPosition;
 
         //load data from the phone instance
         NbtCompound nbt;//= phoneInstance.getOrCreateNbt();
