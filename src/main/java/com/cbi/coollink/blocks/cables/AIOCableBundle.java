@@ -11,7 +11,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -34,7 +33,6 @@ public class AIOCableBundle extends Block {
     public static BooleanProperty west=BooleanProperty.of("west");
     public static BooleanProperty up=BooleanProperty.of("up");
     public static BooleanProperty down=BooleanProperty.of("down");
-    //public static IntProperty shape=IntProperty.of("shape",1,16);
     public static DirectionProperty wallPortDir=DirectionProperty.of("wall_port_dir");
 
     public static final AIOCableBundle ENTRY = new AIOCableBundle(FabricBlockSettings.create().hardness(0.5f));
@@ -171,7 +169,6 @@ public class AIOCableBundle extends Block {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
         VoxelShape shape = VoxelShapes.empty();
