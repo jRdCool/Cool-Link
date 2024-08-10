@@ -7,6 +7,7 @@ import com.cbi.coollink.guis.ConduitGUI;
 import com.cbi.coollink.guis.ConduitScreen;
 import com.cbi.coollink.guis.PhoneGui;
 import com.cbi.coollink.guis.PhoneScreen;
+import com.cbi.coollink.net.OpenConduitGuiPacket;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -58,11 +59,11 @@ public class ClientEntryPoint implements ClientModInitializer {
             });
         });
 
-        //ClientPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link", "open-conduit-gui"),(client,handler,buf,responseSender) -> {
-        //    client.execute( ()->{
-        //        client.setScreen(new ConduitScreen(new ConduitGUI()));
-        //    });
-        //});
+        ClientPlayNetworking.registerGlobalReceiver(OpenConduitGuiPacket.ID,(payload, context) -> {
+            context.client().execute( ()->{
+                context.client().setScreen(new ConduitScreen(new ConduitGUI()));
+            });
+        });
 
 
     }

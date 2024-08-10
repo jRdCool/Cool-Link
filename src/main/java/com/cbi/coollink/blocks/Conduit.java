@@ -8,6 +8,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
@@ -26,14 +27,14 @@ import static net.minecraft.state.property.Properties.*;
 public abstract class Conduit extends BlockWithEntity {
 
 
-    static BooleanProperty north = BooleanProperty.of("north");
-    static BooleanProperty east = BooleanProperty.of("east");
-    static BooleanProperty south = BooleanProperty.of("south");
-    static BooleanProperty west = BooleanProperty.of("west");
-    static BooleanProperty junctionBox = BooleanProperty.of("junctionbox");
-    static IntProperty cableShape = IntProperty.of("cableshape",0,7);
-    static IntProperty cableLevel = IntProperty.of("cablelevel",1,3);
-    static BooleanProperty neighborLarger = BooleanProperty.of("largerneighbor");
+    public static final BooleanProperty north = BooleanProperty.of("north");
+    public static final BooleanProperty east = BooleanProperty.of("east");
+    public static final BooleanProperty south = BooleanProperty.of("south");
+    public static final BooleanProperty west = BooleanProperty.of("west");
+    public static final BooleanProperty junctionBox = BooleanProperty.of("junctionbox");
+    public static final IntProperty cableShape = IntProperty.of("cableshape",0,7);
+    public static final IntProperty cableLevel = IntProperty.of("cablelevel",1,3);
+    public static final BooleanProperty neighborLarger = BooleanProperty.of("largerneighbor");
 
 
     //cableShape is an integer that is used to switch between the models
@@ -63,11 +64,11 @@ public abstract class Conduit extends BlockWithEntity {
 
     @SuppressWarnings({"deprecation","all"})
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
-        north = BooleanProperty.of("north");
-        east = BooleanProperty.of("east");
-        south = BooleanProperty.of("south");
-        west = BooleanProperty.of("west");
-        junctionBox = BooleanProperty.of("junctionbox");
+        //north = BooleanProperty.of("north");
+        //east = BooleanProperty.of("east");
+        //south = BooleanProperty.of("south");
+        //west = BooleanProperty.of("west");
+        //junctionBox = BooleanProperty.of("junctionbox");
         stateManager.add(AXIS);
         //stateManager.add(HORIZONTAL_FACING);
         stateManager.add(north);
@@ -364,9 +365,8 @@ public abstract class Conduit extends BlockWithEntity {
             //check witch thread the code is being executed on the server
             if (currentThread.equals("Server thread")) {//if the code is being executed on the server thread
 
-                OpenConduitGuiPacket packet = new OpenConduitGuiPacket();//add data to send to GUI here
-                com.cbi.coollink.Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
-                //ServerPlayNetworking.send((ServerPlayerEntity) player, packet);
+                OpenConduitGuiPacket packet = new OpenConduitGuiPacket(/*world.getBlockEntity(pos).writeNbt()*/new NbtCompound(),pos);//add data to send to GUI here
+                ServerPlayNetworking.send((ServerPlayerEntity) player, packet);
             }
 
         }
