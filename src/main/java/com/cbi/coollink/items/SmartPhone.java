@@ -2,6 +2,7 @@ package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
+import com.cbi.coollink.net.protocol.Mac;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,6 +25,8 @@ public class SmartPhone extends Item {
 
     }
     public BlockEntity usedBlockEntity;
+    public Mac mac;
+    private static final int deviceID = 0x31;
 
 
 
@@ -36,6 +39,10 @@ public class SmartPhone extends Item {
             //Main.LOGGER.info("normal");
             //open the phone GUI
             ItemStack heldItem = null;
+
+            if(mac==null){
+                mac=new Mac(deviceID);
+            }
 
             for (ItemStack itemStack : user.getHandItems()) {
                 if(itemStack.getItem().equals(this)){
