@@ -4,6 +4,7 @@ import com.cbi.coollink.blocks.*;
 import com.cbi.coollink.blocks.cables.AIOCableBundle;
 import com.cbi.coollink.blocks.cables.CoaxCable;
 import com.cbi.coollink.items.*;
+import com.cbi.coollink.net.OpenConduitGuiPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import net.fabricmc.api.ModInitializer;
@@ -131,6 +132,7 @@ public class Main implements ModInitializer {
 
         //register the open phone gui network packet
         PayloadTypeRegistry.playS2C().register(OpenPhoneGuiPacket.ID,OpenPhoneGuiPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(OpenConduitGuiPacket.ID,OpenConduitGuiPacket.CODEC);
 /*
         //register a packet listener to listen for the aio-set-password packet
         ServerPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","aio-set-password"), (server, player, handler, buf, responseSender) -> {
