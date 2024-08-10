@@ -1,6 +1,7 @@
 package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.net.AioSyncMacPacket;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -59,6 +60,8 @@ public class SmartPhone extends Item {
             if(usedBlockEntity!=null){
                 blockEntityPos=usedBlockEntity.getPos();
                 noBLockEntity = false;
+                //TODO implement this
+                ServerPlayNetworking.send((ServerPlayerEntity) user,new AioSyncMacPacket(blockEntityPos,"first mac address here","2nd mass address here",world.getRegistryKey()));
             }else{
                 noBLockEntity = true;
                 blockEntityPos = new BlockPos(0,0,0);
@@ -84,7 +87,7 @@ public class SmartPhone extends Item {
             //Main.LOGGER.info(pos.toShortString());
             BlockEntity be = context.getWorld().getBlockEntity(pos);
             if (be != null) {
-                //Main.LOGGER.info(be.getClass().getName());
+                //this is prbly a terrible way to do this
                 usedBlockEntity=be;
             }
 

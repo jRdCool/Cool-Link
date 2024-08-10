@@ -133,4 +133,9 @@ public class AIOBlockEntity extends BlockEntity {
 		}
 	}
 
+	//TODO implement this
+	public void setMacAddresses(String mac1,String mac2){
+
+	}
+
 }

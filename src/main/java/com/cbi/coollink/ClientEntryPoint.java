@@ -3,10 +3,12 @@ package com.cbi.coollink;
 import com.cbi.coollink.app.AppRegistry;
 import com.cbi.coollink.app.ExampleApp;
 import com.cbi.coollink.app.SnakeGameApp;
+import com.cbi.coollink.blocks.AIOBlockEntity;
 import com.cbi.coollink.guis.ConduitGUI;
 import com.cbi.coollink.guis.ConduitScreen;
 import com.cbi.coollink.guis.PhoneGui;
 import com.cbi.coollink.guis.PhoneScreen;
+import com.cbi.coollink.net.AioSyncMacPacket;
 import com.cbi.coollink.net.OpenConduitGuiPacket;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import net.fabricmc.api.ClientModInitializer;
@@ -62,6 +64,19 @@ public class ClientEntryPoint implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(OpenConduitGuiPacket.ID,(payload, context) -> {
             context.client().execute( ()->{
                 context.client().setScreen(new ConduitScreen(new ConduitGUI()));
+            });
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(AioSyncMacPacket.ID,(payload, context) -> {
+            context.client().execute(()->{
+                if(context.client().world.getRegistryKey().equals(payload.world())){
+                    try {
+                        BlockEntity be = context.client().world.getBlockEntity(payload.pos());
+                        if(be instanceof AIOBlockEntity aio){
+                            aio.setMacAddresses(payload.mac1(),payload.mac2());
+                        }
+                    }catch(Exception e){}
+                }
             });
         });
 
