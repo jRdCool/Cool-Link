@@ -5,6 +5,7 @@ import com.cbi.coollink.blocks.cables.AIOCableBundle;
 import com.cbi.coollink.blocks.cables.CoaxCable;
 import com.cbi.coollink.items.*;
 import com.cbi.coollink.net.OpenConduitGuiPacket;
+import com.cbi.coollink.net.SavePhoneDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import net.fabricmc.api.ModInitializer;
@@ -19,6 +20,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ConduitBlockEntity;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -133,6 +136,7 @@ public class Main implements ModInitializer {
         //register the open phone gui network packet
         PayloadTypeRegistry.playS2C().register(OpenPhoneGuiPacket.ID,OpenPhoneGuiPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenConduitGuiPacket.ID,OpenConduitGuiPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(SavePhoneDataPacket.ID,SavePhoneDataPacket.CODEC);
 /*
         //register a packet listener to listen for the aio-set-password packet
         ServerPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","aio-set-password"), (server, player, handler, buf, responseSender) -> {
@@ -182,26 +186,26 @@ public class Main implements ModInitializer {
                 }
             });
         });
-
+    */
         //receive incoming data from the phone and write it to the server version of the phone object
-        ServerPlayNetworking.registerGlobalReceiver(Identifier.of("cool-link","save-phone-data"),(server, player, handler, buf, responseSender) -> {
+        ServerPlayNetworking.registerGlobalReceiver(SavePhoneDataPacket.ID,(payload, context) -> {
 
-            NbtCompound nbt=buf.readNbt();
-            ItemStack itemFromClient = buf.readItemStack();
-            server.execute(() -> {
+            NbtCompound nbt=payload.nbt();
+            ItemStack itemFromClient = payload.phone();
+            context.server().execute(() -> {
                 ItemStack heldItem = null;
-                for (ItemStack itemStack : player.getHandItems()) {
+                for (ItemStack itemStack : context.player().getHandItems()) {
                     if (itemStack.getItem().equals(itemFromClient.getItem())) {
                         heldItem = itemStack;
                         break;
                     }
                 }
                 if(heldItem!=null)
-                  heldItem.setNbt(nbt);
+                  heldItem.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
 
 
             });
-        });*/
+        });
 
 
     }

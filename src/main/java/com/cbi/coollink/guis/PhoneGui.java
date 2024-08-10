@@ -2,6 +2,7 @@ package com.cbi.coollink.guis;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.app.*;
+import com.cbi.coollink.net.SavePhoneDataPacket;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
@@ -271,11 +272,7 @@ public class PhoneGui extends LightweightGuiDescription {
 
         //write the data
         phoneInstance.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeNbt(nbt);
-        //TODO figure this out
-        //buf.writeItemStack(phoneInstance);
-        //ClientPlayNetworking.send(Identifier.of("cool-link", "save-phone-data"), buf);
+        ClientPlayNetworking.send(new SavePhoneDataPacket(nbt,phoneInstance));
 
     }
 
