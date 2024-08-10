@@ -7,6 +7,7 @@ import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -124,7 +125,7 @@ public class SettingsPhoneApp extends AbstractRootApp{
             for (int i=-30;i<=30;i++){
                 for (int j=-10;j<=10;j++){
                     for (int k=-30;k<=30;k++){
-                        BlockEntity target = world.getBlockEntity(new BlockPos(playerX+i,playerY+j,playerZ+k));
+                        BlockEntity target = world.getBlockEntity(new BlockPos((int)Math.floor(phone.playerPosition.x)+i,(int)Math.floor(phone.playerPosition.y)+j,(int)Math.floor(phone.playerPosition.z)+k));
                         if(target instanceof AIOBlockEntity){
                             String lSSID=((AIOBlockEntity) target).ssid;
                             if(availNets.isEmpty()|| !(availNets.contains(lSSID))){
@@ -137,9 +138,9 @@ public class SettingsPhoneApp extends AbstractRootApp{
         });
 
         panel.add(networks,265,30);
-/*        WListPanel<String,AIODeviceList> connectedDevicesPanel=new WListPanel<>(blockA.connectedDevices, AIODeviceList::new, configurator);
-        connectedDevicesPanel.setListItemHeight(2*18);
-        panel.add(connectedDevicesPanel,220,40,190,155);
+   /*     WListPanel<String,AIODeviceList> accessPoints=new WListPanel<>(availNets, AIODeviceList::new, configurator);
+        accessPoints.setListItemHeight(2*18);
+        panel.add(accessPoints,220,40,190,155);
 */
 
     }
