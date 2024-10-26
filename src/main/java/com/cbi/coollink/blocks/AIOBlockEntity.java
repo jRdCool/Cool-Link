@@ -67,8 +67,8 @@ public class AIOBlockEntity extends BlockEntity {
 		else{
 			nbt.putString("Wireless_Password", netPass);
 		}
-		nbt.putString("MAC1",mac1.toString());
-		nbt.putString("MAC2",mac2.toString());
+		nbt.putByteArray("MAC1",mac1.getBytes());
+		nbt.putByteArray("MAC2",mac2.getBytes());
 		super.writeNbt(nbt,registryLookup);
 	}
 
@@ -80,6 +80,9 @@ public class AIOBlockEntity extends BlockEntity {
 		number = nbt.getInt("number");
 		ssid = nbt.getString("ssid");
 		netPass = nbt.getString("Wireless_Password");
+		byte[] mac1Bytes = nbt.getByteArray("MAC1");
+		byte[] mac2Bytes = nbt.getByteArray("MAC2");
+		setMacAddresses(mac1Bytes,mac2Bytes);
 	}
 
 	@Nullable
@@ -123,19 +126,15 @@ public class AIOBlockEntity extends BlockEntity {
 		else {
 			for (int i=0;i<deviceName.size();i++)
 			{
-				String space = "  ";
-				for(int j=16-deviceName.get(i).length();j>0;j--)
-				{
-					space += " ";
-				}
-				connectedDevices.set(i,deviceName.get(i)+space+deviceIP.get(i));
+                connectedDevices.set(i, deviceName.get(i) + "  " + " ".repeat(Math.max(0, 16 - deviceName.get(i).length())) + deviceIP.get(i));
 			}
 		}
 	}
 
 	//TODO implement this
-	public void setMacAddresses(String mac1,String mac2){
-
+	public void setMacAddresses(byte[] mac1,byte[] mac2){
+		this.mac1 = new Mac(mac1);
+		this.mac2 = new Mac(mac2);
 	}
 
 }

@@ -10,12 +10,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public record AioSyncMacPacket(BlockPos pos, String mac1, String mac2, RegistryKey<World> world) implements CustomPayload {
+public record AioSyncMacPacket(BlockPos pos, byte[] mac1, byte[] mac2, RegistryKey<World> world) implements CustomPayload {
     public static final Id<AioSyncMacPacket> ID = new CustomPayload.Id<>(Identifier.of(Main.namespace, "aio-sync-mac"));
     public static final PacketCodec<RegistryByteBuf, AioSyncMacPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC, AioSyncMacPacket::pos,
-        PacketCodecs.STRING, AioSyncMacPacket::mac1,
-        PacketCodecs.STRING, AioSyncMacPacket::mac2,
+        PacketCodecs.BYTE_ARRAY, AioSyncMacPacket::mac1,
+        PacketCodecs.BYTE_ARRAY, AioSyncMacPacket::mac2,
         PacketCodecs.registryCodec(World.CODEC), AioSyncMacPacket::world,
         AioSyncMacPacket::new
     );

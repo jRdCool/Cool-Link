@@ -1,9 +1,11 @@
 package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.blocks.AIOBlockEntity;
 import com.cbi.coollink.net.AioSyncMacPacket;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import com.cbi.coollink.net.protocol.Mac;
+import jdk.jshell.spi.ExecutionControl;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -61,7 +63,9 @@ public class SmartPhone extends Item {
                 blockEntityPos=usedBlockEntity.getPos();
                 noBLockEntity = false;
                 //TODO implement this
-                ServerPlayNetworking.send((ServerPlayerEntity) user,new AioSyncMacPacket(blockEntityPos,"first mac address here","2nd mass address here",world.getRegistryKey()));
+                if(usedBlockEntity instanceof AIOBlockEntity aio) {
+                    ServerPlayNetworking.send((ServerPlayerEntity) user, new AioSyncMacPacket(blockEntityPos, aio.mac1.getBytes(), aio.mac2.getBytes(), world.getRegistryKey()));
+                }
             }else{
                 noBLockEntity = true;
                 blockEntityPos = new BlockPos(0,0,0);
