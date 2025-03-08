@@ -1,5 +1,6 @@
 package com.cbi.coollink.rendering.blockentities;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.ServerRack;
 import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
 import net.minecraft.client.render.*;
@@ -47,11 +48,43 @@ public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<Server
             case 2 -> matrices.translate(0, 4.16 / 4.6, 0);
             case 3 -> matrices.translate(0, 5.6 / 4.6, 0);
             case 4 -> matrices.translate(0, 1.53, 0);
-            case 5 -> matrices.translate(0, 2*4.24 / 4.6, 0);
+            case 5 -> matrices.translate(0, 8.48 / 4.6, 0);
         }
 
         MatrixStack.Entry matrix = matrices.peek();
-        quadY(matrix,vertexConsumer,0,0,0,1,1,0xFF_00AF00,FACE_FRONT | FACE_BACK);
+        //center rect
+        //quadY(matrix,vertexConsumer,0,0,0,1,1,0xFF_00AF00,FACE_FRONT | FACE_BACK);
+
+        float serverHeight = 0.28f;
+
+        //rail thing
+        //west rail
+        quadX(matrix,vertexConsumer,0.8f/16,-0.014f,0,0.028f,1,0xFF_9E9A95,FACE_BACK | FACE_FRONT);//rail side
+        quadY(matrix,vertexConsumer,0.8f/16,-0.014f,0,0.035f,1,0xFF_909090,FACE_BACK | FACE_FRONT);//rail bottom
+        quadY(matrix,vertexConsumer,0.8f/16,0.014f,0,0.035f,1,0xFF_909090,FACE_BACK | FACE_FRONT);//rail top
+        quadZ(matrix,vertexConsumer,0.8f/16,-0.014f,0,0.035f,0.028f,0xFF_9E9A95,FACE_BACK | FACE_FRONT);//end cap
+        quadZ(matrix,vertexConsumer,0.8f/16,-0.014f,1,0.035f,0.028f,0xFF_9E9A95,FACE_BACK | FACE_FRONT);//end cap
+        //east rail
+        quadX(matrix,vertexConsumer,1-0.8f/16,-0.014f,0,0.028f,1,0xFF_9E9A95,FACE_BACK | FACE_FRONT);//rail side
+        quadY(matrix,vertexConsumer,1-0.8f/16,-0.014f,0,-0.035f,1,0xFF_909090,FACE_BACK | FACE_FRONT);//rail bottom
+        quadY(matrix,vertexConsumer,1-0.8f/16,0.014f,0,-0.035f,1,0xFF_909090,FACE_BACK | FACE_FRONT);//rail top
+        quadZ(matrix,vertexConsumer,1-0.8f/16,-0.014f,0,-0.035f,0.028f,0xFF_9E9A95,FACE_BACK | FACE_FRONT);//end cap
+        quadZ(matrix,vertexConsumer,1-0.8f/16,-0.014f,1,-0.035f,0.028f,0xFF_9E9A95,FACE_BACK | FACE_FRONT);//end cap
+
+        //west wall
+        quadX(matrix,vertexConsumer,0.085f,-serverHeight/2,0,serverHeight,1,0xFF_909090,FACE_BACK | FACE_FRONT);
+        //east wall
+        quadX(matrix,vertexConsumer,1-0.085f,-serverHeight/2,0,serverHeight,1,0xFF_909090,FACE_BACK | FACE_FRONT);
+        //floor
+        quadY(matrix,vertexConsumer,0.085f,-serverHeight/2,0,0.83f,1,0xFF_9E9A95,FACE_BACK | FACE_FRONT);
+        //top
+        quadY(matrix,vertexConsumer,0.085f, serverHeight/2,0,0.83f,1,0xFF_8E8A85,FACE_BACK | FACE_FRONT);
+
+        //front
+        quadZ(matrix,vertexConsumer, 0.085f, -serverHeight/2,0,0.83f,serverHeight,0xFF_c4c1bc,FACE_BACK | FACE_FRONT);
+
+        //back
+        quadZ(matrix,vertexConsumer, 0.085f, -serverHeight/2,1,0.83f,serverHeight,0xFF_c4c1bc,FACE_BACK | FACE_FRONT);
 
         matrices.pop();
     }
