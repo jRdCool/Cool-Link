@@ -28,7 +28,7 @@ public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<Server
             RenderSystem.setShaderTexture(0, SERVER_RACK_TEXTURE);
             RenderLayer.getEntityTranslucent(SERVER_RACK_TEXTURE);
             SpriteIdentifier spriteIdentifier = new SpriteIdentifier(SERVER_RACK_TEXTURE,Identifier.of(Main.namespace,"textures/test"));
-            spriteIdentifier.getVertexConsumer(vertexConsumers,layer);
+            //spriteIdentifier.getVertexConsumer(vertexConsumers,layer);
 
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(layer);
             MatrixStack.Entry matrix = matrices.peek();
