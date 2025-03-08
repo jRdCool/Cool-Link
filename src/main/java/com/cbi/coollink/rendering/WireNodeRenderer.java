@@ -1,5 +1,6 @@
 package com.cbi.coollink.rendering;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.BlockState;
@@ -47,9 +48,9 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 			float oz2 = ((float) d2.z);
 			BlockPos other = te.getNodePos(i);
 
-			float tx = other.getX() - te.getPos().getX();
-			float ty = other.getY() - te.getPos().getY();
-			float tz = other.getZ() - te.getPos().getZ();
+			float tx = other.getX() ;//- te.getPos().getX();
+			float ty = other.getY() ;//- te.getPos().getY();
+			float tz = other.getZ() +1;//- te.getPos().getZ();
 			matrixStackIn.push();
 
 			float dis = distanceFromZero(tx, ty, tz);

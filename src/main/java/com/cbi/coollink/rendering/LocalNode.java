@@ -87,7 +87,7 @@ public class LocalNode {
     }
 
     public BlockPos getPos() {
-        return entity.getPos().offset(Direction.fromVector(this.relativePos.getX(),this.relativePos.getY(),this.relativePos.getZ()));
+        return new BlockPos(entity.getPos().getX()+relativePos.getX(),entity.getPos().getY()+relativePos.getY(),entity.getPos().getZ()+relativePos.getZ());
     }
 
     public boolean isInvalid() {
