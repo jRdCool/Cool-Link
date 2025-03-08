@@ -29,8 +29,7 @@ public class AIO_Network extends BlockWithEntity implements BlockEntityProvider 
 
 	@Override
 	protected MapCodec<? extends BlockWithEntity> getCodec() {
-		//TODO figure out what this needs (I think it is related to networking)
-		return null;
+		return createCodec(AIO_Network::new);
 	}
 
 

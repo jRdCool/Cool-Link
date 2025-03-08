@@ -11,9 +11,11 @@ import com.cbi.coollink.guis.PhoneScreen;
 import com.cbi.coollink.net.AioSyncMacPacket;
 import com.cbi.coollink.net.OpenConduitGuiPacket;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
+import com.cbi.coollink.rendering.blockentities.ServerRackBlockEntityRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
@@ -28,6 +30,8 @@ public class ClientEntryPoint implements ClientModInitializer {
         AppRegistry.registerApp(new ExampleApp());
         AppRegistry.registerApp(new SnakeGameApp());
 
+
+        BlockEntityRendererFactories.register(Main.SERVER_RACK_BLOCK_ENTITY, ServerRackBlockEntityRenderer::new);
 
         ClientPlayNetworking.registerGlobalReceiver(OpenPhoneGuiPacket.ID,(payload,context) -> {
             RegistryKey<World> wrk = payload.world();

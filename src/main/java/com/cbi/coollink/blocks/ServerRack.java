@@ -1,7 +1,10 @@
 package com.cbi.coollink.blocks;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -19,12 +22,23 @@ import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 
-public class ServerRack extends Block {
+public class ServerRack extends BlockWithEntity implements BlockEntityProvider {
     //All property definitions MUST be declared before the entry
-    static final EnumProperty<ServerRack.Half> half = EnumProperty.of("half", ServerRack.Half.class);
-    static final EnumProperty<ServerRack.Direction> direction = EnumProperty.of("direction", ServerRack.Direction.class);
+    public static final EnumProperty<ServerRack.Half> half = EnumProperty.of("half", ServerRack.Half.class);
+    public static final EnumProperty<ServerRack.Direction> direction = EnumProperty.of("direction", ServerRack.Direction.class);
 
     public static final ServerRack ENTRY = new ServerRack(AbstractBlock.Settings.create().hardness(0.5f));
+
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new ServerRackBlockEntity(pos,state);
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return createCodec(ServerRack::new);
+    }
 
     public enum Half implements StringIdentifiable{
         TOP("top"),
@@ -239,5 +253,10 @@ static boolean presented = false;
         shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.234375, 0.921875, 1, 0.25, 0.953125));
 
         return shape;
+    }
+
+    public BlockRenderType getRenderType(BlockState state) {
+        // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
+        return BlockRenderType.MODEL;
     }
 }
