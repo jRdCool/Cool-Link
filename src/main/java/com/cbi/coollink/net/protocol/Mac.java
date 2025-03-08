@@ -11,13 +11,10 @@ public class Mac {
 
     private int[] mac;
 
-@ConstructorProperties({"0x00-0xFF"})
-    public Mac(int deviceType){//constructor
+    @ConstructorProperties({"0x00-0xFF"})
+    public Mac(int deviceType){
         mac = new int[3];
-        setMac(generateMac(deviceType),deviceType);
-    }
-    public Mac(int[] mac,int deviceID){
-        setMac(mac,deviceID);
+        setMac(generateMac(deviceType));
     }
 
     public Mac(byte[] bytes){
@@ -64,7 +61,7 @@ public class Mac {
         return data;
     }
 
-    private int[] generateMac(int deviceType){//generates a new mac address and checks if it has already been assigned in this world
+    private int[] generateMac(int deviceType){
         if (deviceType>0xFF||deviceType<0x00)
         {
             throw new RuntimeException("INVALID MAC ADDRESS, ADDRESSES MUST BE BETWEEN 0x00-0xFF");
@@ -81,26 +78,18 @@ public class Mac {
         return address;
     }
 
-    public void setMac(int[] mac,int deviceID){
-        if(mac[0]>0xFF||mac[0]<0x00){
-            throw new RuntimeException("INVALID MAC ADDRESS, ADDRESSES MUST BE BETWEEN 0x00-0xFF. Reminder This method is only to be used while updating the client");
-        }
-        else if(mac[0]==deviceID) {
-            this.mac=mac;
-        }
-        else {
-            throw new RuntimeException("DEVICE IDs DID NOT MATCH. Reminder This method is only to be used while updating the client");
-        }
+    private void setMac(int[] mac){
+        this.mac=mac;
     }
 
     @Override
     public String toString() {
-    String ab=Integer.toHexString(mac[0]);//takes the hex value of mac set 1 as a string
-    String cd=Integer.toHexString(mac[1]);//takes the hex value of mac set 2 as a string
-    String ef=Integer.toHexString(mac[2]);//takes the hex value of mac set 3 as a string
-    if(ab.length()==1){ab="0"+ab;}//adds on a leading 0 if the number is 1 character long
-    if(cd.length()==1){cd="0"+cd;}//adds on a leading 0 if the number is 1 character long
-    if(ef.length()==1){ef="0"+ef;}//adds on a leading 0 if the number is 1 character long
-    return ab+":"+cd+":"+ef;
+        String ab=Integer.toHexString(mac[0]);//takes the hex value of mac set 1 as a string
+        String cd=Integer.toHexString(mac[1]);//takes the hex value of mac set 2 as a string
+        String ef=Integer.toHexString(mac[2]);//takes the hex value of mac set 3 as a string
+        if(ab.length()==1){ab="0"+ab;}//adds on a leading 0 if the number is 1 character long
+        if(cd.length()==1){cd="0"+cd;}//adds on a leading 0 if the number is 1 character long
+        if(ef.length()==1){ef="0"+ef;}//adds on a leading 0 if the number is 1 character long
+        return ab+":"+cd+":"+ef;
     }
 }
