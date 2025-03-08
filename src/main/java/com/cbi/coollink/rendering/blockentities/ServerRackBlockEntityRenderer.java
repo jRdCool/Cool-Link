@@ -21,13 +21,13 @@ public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<Server
     @Override
     public void render(ServerRackBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         if(entity.getCachedState().get(ServerRack.half)== ServerRack.Half.BOTTOM) {
-            RenderLayer layer = RenderLayer.of("serverrack", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS, 256, RenderLayer.of(RenderPhase.TRANSLUCENT_PROGRAM));
+            RenderLayer layer = RenderLayer.of("serverrack", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS, 256, RenderLayer.of(RenderPhase.COLOR_PROGRAM));
 
 
-            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            RenderSystem.setShaderTexture(0, SERVER_RACK_TEXTURE);
-            RenderLayer.getEntityTranslucent(SERVER_RACK_TEXTURE);
-            SpriteIdentifier spriteIdentifier = new SpriteIdentifier(SERVER_RACK_TEXTURE,Identifier.of(Main.namespace,"textures/test"));
+           // RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+            //RenderSystem.setShaderTexture(0, SERVER_RACK_TEXTURE);
+            //RenderLayer.getEntityTranslucent(SERVER_RACK_TEXTURE);
+            //SpriteIdentifier spriteIdentifier = new SpriteIdentifier(SERVER_RACK_TEXTURE,Identifier.of(Main.namespace,"textures/test"));
             //spriteIdentifier.getVertexConsumer(vertexConsumers,layer);
 
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(layer);
