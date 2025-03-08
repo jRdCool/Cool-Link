@@ -31,6 +31,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 			mac1 = new Mac(deviceID);
 			mac2 = new Mac(deviceID);
 		//}
+		this.localNodes = new LocalNode[getNodeCount()];
+		this.nodeCache = new IWireNode[getNodeCount()];
 	}
 
 	public String password;
@@ -139,53 +141,47 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		this.mac2 = new Mac(mac2);
 	}
 
+	private final LocalNode[] localNodes;
+	private final IWireNode[] nodeCache;
 	@Override
-	public int getNodeCount() {
+	public Vec3d getNodeOffset(int node) {
+		if(node == 0 ){
+			return new Vec3d(1,1,1);
+		}
+		if(node == 1 ){
+			return new Vec3d(0,1,0);
+		}
+
+		return null;
+	}
+
+	@Override
+	public IWireNode getWireNode(int index) {
+		return null;
+	}
+
+	@Override
+	public int getOtherNodeIndex(int index) {
 		return 0;
 	}
 
 	@Override
-	public boolean hasConnection(int i) {
-		return false;
-	}
-
-	@Override
-	public Vec3d getNodeOffset(int i) {
-		return null;
-	}
-
-	@Override
-	public IWireNode getWireNode(int i) {
-		return null;
-	}
-
-	@Override
-	public int getOtherNodeIndex(int i) {
-		return 0;
-	}
-
-	@Override
-	public BlockPos getNodePos(int i) {
-		return null;
-	}
-
-	@Override
-	public WireType getNodeType(int i) {
-		return null;
-	}
-
-	@Override
-	public LocalNode getLocalNode(int index) {
+	public @Nullable LocalNode getLocalNode(int index) {
 		return null;
 	}
 
 	@Override
 	public void setNode(int index, int other, BlockPos pos, WireType type) {
+		this.localNodes[index] = new LocalNode(this, index, other, type, pos);
+
 
 	}
 
 	@Override
 	public void removeNode(int index, boolean dropWire) {
+		LocalNode old = this.localNodes[index];
+		this.localNodes[index] = null;
+		this.nodeCache[index] = null;
 
 	}
 }
