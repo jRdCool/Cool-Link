@@ -1,7 +1,10 @@
 package com.cbi.coollink.blocks.blockentities;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.net.protocol.Mac;
+import com.cbi.coollink.rendering.IWireNode;
+import com.cbi.coollink.rendering.LocalNode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -11,6 +14,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +23,7 @@ import java.util.ArrayList;
 // Made with Blockbench 4.5.2
 // Exported for Minecraft version 1.17+ for Yarn
 // Paste this class into your mod and generate all required imports
-public class AIOBlockEntity extends BlockEntity {
+public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public AIOBlockEntity(BlockPos pos, BlockState state) {
 		super(Main.AIO_BLOCK_ENTITY, pos, state);
 		String currentThread = Thread.currentThread().getName();
@@ -135,4 +139,53 @@ public class AIOBlockEntity extends BlockEntity {
 		this.mac2 = new Mac(mac2);
 	}
 
+	@Override
+	public int getNodeCount() {
+		return 0;
+	}
+
+	@Override
+	public boolean hasConnection(int i) {
+		return false;
+	}
+
+	@Override
+	public Vec3d getNodeOffset(int i) {
+		return null;
+	}
+
+	@Override
+	public IWireNode getWireNode(int i) {
+		return null;
+	}
+
+	@Override
+	public int getOtherNodeIndex(int i) {
+		return 0;
+	}
+
+	@Override
+	public BlockPos getNodePos(int i) {
+		return null;
+	}
+
+	@Override
+	public WireType getNodeType(int i) {
+		return null;
+	}
+
+	@Override
+	public LocalNode getLocalNode(int index) {
+		return null;
+	}
+
+	@Override
+	public void setNode(int index, int other, BlockPos pos, WireType type) {
+
+	}
+
+	@Override
+	public void removeNode(int index, boolean dropWire) {
+
+	}
 }

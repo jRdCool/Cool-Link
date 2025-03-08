@@ -38,7 +38,7 @@ public enum WireType {//IRON(4, 256, 87, 87, 87, CAItems.IRON_WIRE.asStack(4), C
 		};
 	}
 
-	//public int getIndex() {return ID;}
+	public int getIndex() {return ID;}
 
 	//public ItemStack getDrop() {return DROP.copy();}
 
