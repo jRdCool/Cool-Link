@@ -30,26 +30,26 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 
 		//time += partialTicks;
 
-		for (int i = 0; i < te.getNodeCount(); i++) {
+		for (int i = 0; i < 1; i++) {
 			if (!te.hasConnection(i)) continue;
 			Vec3d d1 = te.getNodeOffset(i);
-			float ox1 = ((float) d1.x());
-			float oy1 = ((float) d1.y());
-			float oz1 = ((float) d1.z());
+			float ox1 = ((float) d1.x);
+			float oy1 = ((float) d1.y);
+			float oz1 = ((float) d1.z);
 
 			IWireNode wn = te.getWireNode(i);
 			if (wn == null) return;
 
 			Vec3d d2 = wn.getNodeOffset(te.getOtherNodeIndex(i)); // get other
-			float ox2 = ((float) d2.x());
-			float oy2 = ((float) d2.y());
-			float oz2 = ((float) d2.z());
+			float ox2 = ((float) d2.x);
+			float oy2 = ((float) d2.y);
+			float oz2 = ((float) d2.z);
 			BlockPos other = te.getNodePos(i);
 
 			float tx = other.getX() - te.getPos().getX();
 			float ty = other.getY() - te.getPos().getY();
 			float tz = other.getZ() - te.getPos().getZ();
-			matrixStackIn.pushPose();
+			matrixStackIn.push();
 
 			float dis = distanceFromZero(tx, ty, tz);
 
@@ -65,7 +65,7 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 					te.getNodeType(i),
 					dis
 				);
-				matrixStackIn.popPose();
+				matrixStackIn.pop();
 			}
 
 		/*if(ClientEventHandler.clientRenderHeldWire) {
@@ -126,7 +126,7 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 			WireType type, float dis) {
 		//matrix.pushPose();
 
-		VertexConsumer ivertexbuilder = buffer.getBuffer(CARenderType.WIRE);
+		VertexConsumer ivertexbuilder = buffer.getBuffer(RenderType.WIRE);
 		Matrix4f matrix4f = stack.peek().getPositionMatrix();
 		float f = MathHelper.inverseSqrt(x * x + z * z) * 0.025F / 2.0F;//fastInvSqrt
 		float o1 = z * f;

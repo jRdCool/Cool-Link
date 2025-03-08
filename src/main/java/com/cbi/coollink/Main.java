@@ -52,12 +52,18 @@ public class Main implements ModInitializer {
 
     public static final String namespace = "cool-link";
     public static final String[] woodTypes = {"oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry","bamboo","crimson","warped"};
+
+    //Block Entity Registry
     public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "aio_block_entity"), FabricBlockEntityTypeBuilder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "small_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, SmallConduit.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "medium_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, MediumConduit.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "large_conduit_block_entity"), FabricBlockEntityTypeBuilder.create(ConduitBlockEntity::new, LargeConduit.ENTRY).build());
 
     public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
+
+    //Cable Registries
+    public static final Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "cat6_ethernet_cable"),new Cat6Cable(new Item.Settings()));
+    public static final CoaxialCable coaxialCableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "coaxial_cable"),new CoaxialCable(new Item.Settings()));
 
     public static final ItemGroup COOL_LINK_ITEM_GROUP = FabricItemGroup.builder()
             .icon(() -> new ItemStack(AIO_Network.ENTRY))
@@ -82,8 +88,8 @@ public class Main implements ModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(AIO_Network.ENTRY, RenderLayer.getCutout());
         Registry.register(Registries.ITEM, Identifier.of("cool-link", "aio_network"),new BlockItem(AIO_Network.ENTRY, new Item.Settings()));
         SmartPhone smartPhoneEntry= Registry.register(Registries.ITEM, Identifier.of("cool-link", "smart_phone"),new SmartPhone(new Item.Settings()));
-        Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "cat6_ethernet_cable"),new Cat6Cable(new Item.Settings()));
-        CoaxialCable coaxialCableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "coaxial_cable"),new CoaxialCable(new Item.Settings()));
+
+
         WireTester wireTesterEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "wire_tester"),new WireTester(new Item.Settings()));
         ProgramingCable programingCableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "programing_cable"),new ProgramingCable(new Item.Settings()));
 
