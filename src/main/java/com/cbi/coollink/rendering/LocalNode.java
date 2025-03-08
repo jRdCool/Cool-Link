@@ -5,13 +5,10 @@ import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
 public class LocalNode {
 
-    public static final String NODES = "nodes";
     public static final String ID = "id";
     public static final String OTHER = "other";
     public static final String TYPE = "type";
@@ -34,13 +31,19 @@ public class LocalNode {
      * The relative position of this node from the original block entity.
      */
     private Vec3i relativePos;
-    private Vec3d test;
 
     /**
      * Whether this node is invalid.
      */
     private boolean invalid = false;
 
+    /**create a connection for a wire between ports
+     * @param entity the block entity the connection starts from
+     * @param index the index on the starting block entity
+     * @param other the index on the destination block entity
+     * @param type the type of wire to connect
+     * @param position the position of the target block entity
+     */
     public LocalNode(BlockEntity entity, int index, int other, WireType type, BlockPos position) {
         this.entity = entity;
         this.index = index;
@@ -86,7 +89,7 @@ public class LocalNode {
         return this.relativePos;
     }
 
-    public BlockPos getPos() {
+    public BlockPos getTargetPos() {
         return new BlockPos(entity.getPos().getX()+relativePos.getX(),entity.getPos().getY()+relativePos.getY(),entity.getPos().getZ()+relativePos.getZ());
     }
 

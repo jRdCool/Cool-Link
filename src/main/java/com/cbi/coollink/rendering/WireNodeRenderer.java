@@ -32,7 +32,7 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 
 		//time += partialTicks;
 
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < te.getNodeCount(); i++) {
 			if (!te.hasConnection(i)) continue;
 			Vec3d d1 = te.getNodeOffset(i);
 			float ox1 = ((float) d1.x);
@@ -48,14 +48,14 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 			float oz2 = ((float) d2.z);
 			BlockPos other = te.getNodePos(i);
 
-			float tx = other.getX() ;//- te.getPos().getX();
-			float ty = other.getY() ;//- te.getPos().getY();
-			float tz = other.getZ() +1;//- te.getPos().getZ();
+			float tx = other.getX() - te.getPos().getX();
+			float ty = other.getY() - te.getPos().getY();
+			float tz = other.getZ() - te.getPos().getZ();
 			matrixStackIn.push();
 
 			float dis = distanceFromZero(tx, ty, tz);
 
-			matrixStackIn.translate(tx + .5f + ox2, ty + .5f + oy2, tz + .5f + oz2);
+			matrixStackIn.translate(tx + ox2, ty + oy2, tz + oz2);
 			wireRender(
 					tileEntityIn,
 					other,
@@ -157,6 +157,8 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 
 			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j, false, o1, o2, type, dis, state, stack, lightOffset, hangFactor);
 			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j + 1, true, o1, o2, type, dis, state, stack, lightOffset+1, hangFactor);
+			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j, true, o1, o2, type, dis, state, stack, lightOffset, hangFactor);
+			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j + 1, false, o1, o2, type, dis, state, stack, lightOffset+1, hangFactor);
 
 		}
 
@@ -185,28 +187,28 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 
 		//System.out.println((fx + o1) +":"+ (fy + n1 - n2) +":"+ (fz - o2));
 
-
+		int singleColor = 0xFF_000000 | cr << 16 | cg << 8 | cb;
 		if(Math.abs(x) + Math.abs(z) < Math.abs(y)) {
 			boolean p = b > 0;
 			float c = 0.015f;
 
 			if (!sw) {
-				vertBuilder.vertex(matrix, fx -c, fy, fz + (p?-c:c)).color(cr, cg, cb, 255).light(light);//Changes May be necessary
+				vertBuilder.vertex(matrix, fx -c, fy, fz + (p?-c:c)).color(singleColor).light(light);//Changes May be necessary
 			}
 
-			vertBuilder.vertex(matrix, fx + c, fy, fz + (p?c:-c)).color(cr, cg, cb, 255).light(light);
+			vertBuilder.vertex(matrix, fx + c, fy, fz + (p?c:-c)).color(singleColor).light(light);
 			if (sw) {
-				vertBuilder.vertex(matrix, fx -c, fy, fz + (p?-c:c)).color(cr, cg, cb, 255).light(light);
+				vertBuilder.vertex(matrix, fx -c, fy, fz + (p?-c:c)).color(singleColor).light(light);
 			}
 		}
 		else {
 			if (!sw) {
-				vertBuilder.vertex(matrix, fx + o1, fy + a - b, fz - o2).color(cr, cg, cb, 255).light(light);
+				vertBuilder.vertex(matrix, fx + o1, fy + a - b, fz - o2).color(singleColor).light(light);
 			}
 
-			vertBuilder.vertex(matrix, fx - o1, fy + b, fz + o2).color(cr, cg, cb, 255).light(light);
+			vertBuilder.vertex(matrix, fx - o1, fy + b, fz + o2).color(singleColor).light(light);
 			if (sw) {
-				vertBuilder.vertex(matrix, fx + o1, fy + a - b, fz - o2).color(cr, cg, cb, 255).light(light);
+				vertBuilder.vertex(matrix, fx + o1, fy + a - b, fz - o2).color(singleColor).light(light);
 			}
 		}
 	}

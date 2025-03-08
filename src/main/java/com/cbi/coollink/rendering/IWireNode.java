@@ -45,7 +45,7 @@ public interface IWireNode {
         for (int i = 0; i < getNodeCount(); i++) {
             LocalNode node = getLocalNode(i);
             if (node == null) continue;
-            if (node.getPos().equals(pos)) return true;
+            if (node.getTargetPos().equals(pos)) return true;
         }
         return false;
     }
@@ -79,7 +79,7 @@ public interface IWireNode {
     default BlockPos getNodePos(int index){
         LocalNode node = getLocalNode(index);
         if (node == null) return null;
-        return node.getPos();
+        return node.getTargetPos();
     }
 
     BlockPos getPos();
@@ -175,7 +175,7 @@ public interface IWireNode {
         for (int i = 0; i < getNodeCount(); i++) {
             LocalNode node = getLocalNode(i);
             if (node == null) continue;
-            if (node.getPos().equals(pos)) return node;
+            if (node.getTargetPos().equals(pos)) return node;
         }
         return null;
     }
@@ -190,7 +190,7 @@ public interface IWireNode {
         if (!obj.hasConnection(index)) return null;
         // Cache the node if it isn't already.
         if (nodeCache[index] == null)
-            nodeCache[index] = IWireNode.getWireNode(level, localNodes[index].getPos());
+            nodeCache[index] = IWireNode.getWireNode(level, localNodes[index].getTargetPos());
         // If the node is still null, remove it.
         if (nodeCache[index] == null) obj.removeNode(index);
         return nodeCache[index];

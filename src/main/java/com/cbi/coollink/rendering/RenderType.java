@@ -11,6 +11,6 @@ public class RenderType extends RenderLayer {
         super(name, vertexFormat, drawMode, expectedBufferSize, hasCrumbling, translucent, startAction, endAction);
     }
 
-    public static final RenderLayer WIRE = RenderLayer.of("wire", VertexFormats.POSITION_COLOR_LIGHT, VertexFormat.DrawMode.QUADS, 256, false, true, RenderLayer.of(RenderPhase.LEASH_PROGRAM));
+    public static final RenderLayer WIRE = RenderLayer.of("wire", VertexFormats.POSITION_COLOR_LIGHT, VertexFormat.DrawMode.QUADS, 256, false, true, RenderLayer.of(RenderPhase.COLOR_PROGRAM));
 
 }

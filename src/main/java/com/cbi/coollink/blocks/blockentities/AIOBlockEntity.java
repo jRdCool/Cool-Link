@@ -33,7 +33,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		//}
 		this.localNodes = new LocalNode[getNodeCount()];
 		this.nodeCache = new IWireNode[getNodeCount()];
-		setNode(0,0,pos,WireType.CAT6);
+		setNode(0,1,pos,WireType.CAT6);
+		//setNode(1,1,pos,WireType.COAX);
 	}
 
 	public String password;
@@ -150,7 +151,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 			return new Vec3d(1,1,1);
 		}
 		if(node == 1 ){
-			return new Vec3d(0,1,0);
+			return new Vec3d(0,0,0);
 		}
 
 		return null;
@@ -163,7 +164,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 
 	@Override
 	public int getOtherNodeIndex(int index) {
-		return 0;
+		return localNodes[index].getOtherIndex();
 	}
 
 	@Override
@@ -188,6 +189,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 
 	@Override
 	public boolean hasConnection(int index) {
-		return true;
+		return localNodes[index] != null;
+	}
+
+	@Override
+	public int getNodeCount() {
+		return 2;
 	}
 }
