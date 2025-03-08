@@ -11,6 +11,7 @@ import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RotationAxis;
 
 public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<ServerRackBlockEntity> {
     public ServerRackBlockEntityRenderer(BlockEntityRendererFactory.Context context){
@@ -31,7 +32,11 @@ public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<Server
             //spriteIdentifier.getVertexConsumer(vertexConsumers,layer);
 
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(layer);
-            MatrixStack.Entry matrix = matrices.peek();
+            matrices.push();
+            if(entity.getCachedState().get(ServerRack.direction) == ServerRack.Direction.EAST_WEST) {
+                matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(90));
+                matrices.translate(0,0,-1);
+            }
 
             //TODO: check the installed servers and only render on bays that have servers installed
             renderServer(matrices,vertexConsumer,0);
@@ -40,6 +45,7 @@ public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<Server
             renderServer(matrices,vertexConsumer,3);
             renderServer(matrices,vertexConsumer,4);
             renderServer(matrices,vertexConsumer,5);
+            matrices.pop();
         }
     }
 
