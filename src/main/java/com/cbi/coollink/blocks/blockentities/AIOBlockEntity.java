@@ -1,4 +1,4 @@
-package com.cbi.coollink.blocks;
+package com.cbi.coollink.blocks.blockentities;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.net.protocol.Mac;
@@ -29,8 +29,6 @@ public class AIOBlockEntity extends BlockEntity {
 		//}
 	}
 
-	private int number = 0;
-	private String key;
 	public String password;
 	public String ssid;
 	public String netPass;
@@ -77,7 +75,6 @@ public class AIOBlockEntity extends BlockEntity {
 	public void readNbt(NbtCompound nbt,RegistryWrapper.WrapperLookup registryLookup) {
 		super.readNbt(nbt,registryLookup);
 		password=nbt.getString("password");
-		number = nbt.getInt("number");
 		ssid = nbt.getString("ssid");
 		netPass = nbt.getString("Wireless_Password");
 		byte[] mac1Bytes = nbt.getByteArray("MAC1");
@@ -99,7 +96,6 @@ public class AIOBlockEntity extends BlockEntity {
 	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//Main.LOGGER.info(be.password);
 		be.createConnectedDevices();
-
 	}
 	public void updateStates(){
 		world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
@@ -120,13 +116,15 @@ public class AIOBlockEntity extends BlockEntity {
 				//return;
 			}
 			else {
-				Main.LOGGER.info("!!!!! !!!ERROR!!! MORE IPs THAN DEVICES !!!!!");
+				Main.LOGGER.info("!!!!! !!!ERROR!!! MORE DEVICES THAN IPs !!!!!");
 			}
 		}
 		else {
 			for (int i=0;i<deviceName.size();i++)
 			{
                 connectedDevices.set(i, deviceName.get(i) + "  " + " ".repeat(Math.max(0, 16 - deviceName.get(i).length())) + deviceIP.get(i));
+				String sb = "  " + " ".repeat(Math.max(0, 16 - deviceName.get(i).length()));
+				connectedDevices.set(i,deviceName.get(i)+ sb +deviceIP.get(i));
 			}
 		}
 	}

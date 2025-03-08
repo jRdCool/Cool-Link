@@ -1,9 +1,8 @@
-package com.cbi.coollink.blocks;
+package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.mojang.serialization.MapCodec;
-import com.cbi.coollink.net.protocol.Mac;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;

@@ -1,11 +1,10 @@
 package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.blocks.AIOBlockEntity;
+import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.net.AioSyncMacPacket;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import com.cbi.coollink.net.protocol.Mac;
-import jdk.jshell.spi.ExecutionControl;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;

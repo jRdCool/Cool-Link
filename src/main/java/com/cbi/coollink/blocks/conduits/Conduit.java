@@ -1,4 +1,4 @@
-package com.cbi.coollink.blocks;
+package com.cbi.coollink.blocks.conduits;
 
 import com.cbi.coollink.net.OpenConduitGuiPacket;
 import com.mojang.serialization.MapCodec;
@@ -13,7 +13,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;

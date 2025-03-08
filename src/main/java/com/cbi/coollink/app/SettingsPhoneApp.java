@@ -1,13 +1,12 @@
 package com.cbi.coollink.app;
 
-import com.cbi.coollink.blocks.AIOBlockEntity;
+import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.guis.PhoneGui;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;

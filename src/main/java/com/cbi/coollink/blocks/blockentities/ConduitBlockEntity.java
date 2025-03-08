@@ -1,4 +1,4 @@
-package com.cbi.coollink.blocks;
+package com.cbi.coollink.blocks.blockentities;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

@@ -1,4 +1,4 @@
-package com.cbi.coollink.mic;
+package com.cbi.coollink.net.mic;
 
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;

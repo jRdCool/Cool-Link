@@ -1,4 +1,4 @@
-package com.cbi.coollink.mic;
+package com.cbi.coollink.net.mic;
 
 import io.github.cottonmc.cotton.gui.widget.WTextField;
 import net.fabricmc.api.EnvType;

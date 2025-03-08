@@ -3,7 +3,7 @@ package com.cbi.coollink;
 import com.cbi.coollink.app.AppRegistry;
 import com.cbi.coollink.app.ExampleApp;
 import com.cbi.coollink.app.SnakeGameApp;
-import com.cbi.coollink.blocks.AIOBlockEntity;
+import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.guis.ConduitGUI;
 import com.cbi.coollink.guis.ConduitScreen;
 import com.cbi.coollink.guis.PhoneGui;
@@ -16,8 +16,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 

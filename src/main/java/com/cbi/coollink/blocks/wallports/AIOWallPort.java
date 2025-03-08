@@ -1,4 +1,4 @@
-package com.cbi.coollink.blocks;
+package com.cbi.coollink.blocks.wallports;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.AIOCableBundle;

@@ -1,8 +1,7 @@
 package com.cbi.coollink.blocks.cables;
 
-import com.cbi.coollink.blocks.CoaxWallPort;
-import com.cbi.coollink.blocks.SatelliteDishBlock;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import com.cbi.coollink.blocks.wallports.CoaxWallPort;
+import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -23,8 +22,7 @@ import net.minecraft.world.BlockView;
 
 
 import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
-import static com.cbi.coollink.blocks.SatelliteDishBlock.MultiBlockPartStates.D1;
-import static com.cbi.coollink.blocks.SatelliteDishBlock.multiBlockPose;
+import static com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock.MultiBlockPartStates.D1;
 import static net.minecraft.state.property.Properties.FACING;
 
 public class CoaxCable extends Block {

@@ -12,9 +12,12 @@ public class Mac {
     private int[] mac;
 
 @ConstructorProperties({"0x00-0xFF"})
-    public Mac(int deviceType){
+    public Mac(int deviceType){//constructor
         mac = new int[3];
-        setMac(generateMac(deviceType));
+        setMac(generateMac(deviceType),deviceType);
+    }
+    public Mac(int[] mac,int deviceID){
+        setMac(mac,deviceID);
     }
 
     public Mac(byte[] bytes){
@@ -61,7 +64,7 @@ public class Mac {
         return data;
     }
 
-    private int[] generateMac(int deviceType){
+    private int[] generateMac(int deviceType){//generates a new mac address and checks if it has already been assigned in this world
         if (deviceType>0xFF||deviceType<0x00)
         {
             throw new RuntimeException("INVALID MAC ADDRESS, ADDRESSES MUST BE BETWEEN 0x00-0xFF");
@@ -78,8 +81,16 @@ public class Mac {
         return address;
     }
 
-    private void setMac(int[] mac){
-        this.mac=mac;
+    public void setMac(int[] mac,int deviceID){
+        if(mac[0]>0xFF||mac[0]<0x00){
+            throw new RuntimeException("INVALID MAC ADDRESS, ADDRESSES MUST BE BETWEEN 0x00-0xFF. Reminder This method is only to be used while updating the client");
+        }
+        else if(mac[0]==deviceID) {
+            this.mac=mac;
+        }
+        else {
+            throw new RuntimeException("DEVICE IDs DID NOT MATCH. Reminder This method is only to be used while updating the client");
+        }
     }
 
     @Override

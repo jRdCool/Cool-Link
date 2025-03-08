@@ -1,11 +1,18 @@
 package com.cbi.coollink;
 
 import com.cbi.coollink.blocks.*;
+import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.blocks.cables.AIOCableBundle;
 import com.cbi.coollink.blocks.cables.CoaxCable;
+import com.cbi.coollink.blocks.conduits.LargeConduit;
+import com.cbi.coollink.blocks.conduits.MediumConduit;
+import com.cbi.coollink.blocks.conduits.SmallConduit;
+import com.cbi.coollink.blocks.networkdevices.AIO_Network;
+import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
+import com.cbi.coollink.blocks.wallports.AIOWallPort;
+import com.cbi.coollink.blocks.wallports.CoaxWallPort;
 import com.cbi.coollink.items.*;
 import com.cbi.coollink.net.*;
-import com.cbi.coollink.net.protocol.Mac;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -60,7 +67,7 @@ public class Main implements ModInitializer {
 
     private static final RegistryKey<ItemGroup> ITEM_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of("cool-link", "cool-link"));
 
-    static HashMap<String,CoaxWallPort> coaxWallPortVarients = new HashMap<>();
+    static HashMap<String, CoaxWallPort> coaxWallPortVarients = new HashMap<>();
     @Override
     public void onInitialize() {
         LOGGER.info("loading cool link");
@@ -91,10 +98,10 @@ public class Main implements ModInitializer {
         Registry.register(Registries.BLOCK, Identifier.of("cool-link","small_conduit"),SmallConduit.ENTRY);
         Registry.register(Registries.ITEM, Identifier.of("cool-link", "small_conduit"),new BlockItem(SmallConduit.ENTRY, new Item.Settings()));
 
-        Registry.register(Registries.BLOCK, Identifier.of("cool-link","medium_conduit"),MediumConduit.ENTRY);
+        Registry.register(Registries.BLOCK, Identifier.of("cool-link","medium_conduit"), MediumConduit.ENTRY);
         Registry.register(Registries.ITEM, Identifier.of("cool-link", "medium_conduit"),new BlockItem(MediumConduit.ENTRY, new Item.Settings()));
 
-        Registry.register(Registries.BLOCK, Identifier.of("cool-link","large_conduit"),LargeConduit.ENTRY);
+        Registry.register(Registries.BLOCK, Identifier.of("cool-link","large_conduit"), LargeConduit.ENTRY);
         Registry.register(Registries.ITEM, Identifier.of("cool-link", "large_conduit"),new BlockItem(LargeConduit.ENTRY, new Item.Settings()));
 
         Registry.register(Registries.BLOCK,Identifier.of("cool-link","coax_cable"), CoaxCable.ENTRY);

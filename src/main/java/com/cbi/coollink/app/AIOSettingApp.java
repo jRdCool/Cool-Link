@@ -1,8 +1,8 @@
 package com.cbi.coollink.app;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.blocks.AIOBlockEntity;
-import com.cbi.coollink.mic.WPasswordField;
+import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
+import com.cbi.coollink.net.mic.WPasswordField;
 import com.cbi.coollink.net.AioSetAdminPasswordPacket;
 import com.cbi.coollink.net.AioSetNetPasswordPacket;
 import com.cbi.coollink.net.AioSetSSIDPacket;
@@ -11,10 +11,8 @@ import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.PlainTextContent.Literal;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
