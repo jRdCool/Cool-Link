@@ -15,7 +15,10 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiConsumer;
 
 import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
 
@@ -214,6 +217,12 @@ public class SatelliteDishBlock extends Block {
 
         }
 
+    }
+
+    @Override
+    protected void onExploded(BlockState state, World world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        super.onExploded(state, world, pos, explosion, stackMerger);
+        onBroken(world,pos,state);
     }
 
     public VoxelShape voxelD1(){

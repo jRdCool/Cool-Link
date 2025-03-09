@@ -24,18 +24,6 @@ public record OpenPhoneGuiPacket(RegistryKey<World> world, BlockPos block, ItemS
             OpenPhoneGuiPacket::new
     );
 
-    //public OpenPhoneGuiPacket(PacketByteBuf buf) {
-    //    this(buf.readRegistryKey(RegistryKeys.WORLD),buf.readBlockPos(),/*buf.readItemStack()*/null,buf.readBoolean());
-    //}
-//
-    ////@Override
-    //public void write(PacketByteBuf buf) {
-    //    buf.writeRegistryKey(this.world);
-    //    buf.writeBlockPos(this.block);
-    //    //buf.writeItemStack(this.heldItem);
-    //    buf.writeBoolean(this.noBlockEntity);
-    //}
-
     @Override
     public Id<? extends CustomPayload> getId() {
 

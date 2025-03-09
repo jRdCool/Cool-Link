@@ -4,20 +4,17 @@ import com.cbi.coollink.app.AppRegistry;
 import com.cbi.coollink.app.ExampleApp;
 import com.cbi.coollink.app.SnakeGameApp;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
-import com.cbi.coollink.guis.ConduitGUI;
-import com.cbi.coollink.guis.ConduitScreen;
-import com.cbi.coollink.guis.PhoneGui;
-import com.cbi.coollink.guis.PhoneScreen;
+import com.cbi.coollink.guis.*;
 import com.cbi.coollink.net.AioSyncMacPacket;
 import com.cbi.coollink.net.OpenConduitGuiPacket;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
+import com.cbi.coollink.net.OpenPortSelectGuiPacket;
 import com.cbi.coollink.rendering.blockentities.ServerRackBlockEntityRenderer;
 import com.cbi.coollink.rendering.WireNodeRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
@@ -67,7 +64,7 @@ public class ClientEntryPoint implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(OpenConduitGuiPacket.ID,(payload, context) -> {
             context.client().execute( ()->{
-                context.client().setScreen(new ConduitScreen(new ConduitGUI()));
+                context.client().setScreen(new BasicScreen(new ConduitGUI()));
             });
         });
 
@@ -80,6 +77,19 @@ public class ClientEntryPoint implements ClientModInitializer {
                             aio.setMacAddresses(payload.mac1(),payload.mac2());
                         }
                     }catch(Exception e){}
+                }
+            });
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(OpenPortSelectGuiPacket.ID, (payload, context) -> {
+            World clientWorld = context.client().world;
+            if(clientWorld == null){
+                return;
+            }
+            context.client().execute(() ->{
+                if(clientWorld.getRegistryKey().equals(payload.world())){
+                    BlockEntity clickedOnBlockEntity = clientWorld.getBlockEntity(payload.pos());
+                    context.client().setScreen(new BasicScreen(new PortSelectGUI()));
                 }
             });
         });
