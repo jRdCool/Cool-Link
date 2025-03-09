@@ -1,7 +1,11 @@
 package com.cbi.coollink.blocks.blockentities;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import com.cbi.coollink.blocks.networkdevices.AIO_Network;
 import com.cbi.coollink.net.protocol.Mac;
+import com.cbi.coollink.rendering.IWireNode;
+import com.cbi.coollink.rendering.LocalNode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -10,7 +14,9 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +25,7 @@ import java.util.ArrayList;
 // Made with Blockbench 4.5.2
 // Exported for Minecraft version 1.17+ for Yarn
 // Paste this class into your mod and generate all required imports
-public class AIOBlockEntity extends BlockEntity {
+public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public AIOBlockEntity(BlockPos pos, BlockState state) {
 		super(Main.AIO_BLOCK_ENTITY, pos, state);
 		String currentThread = Thread.currentThread().getName();
@@ -27,6 +33,10 @@ public class AIOBlockEntity extends BlockEntity {
 			mac1 = new Mac(deviceID);
 			mac2 = new Mac(deviceID);
 		//}
+		this.localNodes = new LocalNode[getNodeCount()];
+		this.nodeCache = new IWireNode[getNodeCount()];
+		//setNode(0,1,pos,WireType.CAT6);
+		//setNode(1,2,pos,WireType.COAX);
 	}
 
 	public String password;
@@ -135,4 +145,70 @@ public class AIOBlockEntity extends BlockEntity {
 		this.mac2 = new Mac(mac2);
 	}
 
+	private final LocalNode[] localNodes;
+	private final IWireNode[] nodeCache;
+	@Override
+	public Vec3d getNodeOffset(int node) {
+		double node0XN = 0.275;
+		double node1XN = 0.475;
+		double node2XN = 0.75;
+		double nodeZN = 0.9;
+		double nodeY = .05;
+		Vec3d[][] nodes = {
+				{new Vec3d(node0XN,nodeY,nodeZN), new Vec3d(node1XN,nodeY,nodeZN), new Vec3d(node2XN,nodeY,nodeZN) },
+				{new Vec3d(1-nodeZN,nodeY,node0XN), new Vec3d(1-nodeZN,nodeY,node1XN), new Vec3d(1-nodeZN,nodeY,node2XN) },
+				{new Vec3d(1-node0XN,nodeY,1-nodeZN), new Vec3d(1-node1XN,nodeY,1-nodeZN), new Vec3d(1-node2XN,nodeY,1-nodeZN) },
+				{new Vec3d(nodeZN,nodeY,1-node0XN), new Vec3d(nodeZN,nodeY,1-node1XN), new Vec3d(nodeZN,nodeY,1-node2XN) }
+		};
+		int dir = 0;
+		switch (getCachedState().get(Properties.HORIZONTAL_FACING)){
+			case EAST -> dir=1;
+			case SOUTH -> dir=2;
+			case WEST -> dir=3;
+			default -> {}
+		}
+
+		return nodes[dir][node];
+	}
+
+	@Override
+	public IWireNode getWireNode(int index) {
+		return this;
+	}
+
+	@Override
+	public int getOtherNodeIndex(int index) {
+		return localNodes[index].getOtherIndex();
+	}
+
+	@Override
+	public @Nullable LocalNode getLocalNode(int index) {
+		return localNodes[index];
+	}
+
+	@Override
+	public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
+		this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
+
+
+	}
+
+	@Override
+	public void removeNode(int index, boolean dropWire) {
+		LocalNode old = this.localNodes[index];
+		this.localNodes[index] = null;
+		this.nodeCache[index] = null;
+
+	}
+
+	@Override
+	public boolean hasConnection(int index) {
+		//Main.LOGGER.info(index+"");
+		return localNodes[index] != null;
+	}
+
+	@Override
+	public int getNodeCount() {
+		return 3;
+	}
 }
