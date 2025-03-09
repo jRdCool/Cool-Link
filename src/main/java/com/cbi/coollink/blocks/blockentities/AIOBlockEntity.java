@@ -2,6 +2,7 @@ package com.cbi.coollink.blocks.blockentities;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import com.cbi.coollink.blocks.networkdevices.AIO_Network;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
@@ -13,6 +14,7 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -33,8 +35,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		//}
 		this.localNodes = new LocalNode[getNodeCount()];
 		this.nodeCache = new IWireNode[getNodeCount()];
-		setNode(0,1,pos,WireType.CAT6);
-		//setNode(1,1,pos,WireType.COAX);
+		//setNode(0,1,pos,WireType.CAT6);
+		//setNode(1,2,pos,WireType.COAX);
 	}
 
 	public String password;
@@ -147,14 +149,26 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	private final IWireNode[] nodeCache;
 	@Override
 	public Vec3d getNodeOffset(int node) {
-		if(node == 0 ){
-			return new Vec3d(1,1,1);
-		}
-		if(node == 1 ){
-			return new Vec3d(0,0,0);
+		double node0XN = 0.275;
+		double node1XN = 0.475;
+		double node2XN = 0.75;
+		double nodeZN = 0.9;
+		double nodeY = .05;
+		Vec3d[][] nodes = {
+				{new Vec3d(node0XN,nodeY,nodeZN), new Vec3d(node1XN,nodeY,nodeZN), new Vec3d(node2XN,nodeY,nodeZN) },
+				{new Vec3d(1-nodeZN,nodeY,node0XN), new Vec3d(1-nodeZN,nodeY,node1XN), new Vec3d(1-nodeZN,nodeY,node2XN) },
+				{new Vec3d(1-node0XN,nodeY,1-nodeZN), new Vec3d(1-node1XN,nodeY,1-nodeZN), new Vec3d(1-node2XN,nodeY,1-nodeZN) },
+				{new Vec3d(nodeZN,nodeY,1-node0XN), new Vec3d(nodeZN,nodeY,1-node1XN), new Vec3d(nodeZN,nodeY,1-node2XN) }
+		};
+		int dir = 0;
+		switch (getCachedState().get(Properties.HORIZONTAL_FACING)){
+			case EAST -> dir=1;
+			case SOUTH -> dir=2;
+			case WEST -> dir=3;
+			default -> {}
 		}
 
-		return null;
+		return nodes[dir][node];
 	}
 
 	@Override
@@ -173,8 +187,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	}
 
 	@Override
-	public void setNode(int index, int other, BlockPos pos, WireType type) {
-		this.localNodes[index] = new LocalNode(this, index, other, type, pos);
+	public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
+		this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
 
 
 	}
@@ -189,11 +203,12 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 
 	@Override
 	public boolean hasConnection(int index) {
+		//Main.LOGGER.info(index+"");
 		return localNodes[index] != null;
 	}
 
 	@Override
 	public int getNodeCount() {
-		return 2;
+		return 3;
 	}
 }

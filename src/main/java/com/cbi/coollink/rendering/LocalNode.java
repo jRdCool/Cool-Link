@@ -40,14 +40,14 @@ public class LocalNode {
     /**create a connection for a wire between ports
      * @param entity the block entity the connection starts from
      * @param index the index on the starting block entity
-     * @param other the index on the destination block entity
+     * @param otherIndex the index on the destination block entity
      * @param type the type of wire to connect
      * @param position the position of the target block entity
      */
-    public LocalNode(BlockEntity entity, int index, int other, WireType type, BlockPos position) {
+    public LocalNode(BlockEntity entity, int index, int otherIndex, WireType type, BlockPos position) {
         this.entity = entity;
         this.index = index;
-        this.otherIndex = other;
+        this.otherIndex = otherIndex;
         this.type = type;
         this.relativePos = position.subtract(entity.getPos());
     }

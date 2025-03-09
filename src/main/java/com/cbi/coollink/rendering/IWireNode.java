@@ -102,7 +102,7 @@ public interface IWireNode {
     @Nullable
     LocalNode getLocalNode(int index);
 
-    void setNode(int index, int other, BlockPos pos, WireType type);
+    void setNode(int index, int otherNode, BlockPos pos, WireType type);
 
     /**
      * Remove the given node.
