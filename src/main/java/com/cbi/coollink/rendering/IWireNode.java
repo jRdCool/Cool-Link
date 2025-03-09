@@ -197,4 +197,9 @@ public interface IWireNode {
     }
 
     WireType getPortType(int index);
+
+    boolean isNodeInUse(int index);
+    void setIsNodeUsed(int index,boolean set);
+
+    BlockPos getBlockPos();
 }

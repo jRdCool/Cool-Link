@@ -28,8 +28,8 @@ public class ACableItem extends Item {
         ItemStack stack = context.getStack();
 
 
-
         if(world.getBlockEntity(pos) instanceof IWireNode node){
+            Main.LOGGER.info("Clicked on an IWire node");
             if(stack.contains(Main.WIRE_INFO_COMPONENT)) {
                 WireInfoComponent comp = stack.get(Main.WIRE_INFO_COMPONENT);
 
@@ -52,12 +52,25 @@ public class ACableItem extends Item {
                 return super.useOnBlock(context);
             }
             if(ofType.size()>1){
-                //TODO: Open up gui to select desired port
+                /*TODO: Open up gui to select desired port
+                 * Pass ofType, TYPE, world, and pos
+                 * return the integer index of the selected port
+                 * Have the GUI display the ports available and weather or not they are currently used
+                 * gather used ports and display as used (isNodeInUse method)
+                 */
+            }else if (nodeCount>1){
+                index = ofType.get(0);
             }
+
             if(stack.contains(Main.WIRE_INFO_COMPONENT)){
+                Main.LOGGER.info("Info component present");
                 WireInfoComponent comp = stack.get(Main.WIRE_INFO_COMPONENT);
-                if(comp!=null&&comp.originBlock() instanceof  IWireNode){
-                    ((IWireNode) comp.originBlock()).setNode(comp.index(),index,pos,TYPE);
+                Main.LOGGER.info(comp.originBlock().toString());
+                if(comp!=null&&world.getBlockEntity(comp.originBlock()) instanceof IWireNode block){
+                   block.setNode(comp.index(),index,pos,TYPE);
+                    //((IWireNode) pos).setNode(index,comp.index(),comp.originBlock(),TYPE);
+                    Main.LOGGER.info("Rendering");
+                    Main.LOGGER.info(block.getNodeOffset(comp.index())+"");
                 }
                 //TODO: connect set the wire to render
 
@@ -65,8 +78,11 @@ public class ACableItem extends Item {
             }
             else {
                 stack.set(Main.WIRE_INFO_COMPONENT, new WireInfoComponent(index, pos));
+                Main.LOGGER.info("Stack Component Set");
+                Main.LOGGER.info(stack.get(Main.WIRE_INFO_COMPONENT).toString());
             }
         }
+
 
         //CoaxCable.ENTRY.onPlaced(world,placedPos,CoaxCable.ENTRY.getDefaultState(),context.getPlayer(), context.getStack());
         return super.useOnBlock(context);

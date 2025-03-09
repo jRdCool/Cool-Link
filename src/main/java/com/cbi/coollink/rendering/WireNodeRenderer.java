@@ -29,6 +29,7 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 	public void render(T tileEntityIn, float partialTicks, MatrixStack matrixStackIn, VertexConsumerProvider bufferIn,
 					   int combinedLightIn, int combinedOverlayIn) {
 		IWireNode te = (IWireNode) tileEntityIn;
+		//tileEntityIn.
 
 		//time += partialTicks;
 

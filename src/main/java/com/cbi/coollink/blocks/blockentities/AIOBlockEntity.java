@@ -2,7 +2,6 @@ package com.cbi.coollink.blocks.blockentities;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
-import com.cbi.coollink.blocks.networkdevices.AIO_Network;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
@@ -21,6 +20,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 // Made with Blockbench 4.5.2
 // Exported for Minecraft version 1.17+ for Yarn
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public AIOBlockEntity(BlockPos pos, BlockState state) {
 		super(Main.AIO_BLOCK_ENTITY, pos, state);
-		String currentThread = Thread.currentThread().getName();
+		//String currentThread = Thread.currentThread().getName();
 		//if(currentThread.equals("Server thread")) {
 			mac1 = new Mac(deviceID);
 			mac2 = new Mac(deviceID);
@@ -38,6 +38,9 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		//setNode(0,1,pos,WireType.CAT6);
 		//setNode(1,2,pos,WireType.COAX);
 	}
+
+	private static final int nodeCount = 3;
+	private final boolean[] isNodeUsed = new boolean[nodeCount];
 
 	public String password;
 	public String ssid;
@@ -55,26 +58,9 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
 		// Save the current value of the number to the nbt
 		nbt.putInt("number", 89);
-		//Main.LOGGER.info("password is: "+password);
-		if(password==null){
-			nbt.putString("password","password123546");
-			//Main.LOGGER.info("saving password as: password123546" );
-		}else {
-			nbt.putString("password", password);
-			//Main.LOGGER.info("saving password as: " + password);
-		}
-		if(ssid==null){
-			nbt.putString("ssid","Unconfigured Network");
-		}
-		else{
-			nbt.putString("ssid", ssid);
-		}
-		if(netPass==null){
-			nbt.putString("Wireless_Password","");
-		}
-		else{
-			nbt.putString("Wireless_Password", netPass);
-		}
+		nbt.putString("password", Objects.requireNonNullElse(password, "password123546"));
+		nbt.putString("ssid", Objects.requireNonNullElse(ssid, "Unconfigured Network"));
+		nbt.putString("Wireless_Password", Objects.requireNonNullElse(netPass, ""));
 		nbt.putByteArray("MAC1",mac1.getBytes());
 		nbt.putByteArray("MAC2",mac2.getBytes());
 		super.writeNbt(nbt,registryLookup);
@@ -103,12 +89,13 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		return createNbt(registryLookup);
 	}
 
+	@SuppressWarnings("unused")
 	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//Main.LOGGER.info(be.password);
 		be.createConnectedDevices();
 	}
 	public void updateStates(){
-		world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+		if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
 	}
 
 	void createConnectedDevices() {
@@ -122,7 +109,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		{
 			if(deviceName.size() < deviceIP.size())
 			{
-				//call a function that assigns ip addresses to devices that don't have them
+				//TODO: Call a function that assigns ip addresses to devices that don't have them
 				//return;
 			}
 			else {
@@ -155,10 +142,10 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		double nodeZN = 0.9;
 		double nodeY = .05;
 		Vec3d[][] nodes = {
-				{new Vec3d(node0XN,nodeY,nodeZN), new Vec3d(node1XN,nodeY,nodeZN), new Vec3d(node2XN,nodeY,nodeZN) },
-				{new Vec3d(1-nodeZN,nodeY,node0XN), new Vec3d(1-nodeZN,nodeY,node1XN), new Vec3d(1-nodeZN,nodeY,node2XN) },
-				{new Vec3d(1-node0XN,nodeY,1-nodeZN), new Vec3d(1-node1XN,nodeY,1-nodeZN), new Vec3d(1-node2XN,nodeY,1-nodeZN) },
-				{new Vec3d(nodeZN,nodeY,1-node0XN), new Vec3d(nodeZN,nodeY,1-node1XN), new Vec3d(nodeZN,nodeY,1-node2XN) }
+				{new Vec3d(node0XN,nodeY,nodeZN), new Vec3d(node1XN,nodeY,nodeZN), new Vec3d(node2XN,nodeY,nodeZN) },// - - - - - - - - - - - - - - NORTH
+				{new Vec3d(1-nodeZN,nodeY,node0XN), new Vec3d(1-nodeZN,nodeY,node1XN), new Vec3d(1-nodeZN,nodeY,node2XN) },// - - - - - - - EAST
+				{new Vec3d(1-node0XN,nodeY,1-nodeZN), new Vec3d(1-node1XN,nodeY,1-nodeZN), new Vec3d(1-node2XN,nodeY,1-nodeZN) },// SOUTH
+				{new Vec3d(nodeZN,nodeY,1-node0XN), new Vec3d(nodeZN,nodeY,1-node1XN), new Vec3d(nodeZN,nodeY,1-node2XN) } // - - - - - - - WEST
 		};
 		int dir = 0;
 		switch (getCachedState().get(Properties.HORIZONTAL_FACING)){
@@ -189,13 +176,14 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	@Override
 	public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
 		this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
+		isNodeUsed[index]=true;
 
 
 	}
 
 	@Override
 	public void removeNode(int index, boolean dropWire) {
-		LocalNode old = this.localNodes[index];
+		//LocalNode old = this.localNodes[index];
 		this.localNodes[index] = null;
 		this.nodeCache[index] = null;
 
@@ -208,6 +196,20 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	}
 
 	@Override
+	public boolean isNodeInUse(int index) {
+		return isNodeUsed[index];
+	}
+
+	public void setIsNodeUsed(int index,boolean set){
+		isNodeUsed[index]=set;
+	}
+
+	@Override
+	public BlockPos getBlockPos() {
+		return this.getPos();
+	}
+
+	@Override
 	public boolean hasConnection(int index) {
 		//Main.LOGGER.info(index+"");
 		return localNodes[index] != null;
@@ -215,6 +217,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 
 	@Override
 	public int getNodeCount() {
-		return 3;
+		return nodeCount;
 	}
 }
