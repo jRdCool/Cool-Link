@@ -14,6 +14,7 @@ import com.cbi.coollink.blocks.wallports.AIOWallPort;
 import com.cbi.coollink.blocks.wallports.CoaxWallPort;
 import com.cbi.coollink.items.*;
 import com.cbi.coollink.net.*;
+import com.cbi.coollink.rendering.IWireNode;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -161,6 +162,7 @@ public class Main implements ModInitializer {
         PayloadTypeRegistry.playC2S().register(AioSetNetPasswordPacket.ID,AioSetNetPasswordPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(AioSyncMacPacket.ID,AioSyncMacPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenPortSelectGuiPacket.ID,OpenPortSelectGuiPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(WireInfoDataPacket.ID,WireInfoDataPacket.CODEC);
 
         //register a packet listener to listen for the aio-set-password packet
         ServerPlayNetworking.registerGlobalReceiver(AioSetAdminPasswordPacket.ID, (payload, context) -> {
@@ -229,6 +231,54 @@ public class Main implements ModInitializer {
 
 
             });
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(WireInfoDataPacket.ID ,(payload, context) -> {
+            //check if the item has the component on it already
+            ItemStack itemFromClient = payload.heldItem();
+            World world = context.player().getWorld();
+            if(world == null){
+                return;
+            }
+            context.server().execute(() -> {
+                ItemStack heldItem = null;
+                for (ItemStack itemStack : context.player().getHandItems()) {
+                    if (itemStack.getItem().equals(itemFromClient.getItem())) {
+                        heldItem = itemStack;
+                        break;
+                    }
+                }
+                if (heldItem == null) {
+                    LOGGER.error("Player attempted to create wire info but were not holding the item they started with");
+                    return;
+                }
+                if(heldItem.contains(WIRE_INFO_COMPONENT)){
+                    if(payload.clear()){
+                        heldItem.remove(WIRE_INFO_COMPONENT);
+                        return;
+                    }
+                    //finishing the wire
+                    WireInfoComponent startingWireInfo = heldItem.get(WIRE_INFO_COMPONENT);
+                    BlockEntity block2 = world.getBlockEntity(payload.originBlock());
+                    if(block2 == null){
+                        heldItem.remove(WIRE_INFO_COMPONENT);
+                        return;
+                    }
+                    if(startingWireInfo != null && world.getBlockEntity(startingWireInfo.originBlock()) instanceof IWireNode block){
+                        block.setNode(startingWireInfo.index(),payload.index(),payload.originBlock(),payload.wireType());
+
+                        ((IWireNode) block2).setNode(payload.index(), startingWireInfo.index(),startingWireInfo.originBlock(),payload.wireType());
+                    }
+                    heldItem.remove(WIRE_INFO_COMPONENT);
+                    context.player().swingHand(context.player().getActiveHand(),true);
+                }else {
+                    //starting the wire
+                    heldItem.set(WIRE_INFO_COMPONENT, new WireInfoComponent(payload.index(), payload.originBlock()));
+                    context.player().swingHand(context.player().getActiveHand(),true);
+                }
+
+            });
+
         });
 
 

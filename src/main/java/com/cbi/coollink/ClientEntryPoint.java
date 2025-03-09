@@ -89,7 +89,7 @@ public class ClientEntryPoint implements ClientModInitializer {
             context.client().execute(() ->{
                 if(clientWorld.getRegistryKey().equals(payload.world())){
                     BlockEntity clickedOnBlockEntity = clientWorld.getBlockEntity(payload.pos());
-                    context.client().setScreen(new BasicScreen(new PortSelectGUI()));
+                    context.client().setScreen(new BasicScreen(new PortSelectGUI(payload.ofType(),payload.type(),clickedOnBlockEntity,payload.heldItem())));
                 }
             });
         });

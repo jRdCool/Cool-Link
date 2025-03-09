@@ -6,6 +6,9 @@ import io.github.cottonmc.cotton.gui.client.CottonClientScreen;
 public class BasicScreen extends CottonClientScreen {
     public BasicScreen(GuiDescription description) {
         super(description);
+        if(description instanceof WantsScreenAccess wsa){
+            wsa.setScreen(this);
+        }
     }
 
     @Override
