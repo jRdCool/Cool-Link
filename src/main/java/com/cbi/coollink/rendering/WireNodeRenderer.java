@@ -1,6 +1,5 @@
 package com.cbi.coollink.rendering;
 
-import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.BlockState;
@@ -13,11 +12,13 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.joml.Matrix4f;
 import net.minecraft.client.render.LightmapTextureManager;
 
 
 public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {//extends BlockEntityRenderer<T> {
+	@SuppressWarnings("unused")
 	public WireNodeRenderer(BlockEntityRendererFactory.Context context) {
 		super();
 	}
@@ -29,19 +30,26 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 	public void render(T tileEntityIn, float partialTicks, MatrixStack matrixStackIn, VertexConsumerProvider bufferIn,
 					   int combinedLightIn, int combinedOverlayIn) {
 		IWireNode te = (IWireNode) tileEntityIn;
-		//tileEntityIn.
-
+		World world = tileEntityIn.getWorld();
+		IWireNode otherBlock;
+		if(world==null) return;
 		//time += partialTicks;
 
 		for (int i = 0; i < te.getNodeCount(); i++) {
+
+
 			if (!te.hasConnection(i)) continue;
+			if (world.getBlockEntity(te.getLocalNode(i).getTargetPos())instanceof IWireNode){
+				otherBlock =(IWireNode) world.getBlockEntity(te.getLocalNode(i).getTargetPos());
+				if(otherBlock==null)continue;
+			}else{continue;}
 			Vec3d d1 = te.getNodeOffset(i);
 			float ox1 = ((float) d1.x);
 			float oy1 = ((float) d1.y);
 			float oz1 = ((float) d1.z);
 
-			IWireNode wn = te.getWireNode(i);
-			if (wn == null) return;
+			IWireNode wn = otherBlock.getWireNode(i);
+			if (wn == null) continue;
 
 			Vec3d d2 = wn.getNodeOffset(te.getOtherNodeIndex(i)); // get other
 			float ox2 = ((float) d2.x);

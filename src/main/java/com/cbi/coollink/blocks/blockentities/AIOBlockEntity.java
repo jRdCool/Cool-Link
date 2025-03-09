@@ -204,10 +204,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		isNodeUsed[index]=set;
 	}
 
-	@Override
-	public BlockPos getBlockPos() {
-		return this.getPos();
-	}
 
 	@Override
 	public boolean hasConnection(int index) {

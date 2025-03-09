@@ -48,10 +48,6 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
         return 0;
     }
 
-    @Override
-    public BlockPos getPos() {
-        return null;
-    }
 
     @Override
     public @Nullable LocalNode getLocalNode(int index) {
