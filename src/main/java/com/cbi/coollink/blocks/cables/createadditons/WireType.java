@@ -70,4 +70,13 @@ public enum WireType {//IRON(4, 256, 87, 87, 87, CAItems.IRON_WIRE.asStack(4), C
 		//	return WireType.FIBER;
 		return WireType.COAX;
 	}
+
+	@Override
+	public String toString() {
+		switch (this){
+			case CAT6 -> {return "Cat 6 Ethernet";}
+			case FIBER -> {return "Fiber Line";}
+			default -> {return "Coax";}
+		}
+	}
 }

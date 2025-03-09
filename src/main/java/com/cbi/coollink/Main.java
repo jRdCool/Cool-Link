@@ -26,6 +26,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ConduitBlockEntity;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.BlockItem;
@@ -72,6 +73,11 @@ public class Main implements ModInitializer {
             .displayName(Text.of("Cool Link"))
             .build();
 
+    public static final ComponentType<WireInfoComponent> WIRE_INFO_COMPONENT = Registry.register(
+            Registries.DATA_COMPONENT_TYPE,
+            Identifier.of(namespace, "custom"),
+            ComponentType.<WireInfoComponent>builder().codec(WireInfoComponent.CODEC).build()
+    );
 
     private static final RegistryKey<ItemGroup> ITEM_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of("cool-link", "cool-link"));
 

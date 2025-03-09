@@ -195,4 +195,6 @@ public interface IWireNode {
         if (nodeCache[index] == null) obj.removeNode(index);
         return nodeCache[index];
     }
+
+    WireType getPortType(int index);
 }
