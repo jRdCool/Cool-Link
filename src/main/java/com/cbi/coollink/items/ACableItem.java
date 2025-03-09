@@ -11,7 +11,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -25,8 +24,6 @@ public class ACableItem extends Item {
 
     public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos pos=context.getBlockPos();
-        BlockPos placedPos;
-        Direction dir=context.getSide();;
         World world=context.getWorld();
         ItemStack stack = context.getStack();
 
@@ -44,7 +41,6 @@ public class ACableItem extends Item {
             }
             int index = 0;
             int nodeCount = node.getNodeCount();
-            WireType[] nodes = new WireType[nodeCount];
             ArrayList<Integer> ofType = new ArrayList<>();
             for(int i=0;i< nodeCount;i++){
                 if(node.getPortType(i)==TYPE){
