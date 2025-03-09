@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
@@ -63,6 +64,19 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		nbt.putString("Wireless_Password", Objects.requireNonNullElse(netPass, ""));
 		nbt.putByteArray("MAC1",mac1.getBytes());
 		nbt.putByteArray("MAC2",mac2.getBytes());
+		NbtList nodeIDS = new NbtList();
+		for(int i=0;i<nodeCount;i++){
+			NbtCompound compound = new NbtCompound();
+			if(localNodes[i]==null){
+				nodeIDS.add(compound);
+				continue;
+			}
+
+			localNodes[i].write(compound);
+			nodeIDS.add(compound);
+		}
+		nbt.put("connections",nodeIDS);
+
 		super.writeNbt(nbt,registryLookup);
 	}
 
@@ -76,6 +90,12 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		byte[] mac1Bytes = nbt.getByteArray("MAC1");
 		byte[] mac2Bytes = nbt.getByteArray("MAC2");
 		setMacAddresses(mac1Bytes,mac2Bytes);
+		NbtList nodeIDS = nbt.getList("connections",NbtCompound.COMPOUND_TYPE);
+		for (int i=0;i<nodeCount;i++){
+			NbtCompound compound = nodeIDS.getCompound(i);
+			if(compound==null || compound.isEmpty()) continue;
+			localNodes[i]=new LocalNode(this , compound);
+		}
 	}
 
 	@Nullable
@@ -177,7 +197,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
 		this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
 		isNodeUsed[index]=true;
-
+		markDirty();
 
 	}
 
@@ -186,7 +206,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		//LocalNode old = this.localNodes[index];
 		this.localNodes[index] = null;
 		this.nodeCache[index] = null;
-
+		markDirty();
 	}
 
 	@Override

@@ -60,7 +60,7 @@ public class ACableItem extends Item {
                  * Have the GUI display the ports available and weather or not they are currently used
                  * gather used ports and display as used (isNodeInUse method)
                  */
-                Main.LOGGER.info("IM IN HERE!");
+                //Main.LOGGER.info("IM IN HERE!");
                 if(context.getPlayer() instanceof ServerPlayerEntity sp) {
                     ServerPlayNetworking.send(sp, new OpenPortSelectGuiPacket(ofType, TYPE, context.getWorld().getRegistryKey(), context.getBlockPos(), context.getStack()));
                 }
@@ -74,7 +74,7 @@ public class ACableItem extends Item {
                 Main.LOGGER.info(comp.originBlock().toString());
                 if(comp!=null&&world.getBlockEntity(comp.originBlock()) instanceof IWireNode block){
                    block.setNode(comp.index(),index,pos,TYPE);
-                    //((IWireNode) pos).setNode(index,comp.index(),comp.originBlock(),TYPE);
+                    ((IWireNode) world.getBlockEntity(pos)).setNode(comp.index(),index,block.getPos(),TYPE);
                     Main.LOGGER.info("Rendering");
                     Main.LOGGER.info(block.getNodeOffset(comp.index())+"");
                 }
