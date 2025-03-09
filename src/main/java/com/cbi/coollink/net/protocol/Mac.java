@@ -4,8 +4,6 @@ package com.cbi.coollink.net.protocol;
 import com.cbi.coollink.Main;
 
 import java.beans.ConstructorProperties;
-import java.lang.annotation.Documented;
-import java.util.Random;
 
 public class Mac {
 

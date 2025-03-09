@@ -4,7 +4,6 @@ import io.github.cottonmc.cotton.gui.widget.WTextField;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public class WPasswordField extends WTextField {

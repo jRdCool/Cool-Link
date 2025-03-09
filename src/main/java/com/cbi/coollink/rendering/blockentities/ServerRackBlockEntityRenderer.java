@@ -3,14 +3,11 @@ package com.cbi.coollink.rendering.blockentities;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.ServerRack;
 import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 
 public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<ServerRackBlockEntity> {

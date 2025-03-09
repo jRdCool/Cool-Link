@@ -1,6 +1,5 @@
 package com.cbi.coollink.app;
 
-import com.cbi.coollink.Main;
 import com.cbi.coollink.guis.PhoneGui;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
