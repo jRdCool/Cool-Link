@@ -3,7 +3,9 @@ package com.cbi.coollink.items;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.WireInfoComponent;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import com.cbi.coollink.net.OpenPortSelectGuiPacket;
 import com.cbi.coollink.rendering.IWireNode;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -58,6 +60,10 @@ public class ACableItem extends Item {
                  * Have the GUI display the ports available and weather or not they are currently used
                  * gather used ports and display as used (isNodeInUse method)
                  */
+                Main.LOGGER.info("IM IN HERE!");
+                if(context.getPlayer() instanceof ServerPlayerEntity sp) {
+                    ServerPlayNetworking.send(sp, new OpenPortSelectGuiPacket(ofType, TYPE, context.getWorld().getRegistryKey(), context.getBlockPos(), context.getStack()));
+                }
             }else if (nodeCount>1){
                 index = ofType.get(0);
             }
