@@ -82,6 +82,7 @@ public class ACableItem extends Item {
                 Main.LOGGER.info(stack.get(Main.WIRE_INFO_COMPONENT).toString());
             }
         }
+        if(context.getPlayer()!= null) context.getPlayer().swingHand(context.getHand());
 
 
         //CoaxCable.ENTRY.onPlaced(world,placedPos,CoaxCable.ENTRY.getDefaultState(),context.getPlayer(), context.getStack());
