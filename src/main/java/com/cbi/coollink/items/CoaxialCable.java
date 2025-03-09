@@ -16,6 +16,7 @@ import javax.imageio.event.IIOWriteProgressListener;
 public class CoaxialCable extends ACableItem {
     public CoaxialCable(Settings settings) {
         super(settings);
+        TYPE = WireType.COAX;
     }
 
     /*@Override
@@ -23,7 +24,5 @@ public class CoaxialCable extends ACableItem {
         return super.use(world, user, hand);
     }*/
 
-
-    public WireType TYPE = WireType.COAX;
 
 }

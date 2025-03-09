@@ -74,7 +74,7 @@ public class ACableItem extends Item {
                 Main.LOGGER.info(comp.originBlock().toString());
                 if(comp!=null&&world.getBlockEntity(comp.originBlock()) instanceof IWireNode block){
                    block.setNode(comp.index(),index,pos,TYPE);
-                    //((IWireNode) pos).setNode(index,comp.index(),comp.originBlock(),TYPE);
+                    ((IWireNode) world.getBlockEntity(pos)).setNode(comp.index(),index,block.getPos(),TYPE);
                     Main.LOGGER.info("Rendering");
                     Main.LOGGER.info(block.getNodeOffset(comp.index())+"");
                 }
@@ -88,6 +88,7 @@ public class ACableItem extends Item {
                 Main.LOGGER.info(stack.get(Main.WIRE_INFO_COMPONENT).toString());
             }
         }
+        if(context.getPlayer()!= null) context.getPlayer().swingHand(context.getHand());
 
 
         //CoaxCable.ENTRY.onPlaced(world,placedPos,CoaxCable.ENTRY.getDefaultState(),context.getPlayer(), context.getStack());
