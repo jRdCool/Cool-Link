@@ -99,7 +99,7 @@ public interface IWireNode {
      * @return  The {@link LocalNode} for the given index, or null if the node
      *          doesn't exist.
      */
-    @Nullable
+
     LocalNode getLocalNode(int index);
 
     void setNode(int index, int otherNode, BlockPos pos, WireType type);
@@ -201,5 +201,4 @@ public interface IWireNode {
     boolean isNodeInUse(int index);
     void setIsNodeUsed(int index,boolean set);
 
-    BlockPos getBlockPos();
 }
