@@ -198,7 +198,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
 		isNodeUsed[index]=true;
 		markDirty();
-
+        assert world != null;
+        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
 	}
 
 	@Override
@@ -207,6 +208,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		this.localNodes[index] = null;
 		this.nodeCache[index] = null;
 		markDirty();
+        assert world != null;
+        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
 	}
 
 	@Override
