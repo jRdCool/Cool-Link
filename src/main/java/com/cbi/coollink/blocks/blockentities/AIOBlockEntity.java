@@ -202,6 +202,12 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	}
 
 	@Override
+	public WireType getPortType(int index) {
+		if(index <= 1) return WireType.CAT6;
+		else return WireType.COAX;
+	}
+
+	@Override
 	public boolean hasConnection(int index) {
 		//Main.LOGGER.info(index+"");
 		return localNodes[index] != null;
