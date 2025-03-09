@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 // Made with Blockbench 4.5.2
@@ -93,8 +94,12 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		NbtList nodeIDS = nbt.getList("connections",NbtCompound.COMPOUND_TYPE);
 		for (int i=0;i<nodeCount;i++){
 			NbtCompound compound = nodeIDS.getCompound(i);
-			if(compound==null || compound.isEmpty()) continue;
+			if(compound==null || compound.isEmpty()){
+				isNodeUsed[i] = false;
+				continue;
+			}
 			localNodes[i]=new LocalNode(this , compound);
+			isNodeUsed[i] = true;
 		}
 	}
 
@@ -237,5 +242,22 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	@Override
 	public int getNodeCount() {
 		return nodeCount;
+	}
+
+	@Override
+	public String toString() {
+		return "AIOBlockEntity{" +
+				"isNodeUsed=" + Arrays.toString(isNodeUsed) +
+				", password='" + password + '\'' +
+				", ssid='" + ssid + '\'' +
+				", netPass='" + netPass + '\'' +
+				", mac1=" + mac1 +
+				", mac2=" + mac2 +
+				", connectedDevices=" + connectedDevices +
+				", deviceName=" + deviceName +
+				", deviceIP=" + deviceIP +
+				", localNodes=" + Arrays.toString(localNodes) +
+				", nodeCache=" + Arrays.toString(nodeCache) +
+				'}';
 	}
 }

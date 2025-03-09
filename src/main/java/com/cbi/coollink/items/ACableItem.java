@@ -75,6 +75,7 @@ public class ACableItem extends Item {
                 if(comp!=null&&world.getBlockEntity(comp.originBlock()) instanceof IWireNode block){
                    block.setNode(comp.index(),index,pos,TYPE);
                     ((IWireNode) world.getBlockEntity(pos)).setNode(comp.index(),index,block.getPos(),TYPE);
+                    ((IWireNode) world.getBlockEntity(pos)).setNode(index,comp.index(),comp.originBlock(),TYPE);
                     Main.LOGGER.info("Rendering");
                     Main.LOGGER.info(block.getNodeOffset(comp.index())+"");
                 }

@@ -1,5 +1,6 @@
 package com.cbi.coollink.guis;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.net.WireInfoDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
