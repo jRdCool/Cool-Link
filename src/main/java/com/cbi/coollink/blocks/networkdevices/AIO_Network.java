@@ -2,12 +2,15 @@ package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
+import com.cbi.coollink.rendering.IWireNode;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -15,8 +18,12 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
+import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.Nullable;
 
 
+import java.util.function.BiConsumer;
 
 import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
@@ -152,5 +159,37 @@ public class AIO_Network extends BlockWithEntity implements BlockEntityProvider 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
 		return validateTicker(type, Main.AIO_BLOCK_ENTITY, AIOBlockEntity::tick);
+	}
+
+	@Override
+	public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+		//delete both ends of the connection when the block is broken
+		BlockEntity be = world.getBlockEntity(pos);
+		if(be instanceof IWireNode self){
+			for(int i=0;i<self.getNodeCount();i++){
+				if(!self.hasConnection(i)) continue;
+				BlockEntity obe =  world.getBlockEntity(self.getLocalNode(i).getTargetPos());
+				if(obe instanceof IWireNode other) {
+					other.removeNode(self.getOtherNodeIndex(i));
+				}
+			}
+		}
+		return super.onBreak(world,pos,state,player);
+	}
+
+	@Override
+	protected void onExploded(BlockState state, World world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+		//delete both ends of the connection when the block is broken
+		BlockEntity be = world.getBlockEntity(pos);
+		if(be instanceof IWireNode self){
+			for(int i=0;i<self.getNodeCount();i++){
+				if(!self.hasConnection(i)) continue;
+				BlockEntity obe =  world.getBlockEntity(self.getLocalNode(i).getTargetPos());
+				if(obe instanceof IWireNode other) {
+					other.removeNode(self.getOtherNodeIndex(i));
+				}
+			}
+		}
+		super.onExploded(state, world, pos, explosion, stackMerger);
 	}
 }
