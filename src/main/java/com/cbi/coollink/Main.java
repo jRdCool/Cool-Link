@@ -36,6 +36,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -283,9 +284,10 @@ public class Main implements ModInitializer {
                 }else {
                     //starting the wire
                     heldItem.set(WIRE_INFO_COMPONENT, new WireInfoComponent(payload.index(), payload.originBlock()));
-                    context.player().swingHand(context.player().getActiveHand(),true);
+                    context.player().swingHand(context.player().getActiveHand(), true);
+                    BlockPos origin = payload.originBlock();
+                    context.player().networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.of("Starting " +payload.wireType().toString() + " Connection at: " + origin.getX() + ", " + origin.getY() + ", " + origin.getZ())));
                 }
-
             });
 
         });
