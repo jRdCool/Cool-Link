@@ -62,7 +62,7 @@ public class Main implements ModInitializer {
     public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "medium_conduit_block_entity"), BlockEntityType.Builder.create(ConduitBlockEntity::new, MediumConduit.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "large_conduit_block_entity"), BlockEntityType.Builder.create(ConduitBlockEntity::new, LargeConduit.ENTRY).build());
     public static final BlockEntityType<ServerRackBlockEntity> SERVER_RACK_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(namespace,"server_rack_block_entity"), BlockEntityType.Builder.create(ServerRackBlockEntity::new,ServerRack.ENTRY).build());
-    public static final BlockEntityType<CoaxWallPortSingleBE> COAX_WALL_PORT_SINGLE_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(namespace,"coax_wall_port_single_block_entity"), BlockEntityType.Builder.create(CoaxWallPortSingleBE::new,CoaxWallPortSingle.ENTRY).build());
+    //public static final BlockEntityType<CoaxWallPortSingleBE> COAX_WALL_PORT_SINGLE_BLOCK_ENTITY =
 
     public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
 
@@ -84,6 +84,7 @@ public class Main implements ModInitializer {
     private static final RegistryKey<ItemGroup> ITEM_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of("cool-link", "cool-link"));
 
     static HashMap<String, CoaxWallPortSingle> coaxWallPortVarients = new HashMap<>();
+    public static HashMap<String, BlockEntityType<CoaxWallPortSingleBE>> coaxWallPortSingleBlockEntities = new HashMap<>();
     @Override
     public void onInitialize() {
         LOGGER.info("loading cool link");
@@ -127,10 +128,12 @@ public class Main implements ModInitializer {
         Registry.register(Registries.ITEM,Identifier.of(namespace,"aio_cable_bundle"),new BlockItem(AIOCableBundle.ENTRY,new Item.Settings()));
 
         for(String wood:woodTypes) {
-            CoaxWallPortSingle block = new CoaxWallPortSingle(FabricBlockSettings.create().hardness(0.5f));
+            //Main.LOGGER.info("Registering coax wall port of type: "+ wood);
+            CoaxWallPortSingle block = new CoaxWallPortSingle(FabricBlockSettings.create().hardness(0.5f),wood);
             coaxWallPortVarients.put(wood,block);
             Registry.register(Registries.BLOCK, Identifier.of("cool-link", "wall_ports/coax_wall_port_"+wood), block);
             Registry.register(Registries.ITEM, Identifier.of("cool-link", "wall_ports/coax_wall_port_"+wood), new BlockItem(block, new Item.Settings()));
+            coaxWallPortSingleBlockEntities.put(wood, Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(namespace,"coax_wall_port_single_block_entity_"+wood), BlockEntityType.Builder.create(CoaxWallPortSingleBE.of(wood),block).build()));
         }
 
         Registry.register(Registries.BLOCK,Identifier.of("cool-link","aio_wall_port"),AIOWallPort.ENTRY);

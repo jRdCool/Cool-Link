@@ -10,10 +10,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class CoaxWallPortSingleBE extends AWallPortBlockEntity {
-    public CoaxWallPortSingleBE(BlockPos pos, BlockState state) {
-        super(Main.COAX_WALL_PORT_SINGLE_BLOCK_ENTITY, pos, state);
+
+    /**used to get the constructor with entries for the various wood types
+     */
+    public static BlockEntityType.BlockEntityFactory<CoaxWallPortSingleBE> of(String woodType){
+        return ((pos1, state) -> new CoaxWallPortSingleBE(woodType,pos1,state));
+    }
+    public CoaxWallPortSingleBE(String woodType,BlockPos pos, BlockState state) {
+        //resolve type here!!!!
+        super(Main.coaxWallPortSingleBlockEntities.get(woodType), pos, state);
         nodeCount = 1;
     }
+
+
 
 
     @Override
