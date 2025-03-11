@@ -48,6 +48,9 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public String ssid;
 	public String netPass;
 
+	private final LocalNode[] localNodes;
+	private final IWireNode[] nodeCache;
+
 	private static final int deviceID = 0x11;
 	public Mac mac1,mac2;
 
@@ -157,8 +160,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		this.mac2 = new Mac(mac2);
 	}
 
-	private final LocalNode[] localNodes;
-	private final IWireNode[] nodeCache;
+
 	@Override
 	public Vec3d getNodeOffset(int node) {
 		double node0XN = 0.275;
