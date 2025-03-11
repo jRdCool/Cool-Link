@@ -67,14 +67,16 @@ public class ACableItem extends Item {
             }else if (nodeCount>1){
                 index = ofType.get(0);
             }
+            if(world.getBlockEntity(pos) instanceof IWireNode tb&& tb.isNodeInUse(index)){return super.useOnBlock(context);}
 
             if(stack.contains(Main.WIRE_INFO_COMPONENT)){
                 Main.LOGGER.info("Info component present");
                 WireInfoComponent comp = stack.get(Main.WIRE_INFO_COMPONENT);
-                Main.LOGGER.info(comp.originBlock().toString());
+                //Main.LOGGER.info(comp.originBlock().toString());
                 if(comp!=null&&world.getBlockEntity(comp.originBlock()) instanceof IWireNode block){
                    block.setNode(comp.index(),index,pos,TYPE);
-                    ((IWireNode) world.getBlockEntity(pos)).setNode(comp.index(),index,block.getPos(),TYPE);
+                   //if()
+                    ((IWireNode) world.getBlockEntity(comp.originBlock())).setNode(comp.index(),index,block.getPos(),TYPE);
                     ((IWireNode) world.getBlockEntity(pos)).setNode(index,comp.index(),comp.originBlock(),TYPE);
                     Main.LOGGER.info("Rendering");
                     Main.LOGGER.info(block.getNodeOffset(comp.index())+"");
@@ -88,8 +90,9 @@ public class ACableItem extends Item {
                 Main.LOGGER.info("Stack Component Set");
                 Main.LOGGER.info(stack.get(Main.WIRE_INFO_COMPONENT).toString());
             }
+            if(context.getPlayer()!= null) context.getPlayer().swingHand(context.getHand());
         }
-        if(context.getPlayer()!= null) context.getPlayer().swingHand(context.getHand());
+
 
 
         //CoaxCable.ENTRY.onPlaced(world,placedPos,CoaxCable.ENTRY.getDefaultState(),context.getPlayer(), context.getStack());

@@ -100,4 +100,10 @@ public class CoaxWallPortSingle extends BlockWithEntity implements BlockEntityPr
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new CoaxWallPortSingleBE(woodType,pos,state);
     }
+
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
+        return BlockRenderType.MODEL;
+    }
 }
