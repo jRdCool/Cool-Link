@@ -1,7 +1,10 @@
 package com.cbi.coollink.blocks.wallports;
 
 import com.cbi.coollink.blocks.cables.CoaxCable;
+import com.cbi.coollink.blocks.networkdevices.AIO_Network;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -14,15 +17,19 @@ import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.state.property.Properties.*;
 
-public class CoaxWallPort extends Block {
+public class CoaxWallPortSingle extends BlockWithEntity implements BlockEntityProvider{
+    public static final CoaxWallPortSingle ENTRY = new CoaxWallPortSingle(AbstractBlock.Settings.create().hardness(0.5f));
 
-    //public static final CoaxWallPort ENTRY = new CoaxWallPort(FabricBlockSettings.create().hardness(0.5f));
-
-    public CoaxWallPort(Settings settings){
+    public CoaxWallPortSingle(Settings settings){
         super(settings);
         setDefaultState(getDefaultState()
                 .with(FACING,Direction.NORTH)
         );
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return null;
     }
 
     @Override
@@ -83,4 +90,9 @@ public class CoaxWallPort extends Block {
         }
     }
 
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return null;
+    }
 }

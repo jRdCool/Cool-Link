@@ -1,6 +1,6 @@
 package com.cbi.coollink.blocks.cables;
 
-import com.cbi.coollink.blocks.wallports.CoaxWallPort;
+import com.cbi.coollink.blocks.wallports.CoaxWallPortSingle;
 import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -86,7 +86,7 @@ public class CoaxCable extends Block {
                 world.setBlockState(pos.east(), world.getBlockState(pos.east()).with(west, true), NOTIFY_ALL);//set the neighbor block to point to this block
             }
             BlockState s = world.getBlockState(pos.east());
-            if (world.getBlockState(pos.east()).getBlock() instanceof CoaxWallPort&&(s.get(FACING).equals(Direction.WEST))) {//check if the neighbor block is a coax cable
+            if (world.getBlockState(pos.east()).getBlock() instanceof CoaxWallPortSingle &&(s.get(FACING).equals(Direction.WEST))) {//check if the neighbor block is a coax cable
                 //Main.LOGGER.info("Neighbor to east is coax");
                 world.setBlockState(pos, state.with(east, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
             }
@@ -104,7 +104,7 @@ public class CoaxCable extends Block {
                 world.setBlockState(pos.west(), world.getBlockState(pos.west()).with(east, true), NOTIFY_ALL);//set the neighbor block to point to this block
             }
             BlockState s = world.getBlockState(pos.west());
-            if (world.getBlockState(pos.west()).getBlock() instanceof CoaxWallPort&&(s.get(FACING).equals(Direction.EAST))) {//check if the neighbor block is a coax cable
+            if (world.getBlockState(pos.west()).getBlock() instanceof CoaxWallPortSingle &&(s.get(FACING).equals(Direction.EAST))) {//check if the neighbor block is a coax cable
                 //Main.LOGGER.info("Neighbor to east is coax");
                 world.setBlockState(pos, state.with(west, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
             }
@@ -120,7 +120,7 @@ public class CoaxCable extends Block {
             }
             BlockState s = world.getBlockState(pos.south());
             //Main.LOGGER.info(""+((world.getBlockState(pos.south()).getBlock() instanceof CoaxWallPort)+" | "+(s.get(FACING).equals(Direction.NORTH))));// && Objects.equals(CoaxWallPort.ENTRY.isFacing(), DirectionProperty.of("north"))));
-            if (world.getBlockState(pos.south()).getBlock() instanceof CoaxWallPort && (s.get(FACING).equals(Direction.NORTH))) {//check if the neighbor block is a coax cable
+            if (world.getBlockState(pos.south()).getBlock() instanceof CoaxWallPortSingle && (s.get(FACING).equals(Direction.NORTH))) {//check if the neighbor block is a coax cable
                 //Main.LOGGER.info("Neighbor to east is coax port");
                 world.setBlockState(pos, state.with(south, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
             }
@@ -139,7 +139,7 @@ public class CoaxCable extends Block {
                 world.setBlockState(pos.north(), world.getBlockState(pos.north()).with(south, true), NOTIFY_ALL);//set the neighbor block to point to this block
             }
             BlockState s = world.getBlockState(pos.north());
-            if (world.getBlockState(pos.north()).getBlock() instanceof CoaxWallPort&&(s.get(FACING).equals(Direction.SOUTH))) {//check if the neighbor block is a coax cable
+            if (world.getBlockState(pos.north()).getBlock() instanceof CoaxWallPortSingle &&(s.get(FACING).equals(Direction.SOUTH))) {//check if the neighbor block is a coax cable
                 //Main.LOGGER.info("Neighbor to east is coax");
                 world.setBlockState(pos, state.with(north, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
             }

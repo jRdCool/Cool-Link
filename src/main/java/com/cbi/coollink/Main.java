@@ -3,6 +3,7 @@ package com.cbi.coollink;
 import com.cbi.coollink.blocks.*;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
+import com.cbi.coollink.blocks.blockentities.wallports.CoaxWallPortSingleBE;
 import com.cbi.coollink.blocks.cables.AIOCableBundle;
 import com.cbi.coollink.blocks.cables.CoaxCable;
 import com.cbi.coollink.blocks.conduits.LargeConduit;
@@ -11,7 +12,7 @@ import com.cbi.coollink.blocks.conduits.SmallConduit;
 import com.cbi.coollink.blocks.networkdevices.AIO_Network;
 import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
 import com.cbi.coollink.blocks.wallports.AIOWallPort;
-import com.cbi.coollink.blocks.wallports.CoaxWallPort;
+import com.cbi.coollink.blocks.wallports.CoaxWallPortSingle;
 import com.cbi.coollink.items.*;
 import com.cbi.coollink.net.*;
 import com.cbi.coollink.rendering.IWireNode;
@@ -22,7 +23,6 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ConduitBlockEntity;
@@ -62,6 +62,7 @@ public class Main implements ModInitializer {
     public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "medium_conduit_block_entity"), BlockEntityType.Builder.create(ConduitBlockEntity::new, MediumConduit.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "large_conduit_block_entity"), BlockEntityType.Builder.create(ConduitBlockEntity::new, LargeConduit.ENTRY).build());
     public static final BlockEntityType<ServerRackBlockEntity> SERVER_RACK_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(namespace,"server_rack_block_entity"), BlockEntityType.Builder.create(ServerRackBlockEntity::new,ServerRack.ENTRY).build());
+    public static final BlockEntityType<CoaxWallPortSingleBE> COAX_WALL_PORT_SINGLE_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(namespace,"coax_wall_port_single_block_entity"), BlockEntityType.Builder.create(CoaxWallPortSingleBE::new,CoaxWallPortSingle.ENTRY).build());
 
     public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
 
@@ -82,7 +83,7 @@ public class Main implements ModInitializer {
 
     private static final RegistryKey<ItemGroup> ITEM_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of("cool-link", "cool-link"));
 
-    static HashMap<String, CoaxWallPort> coaxWallPortVarients = new HashMap<>();
+    static HashMap<String, CoaxWallPortSingle> coaxWallPortVarients = new HashMap<>();
     @Override
     public void onInitialize() {
         LOGGER.info("loading cool link");
@@ -126,7 +127,7 @@ public class Main implements ModInitializer {
         Registry.register(Registries.ITEM,Identifier.of(namespace,"aio_cable_bundle"),new BlockItem(AIOCableBundle.ENTRY,new Item.Settings()));
 
         for(String wood:woodTypes) {
-            CoaxWallPort block = new CoaxWallPort(FabricBlockSettings.create().hardness(0.5f));
+            CoaxWallPortSingle block = new CoaxWallPortSingle(FabricBlockSettings.create().hardness(0.5f));
             coaxWallPortVarients.put(wood,block);
             Registry.register(Registries.BLOCK, Identifier.of("cool-link", "wall_ports/coax_wall_port_"+wood), block);
             Registry.register(Registries.ITEM, Identifier.of("cool-link", "wall_ports/coax_wall_port_"+wood), new BlockItem(block, new Item.Settings()));

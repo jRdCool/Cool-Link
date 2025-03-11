@@ -17,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.state.property.Properties.FACING;
 
+@SuppressWarnings("all")
+@Deprecated
 public class AIOWallPort extends Block {
 
     public static final AIOWallPort ENTRY = new AIOWallPort(FabricBlockSettings.create().hardness(0.5f));
@@ -56,7 +58,7 @@ public class AIOWallPort extends Block {
     private void editOtherBlock(World world, BlockPos pos, BlockState state,Boolean create){
         switch (state.get(FACING)){
             case NORTH -> {
-                Main.LOGGER.info("North");
+                //Main.LOGGER.info("North");
                 if (world.getBlockState(pos.north()).getBlock() instanceof AIOCableBundle) {//check if the neighbor block is a coax cable
                     //Main.LOGGER.info(!((AIOCableBundle) world.getBlockState(pos.north()).getBlock()).isFacingMultiDirection(world,pos)+"");
                     if(((AIOCableBundle) world.getBlockState(pos.north()).getBlock()).isFacingSingleDirection(world,pos.north())||!create) {
@@ -66,7 +68,7 @@ public class AIOWallPort extends Block {
                 }
             }
             case SOUTH -> {
-                Main.LOGGER.info("South");
+                //Main.LOGGER.info("South");
                 if (world.getBlockState(pos.south()).getBlock() instanceof AIOCableBundle) {//check if the neighbor block is a coax cable
                     //Main.LOGGER.info(!((AIOCableBundle) world.getBlockState(pos.south()).getBlock()).isFacingMultiDirection(world,pos)+"");
                     if(((AIOCableBundle) world.getBlockState(pos.south()).getBlock()).isFacingSingleDirection(world,pos.south())||!create) {
@@ -76,7 +78,7 @@ public class AIOWallPort extends Block {
                 }
             }
             case WEST -> {
-                Main.LOGGER.info("West");
+                //Main.LOGGER.info("West");
                 if (world.getBlockState(pos.west()).getBlock() instanceof AIOCableBundle) {//check if the neighbor block is a coax cable
                     //Main.LOGGER.info(!((AIOCableBundle) world.getBlockState(pos.west()).getBlock()).isFacingMultiDirection(world,pos)+"");
                     if(((AIOCableBundle) world.getBlockState(pos.west()).getBlock()).isFacingSingleDirection(world,pos.west())||!create) {
@@ -86,7 +88,7 @@ public class AIOWallPort extends Block {
                 }
             }
             case EAST -> {
-                Main.LOGGER.info("east");
+                //Main.LOGGER.info("east");
                 if (world.getBlockState(pos.east()).getBlock() instanceof AIOCableBundle) {//check if the neighbor block is a coax cable
                     //Main.LOGGER.info(!((AIOCableBundle) world.getBlockState(pos.east()).getBlock()).isFacingMultiDirection(world,pos)+"");
                     if(((AIOCableBundle) world.getBlockState(pos.east()).getBlock()).isFacingSingleDirection(world,pos.east())||!create) {

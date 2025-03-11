@@ -16,6 +16,10 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
         super(type, pos, state);
     }
 
+    protected int nodeCount = 1;//Needs to be set by each wall port blockEntity
+
+    private final boolean[] isNodeUsed = new boolean[nodeCount];
+
     @Override
     public Vec3d getNodeOffset(int node) {
         Vec3d[][] nodes = {
@@ -26,6 +30,10 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
                 {new Vec3d(0,0,0)},//UP
                 {new Vec3d(0,0,0)}//DOWN
         };
+        return getNodeOffset(node,nodes);
+    }
+
+    public Vec3d getNodeOffset(int node,Vec3d[][] nodes) {
         int dir = 0;
         switch (getCachedState().get(Properties.FACING)){
             case EAST -> dir=1;
@@ -37,6 +45,8 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
         }
         return nodes[dir][node];
     }
+
+
 
     @Override
     public IWireNode getWireNode(int index) {
@@ -62,5 +72,15 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
     @Override
     public void removeNode(int index, boolean dropWire) {
 
+    }
+
+    @Override
+    public boolean isNodeInUse(int index) {
+        return isNodeUsed[index];
+    }
+
+    @Override
+    public void setIsNodeUsed(int index, boolean set) {
+        isNodeUsed[index]= set;
     }
 }
