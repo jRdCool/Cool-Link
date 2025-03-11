@@ -34,7 +34,7 @@ public class CoaxWallPortSingle extends BlockWithEntity implements BlockEntityPr
 
     @Override
     protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return getCodec();
+        return createCodec(settings1 -> new CoaxWallPortSingle(settings1,woodType));
     }
 
     @Override

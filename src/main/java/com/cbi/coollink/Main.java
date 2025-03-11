@@ -2,6 +2,7 @@ package com.cbi.coollink;
 
 import com.cbi.coollink.blocks.*;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
+import com.cbi.coollink.blocks.blockentities.SatelliteDishBlockEntity;
 import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
 import com.cbi.coollink.blocks.blockentities.wallports.CoaxWallPortSingleBE;
 import com.cbi.coollink.blocks.cables.AIOCableBundle;
@@ -56,15 +57,19 @@ public class Main implements ModInitializer {
     public static final String namespace = "cool-link";
     public static final String[] woodTypes = {"oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry","bamboo","crimson","warped"};
 
+    public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
+
     //Block Entity Registry
     public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "aio_block_entity"), BlockEntityType.Builder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "small_conduit_block_entity"), BlockEntityType.Builder.create(ConduitBlockEntity::new, SmallConduit.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "medium_conduit_block_entity"), BlockEntityType.Builder.create(ConduitBlockEntity::new, MediumConduit.ENTRY).build());
     public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "large_conduit_block_entity"), BlockEntityType.Builder.create(ConduitBlockEntity::new, LargeConduit.ENTRY).build());
     public static final BlockEntityType<ServerRackBlockEntity> SERVER_RACK_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(namespace,"server_rack_block_entity"), BlockEntityType.Builder.create(ServerRackBlockEntity::new,ServerRack.ENTRY).build());
+
+    public static final BlockEntityType<SatelliteDishBlockEntity> SATELLITE_DISH_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(namespace,"satellite-dish-block-entity"),BlockEntityType.Builder.create(SatelliteDishBlockEntity::new,SatelliteDishBlock.ENTRY).build());
     //public static final BlockEntityType<CoaxWallPortSingleBE> COAX_WALL_PORT_SINGLE_BLOCK_ENTITY =
 
-    public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
+
 
     //Cable Registries
     public static final Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "cat6_ethernet_cable"),new Cat6Cable(new Item.Settings()));
