@@ -5,7 +5,6 @@ import com.cbi.coollink.blocks.blockentities.AWallPortBlockEntity;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
