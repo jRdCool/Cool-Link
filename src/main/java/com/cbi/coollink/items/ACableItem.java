@@ -77,8 +77,12 @@ public class ACableItem extends Item {
                 WireInfoComponent comp = stack.get(Main.WIRE_INFO_COMPONENT);
                 //Main.LOGGER.info(comp.originBlock().toString());
                 if (comp != null && world.getBlockEntity(comp.originBlock()) instanceof IWireNode block) {
+                    //pos = B
+                    //block = A
+                    //comp.originBlock = A
+                    //node = B
+                    //Main.LOGGER.info(pos+" "+block.getPos()+" "+comp.originBlock()+" "+node.getPos());
                     block.setNode(comp.index(), index, pos, TYPE);
-                    block.setNode(comp.index(), index, block.getPos(), TYPE);
                     node.setNode(index, comp.index(), comp.originBlock(), TYPE);
                     //Main.LOGGER.info("Rendering");
                     //Main.LOGGER.info(block.getNodeOffset(comp.index())+"");}

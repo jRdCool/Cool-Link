@@ -3,7 +3,6 @@ package com.cbi.coollink.rendering;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.BlockState;
-//import net.minecraft.client.player.LocalPlayer;//Need to be replaced to get working
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;

@@ -1,6 +1,5 @@
 package com.cbi.coollink.blocks.networkdevices;
 
-import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.SatelliteDishBlockEntity;
 import com.cbi.coollink.rendering.IWireNode;
 import com.mojang.serialization.MapCodec;

@@ -102,6 +102,12 @@ public interface IWireNode {
 
     LocalNode getLocalNode(int index);
 
+    /** Create a {@link  LocalNode} connection between to 2 specified ports
+     * @param index the port on this wire node
+     * @param otherNode the port on the remote wire node
+     * @param pos the position of the remote node block
+     * @param type the type pof the wire
+     */
     void setNode(int index, int otherNode, BlockPos pos, WireType type);
 
     /**

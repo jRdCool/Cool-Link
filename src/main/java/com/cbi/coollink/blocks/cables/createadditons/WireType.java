@@ -2,12 +2,8 @@ package com.cbi.coollink.blocks.cables.createadditons;
 
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.blocks.cables.CoaxCable;
-import com.cbi.coollink.items.Cat6Cable;
-import com.cbi.coollink.items.CoaxialCable;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.codec.PacketCodec;
 
 //Modified from the create additions wireType class
