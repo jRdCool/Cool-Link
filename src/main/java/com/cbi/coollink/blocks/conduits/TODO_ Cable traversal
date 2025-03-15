@@ -1,0 +1,3 @@
+When a cable is passed through a conduit. the cable should be auto passed through the whole conduit in the direction
+passed until meeting a junction box or the end of the cable. When a wall port is added that takes the cable out of the conduit
+at which point the ones further down the line should be updated that the cable is no longer heading to them.
