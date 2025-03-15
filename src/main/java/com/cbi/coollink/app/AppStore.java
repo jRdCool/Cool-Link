@@ -1,6 +1,5 @@
 package com.cbi.coollink.app;
 
-import com.cbi.coollink.Main;
 import com.cbi.coollink.guis.PhoneGui;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
@@ -18,14 +17,14 @@ public final class AppStore extends AbstractRootApp{
     WButton installButtons[] =new WButton[4];
     PhoneGui phone;
     public AppStore() {
-        super(new Identifier("cool-link","app-store"));
-        icon=new Identifier("cool-link","textures/gui/app_shop_icon.png");
+        super(Identifier.of("cool-link","app-store"));
+        icon=Identifier.of("cool-link","textures/gui/app_shop_icon.png");
     }
 
     public AppStore(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData,PhoneGui phone) {
-        super(new Identifier("cool-link","app-store"));
+        super(Identifier.of("cool-link","app-store"));
         this.phone=phone;
-        icon=new Identifier("cool-link","textures/gui/app_shop_icon.png");
+        icon=Identifier.of("cool-link","textures/gui/app_shop_icon.png");
         root=new WPlainPanel();
         WPlainPanel panel=(WPlainPanel)root;
         WLabel title=new WLabel(Text.of("App Shop"));

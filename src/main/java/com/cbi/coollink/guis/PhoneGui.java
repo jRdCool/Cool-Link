@@ -2,21 +2,23 @@ package com.cbi.coollink.guis;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.app.*;
+import com.cbi.coollink.net.SavePhoneDataPacket;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.PlainTextContent.Literal;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.time.LocalDateTime;
@@ -47,7 +49,9 @@ public class PhoneGui extends LightweightGuiDescription {
     public ClockTimeType clockTimeType = ClockTimeType.AMPM;
     public String phoneName;
 
-    public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance) {
+    public Vec3d playerPosition;
+
+    public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance, Vec3d playerPosition) {
         apps.add(SettingsPhoneApp.getDummyInstance());
         apps.add(AIOSettingApp.getDummyInstance());
         apps.add(new AppStore());
@@ -56,15 +60,23 @@ public class PhoneGui extends LightweightGuiDescription {
         this.world=world;
         this.clickedOnBLockEntity=clickedOnBLockEntity;
         this.phoneInstance=phoneInstance;
+        this.playerPosition = playerPosition;
 
         //load data from the phone instance
-        NbtCompound nbt= phoneInstance.getOrCreateNbt();
+        NbtCompound nbt;//= phoneInstance.getOrCreateNbt();
+        var rawData = phoneInstance.get(DataComponentTypes.CUSTOM_DATA);
+        if(rawData!=null){
+            nbt = rawData.copyNbt();
+        }else{
+            nbt = new NbtCompound();
+        }
+
         if(!nbt.isEmpty()){
             Main.LOGGER.info("NBT data found\n"+nbt.asString());
             NbtList nbtApps= (NbtList) nbt.get("apps");
             if(nbtApps!=null&&!nbtApps.isEmpty()){
                 for(int i=0;i<nbtApps.size();i++){
-                    Identifier tmpName=new Identifier(nbtApps.getString(i));
+                    Identifier tmpName=Identifier.of(nbtApps.getString(i));
                     //if(AppRegistry.get(tmpName)==null)
                     //    continue;
                     apps.add(AppRegistry.get(tmpName));
@@ -116,7 +128,7 @@ public class PhoneGui extends LightweightGuiDescription {
         homeButtonPanel.setHost(this);
 
 
-        time = new WLabel(MutableText.of(new LiteralTextContent(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
+        time = new WLabel(MutableText.of(new Literal(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
         notchAndTimePanel.add(time, (int) (400 * 0.89), (int) (250 * 0.02));
         root.add(notchAndTimePanel,0,0,1,1);
 
@@ -147,7 +159,7 @@ public class PhoneGui extends LightweightGuiDescription {
                 //sets the background to a textures                                                                                                                            UVs go form 0 to 1 indicating where on the image to pull from
 
                 ScreenDrawing.coloredRect(matrices,left-bezel,top-bezel,panel.getWidth()+2*bezel,panel.getHeight()+2*bezel,0xFF007BAB);
-                ScreenDrawing.texturedRect(matrices,left,top,panel.getWidth(),panel.getHeight(),new Identifier("cool-link", "textures/gui/phone_background_"+backgroundNumber+".png"),0,0,1,1,0xFF_FFFFFF);
+                ScreenDrawing.texturedRect(matrices,left,top,panel.getWidth(),panel.getHeight(),Identifier.of("cool-link", "textures/gui/phone_background_"+backgroundNumber+".png"),0,0,1,1,0xFF_FFFFFF);
 
                 if(currentApp!=null){
                     currentApp.addPainters();
@@ -162,13 +174,13 @@ public class PhoneGui extends LightweightGuiDescription {
             });
 
             //pain the notch to the screen
-            notchAndTimePanel.setBackgroundPainter((matrices, left, top, panel) -> ScreenDrawing.texturedRect(matrices,left,top+50,17, 100,new Identifier("cool-link", "textures/gui/noch.png"),0,0,1,1,0xFF_FFFFFF));
+            notchAndTimePanel.setBackgroundPainter((matrices, left, top, panel) -> ScreenDrawing.texturedRect(matrices,left,top+50,17, 100,Identifier.of("cool-link", "textures/gui/noch.png"),0,0,1,1,0xFF_FFFFFF));
         }
     }
 
     public void tick() {
         //Main.LOGGER.info("ticked");
-        time.setText(MutableText.of(new LiteralTextContent(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor((currentApp==null)?0xFFFFFF:currentApp.timeColor)));
+        time.setText(MutableText.of(new Literal(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor((currentApp==null)?0xFFFFFF:currentApp.timeColor)));
         if(currentApp!=null){
             currentApp.tick();
             if(currentApp.requestSave) {
@@ -257,11 +269,8 @@ public class PhoneGui extends LightweightGuiDescription {
         nbt.putString("Name",phoneName);
 
         //write the data
-        phoneInstance.setNbt(nbt);
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeNbt(nbt);
-        buf.writeItemStack(phoneInstance);
-        ClientPlayNetworking.send(new Identifier("cool-link", "save-phone-data"), buf);
+        phoneInstance.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+        ClientPlayNetworking.send(new SavePhoneDataPacket(nbt,phoneInstance));
 
     }
 

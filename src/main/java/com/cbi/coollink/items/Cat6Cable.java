@@ -1,10 +1,11 @@
 package com.cbi.coollink.items;
 
-import net.minecraft.item.Item;
+import com.cbi.coollink.blocks.cables.createadditons.WireType;
 
-public class Cat6Cable extends Item {
+public class Cat6Cable extends ACableItem {
     public Cat6Cable(Settings settings) {
         super(settings);
+        TYPE = WireType.CAT6;
     }
 
 }

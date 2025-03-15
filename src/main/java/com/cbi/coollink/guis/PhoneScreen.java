@@ -1,6 +1,5 @@
 package com.cbi.coollink.guis;
 
-import com.cbi.coollink.Main;
 import io.github.cottonmc.cotton.gui.GuiDescription;
 import io.github.cottonmc.cotton.gui.client.CottonClientScreen;
 

@@ -1,40 +1,42 @@
 package com.cbi.coollink.app;
 
+import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.guis.PhoneGui;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
-import io.github.cottonmc.cotton.gui.widget.WButton;
-import io.github.cottonmc.cotton.gui.widget.WLabel;
-import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
-import io.github.cottonmc.cotton.gui.widget.WTextField;
+import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.function.BiConsumer;
 
 public class SettingsPhoneApp extends AbstractRootApp{
 
     WLabel title=new WLabel(Text.of("Settings"));
     PhoneGui phoneInstance;
-    WButton prevBackground,nextBackground, amPmClock,hour24Clock,setPhoneName;
-    WLabel currentBackground,backgroundLabel,clockSetting=new WLabel(Text.of("Clock")),phoneName;
+    WButton prevBackground,nextBackground, amPmClock,hour24Clock,setPhoneName,aPSearch;
+    WLabel currentBackground,backgroundLabel,clockSetting=new WLabel(Text.of("Clock")),phoneName,mac;
     WTextField phoneNameField;
+    WLabel networks= new WLabel(Text.of("Networks"));
     boolean settingPhoneName=false;
 
     /**do not use this constructor to initialize the app
      * only use to get an instance of this app
      */
     private SettingsPhoneApp(){
-        super(new Identifier("cool-link","settings"));
-        icon=new Identifier("cool-link","textures/gui/setting_app_icon.png");
+        super(Identifier.of("cool-link","settings"));
+        icon=Identifier.of("cool-link","textures/gui/setting_app_icon.png");
     }
     public SettingsPhoneApp(World world, BlockEntity clickedOnBlockEntity,PhoneGui phone){
-        super(new Identifier("cool-link","settings"));
-        icon=new Identifier("cool-link","textures/gui/setting_app_icon.png");
+        super(Identifier.of("cool-link","settings"));
+        icon=Identifier.of("cool-link","textures/gui/setting_app_icon.png");
         root=new WPlainPanel();
         root.setSize(phoneWidth,phoneHeight);
         timeColor=TIME_COLOR_BLACK;
@@ -89,7 +91,7 @@ public class SettingsPhoneApp extends AbstractRootApp{
         panel.add(clockSetting,25,50);
 
         phoneName=new WLabel(Text.of(phone.phoneName));
-        setPhoneName=new WButton(Text.of("set phone name"));
+        setPhoneName=new WButton(Text.of("Set Phone Name"));
         phoneNameField=new WTextField();
         phoneNameField.setText(phone.phoneName);
 
@@ -112,6 +114,37 @@ public class SettingsPhoneApp extends AbstractRootApp{
 
            }
         });
+        mac=new WLabel(Text.of("Mac:"));
+        aPSearch=new WButton(Text.of("Search For Networks"));
+        panel.add(mac,29, 111);
+        panel.add(aPSearch,80,126,150,20);
+        ArrayList<String> availNets=new ArrayList<>();
+
+        aPSearch.setOnClick(()->{
+            for (int i=-30;i<=30;i++){
+                for (int j=-10;j<=10;j++){
+                    for (int k=-30;k<=30;k++){
+                        BlockEntity target = world.getBlockEntity(new BlockPos((int)Math.floor(phone.playerPosition.x)+i,(int)Math.floor(phone.playerPosition.y)+j,(int)Math.floor(phone.playerPosition.z)+k));
+                        if(target instanceof AIOBlockEntity){
+                            String lSSID=((AIOBlockEntity) target).ssid;
+                            if(availNets.isEmpty()|| !(availNets.contains(lSSID))){
+                                availNets.add(lSSID);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        BiConsumer<String, AIODeviceList> configurator = (String name, AIODeviceList destination) -> {
+            destination.device.setLabel(Text.literal(name));
+            //destination.sprite.setImage(new Identifier("libgui-test:portal1.png"));
+        };
+
+        panel.add(networks,265,30);
+        WListPanel<String,AIODeviceList> accessPoints=new WListPanel<>(availNets, AIODeviceList::new,configurator);
+        accessPoints.setListItemHeight(2*18);
+        panel.add(accessPoints,220,40,190,155);
 
 
     }

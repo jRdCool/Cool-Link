@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 
 public class ExampleApp extends AbstractPhoneApp{
     public ExampleApp() {//constructor used to create a dummy instance of the class used for app registration
-        super(new Identifier("cool-link","example-app"));//the id of the app
+        super(Identifier.of("cool-link","example-app"));//the id of the app
 
         //set app icon here
 
@@ -21,7 +21,7 @@ public class ExampleApp extends AbstractPhoneApp{
     }
 
     public ExampleApp(World world, BlockEntity clickedOnBlockEntity){
-        super(new Identifier("cool-link","example-app"));//the id of the app
+        super(Identifier.of("cool-link","example-app"));//the id of the app
         root=new WPlainPanel();//create the panel witch all widget will sit on
         timeColor=TIME_COLOR_BLACK;//set the color of the clock if necessary
         requestSave=true;//requests the phone to save data

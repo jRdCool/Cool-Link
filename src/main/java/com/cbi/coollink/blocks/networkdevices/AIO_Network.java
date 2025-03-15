@@ -1,12 +1,16 @@
-package com.cbi.coollink.blocks;
+package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
+import com.cbi.coollink.rendering.IWireNode;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -14,20 +18,27 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
 
+import java.util.function.BiConsumer;
 
 import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 
 public class AIO_Network extends BlockWithEntity implements BlockEntityProvider {
-	public static final AIO_Network ENTRY = new AIO_Network(FabricBlockSettings.create().hardness(0.5f));
+	public static final AIO_Network ENTRY = new AIO_Network(AbstractBlock.Settings.create().hardness(0.5f));
 	public AIO_Network(Settings settings) {
 		super(settings);
 	}
 
+	@Override
+	protected MapCodec<? extends BlockWithEntity> getCodec() {
+		return createCodec(AIO_Network::new);
+	}
+
+
 	//this function is used to create the in game hit box of the block. despite the fact that this function is deprecated it still works for now
-	@SuppressWarnings("deprecation")
 	@Override
 	public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
 		Direction dir = state.get(HORIZONTAL_FACING);
@@ -145,5 +156,37 @@ public class AIO_Network extends BlockWithEntity implements BlockEntityProvider 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
 		return validateTicker(type, Main.AIO_BLOCK_ENTITY, AIOBlockEntity::tick);
+	}
+
+	@Override
+	public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+		//delete both ends of the connection when the block is broken
+		BlockEntity be = world.getBlockEntity(pos);
+		if(be instanceof IWireNode self){
+			for(int i=0;i<self.getNodeCount();i++){
+				if(!self.hasConnection(i)) continue;
+				BlockEntity obe =  world.getBlockEntity(self.getLocalNode(i).getTargetPos());
+				if(obe instanceof IWireNode other) {
+					other.removeNode(self.getOtherNodeIndex(i));
+				}
+			}
+		}
+		return super.onBreak(world,pos,state,player);
+	}
+
+	@Override
+	protected void onExploded(BlockState state, World world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+		//delete both ends of the connection when the block is broken
+		BlockEntity be = world.getBlockEntity(pos);
+		if(be instanceof IWireNode self){
+			for(int i=0;i<self.getNodeCount();i++){
+				if(!self.hasConnection(i)) continue;
+				BlockEntity obe =  world.getBlockEntity(self.getLocalNode(i).getTargetPos());
+				if(obe instanceof IWireNode other) {
+					other.removeNode(self.getOtherNodeIndex(i));
+				}
+			}
+		}
+		super.onExploded(state, world, pos, explosion, stackMerger);
 	}
 }

@@ -1,8 +1,10 @@
 package com.cbi.coollink.blocks;
 
 import com.cbi.coollink.Main;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -16,13 +18,29 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
-import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
-import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
+import java.util.function.BiConsumer;
 
-public class ServerRack extends Block {
-    public static final ServerRack ENTRY = new ServerRack(FabricBlockSettings.create().hardness(0.5f));
+
+public class ServerRack extends BlockWithEntity implements BlockEntityProvider {
+    //All property definitions MUST be declared before the entry
+    public static final EnumProperty<ServerRack.Half> half = EnumProperty.of("half", ServerRack.Half.class);
+    public static final EnumProperty<ServerRack.Direction> direction = EnumProperty.of("direction", ServerRack.Direction.class);
+
+    public static final ServerRack ENTRY = new ServerRack(AbstractBlock.Settings.create().hardness(0.5f));
+
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new ServerRackBlockEntity(pos,state);
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return createCodec(ServerRack::new);
+    }
 
     public enum Half implements StringIdentifiable{
         TOP("top"),
@@ -62,20 +80,15 @@ public class ServerRack extends Block {
                 .with(half,Half.BOTTOM)
                 .with(direction,Direction.NORTH_SOUTH)
         );
+
     }
 
-    static EnumProperty<ServerRack.Half> half = EnumProperty.of("half", ServerRack.Half.class);
-    static EnumProperty<ServerRack.Direction> direction = EnumProperty.of("direction", ServerRack.Direction.class);
 
-    static void assignStates(){
-        half = EnumProperty.of("half", ServerRack.Half.class);
-        direction = EnumProperty.of("direction", ServerRack.Direction.class);
-    }
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
-        assignStates();
-        stateManager.add(half);
-        stateManager.add(direction);
+        //stateManager.add(half);
+        //stateManager.add(direction);
+        stateManager.add(half,direction);
     }
 
     @SuppressWarnings("deprecation")
@@ -91,8 +104,10 @@ public class ServerRack extends Block {
                 case NORTH_SOUTH -> voxelBNS();
             };
         };
-    }
 
+
+    }
+static boolean presented = false;
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
@@ -117,6 +132,12 @@ public class ServerRack extends Block {
             case TOP -> world.setBlockState(pos.down(), Blocks.AIR.getDefaultState(), NOTIFY_ALL);
             case BOTTOM -> world.setBlockState(pos.up(), Blocks.AIR.getDefaultState(), NOTIFY_ALL);
         }
+    }
+
+    @Override
+    protected void onExploded(BlockState state, World world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        super.onExploded(state, world, pos, explosion, stackMerger);
+        onBroken(world,pos,state);
     }
 
     @Override
@@ -240,5 +261,10 @@ public class ServerRack extends Block {
         shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.234375, 0.921875, 1, 0.25, 0.953125));
 
         return shape;
+    }
+
+    public BlockRenderType getRenderType(BlockState state) {
+        // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
+        return BlockRenderType.MODEL;
     }
 }

@@ -1,4 +1,4 @@
-package com.cbi.coollink.blocks;
+package com.cbi.coollink.blocks.blockentities;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,13 +17,13 @@ public class ConduitBlockEntity extends BlockEntity {
                 super(type, pos, state);
     }
 
-    public void writeNbt(NbtCompound nbt){
-
+    public void writeNbt(NbtCompound nbt,RegistryWrapper.WrapperLookup registryLookup){
+        super.writeNbt(nbt,registryLookup);
     }
 
 
-    public void readNbt(NbtCompound nbt) {
-
+    public void readNbt(NbtCompound nbt,RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt,registryLookup);
     }
 
     @Nullable
@@ -31,9 +32,9 @@ public class ConduitBlockEntity extends BlockEntity {
         return BlockEntityUpdateS2CPacket.create(this);
     }
 
-    @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        return createNbt();
+
+    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
+        return createNbt(registryLookup);
     }
 
 

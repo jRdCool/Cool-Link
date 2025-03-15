@@ -1,8 +1,12 @@
-package com.cbi.coollink.blocks;
+package com.cbi.coollink.blocks.wallports;
 
-import com.cbi.coollink.Main;
+import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
+import com.cbi.coollink.blocks.blockentities.wallports.CoaxWallPortSingleBE;
 import com.cbi.coollink.blocks.cables.CoaxCable;
+import com.cbi.coollink.blocks.networkdevices.AIO_Network;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -15,15 +19,22 @@ import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.state.property.Properties.*;
 
-public class CoaxWallPort extends Block {
+public class CoaxWallPortSingle extends BlockWithEntity implements BlockEntityProvider{
+    //public static final CoaxWallPortSingle ENTRY = new CoaxWallPortSingle(AbstractBlock.Settings.create().hardness(0.5f));
 
-    //public static final CoaxWallPort ENTRY = new CoaxWallPort(FabricBlockSettings.create().hardness(0.5f));
-
-    public CoaxWallPort(Settings settings){
+    public CoaxWallPortSingle(Settings settings,String woodType){
         super(settings);
         setDefaultState(getDefaultState()
                 .with(FACING,Direction.NORTH)
         );
+        this.woodType=woodType;
+    }
+
+    private final String woodType;
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return createCodec(settings1 -> new CoaxWallPortSingle(settings1,woodType));
     }
 
     @Override
@@ -50,8 +61,9 @@ public class CoaxWallPort extends Block {
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         editOtherBlock(world,pos,state,false);
+        return state;
     }
 
     private void editOtherBlock(World world, BlockPos pos, BlockState state,Boolean create){
@@ -83,4 +95,15 @@ public class CoaxWallPort extends Block {
         }
     }
 
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new CoaxWallPortSingleBE(woodType,pos,state);
+    }
+
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
+        return BlockRenderType.MODEL;
+    }
 }

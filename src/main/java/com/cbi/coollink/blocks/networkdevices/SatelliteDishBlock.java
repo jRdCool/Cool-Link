@@ -1,10 +1,12 @@
-package com.cbi.coollink.blocks;
+package com.cbi.coollink.blocks.networkdevices;
 
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
+import com.cbi.coollink.blocks.blockentities.SatelliteDishBlockEntity;
+import com.cbi.coollink.rendering.IWireNode;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
@@ -15,12 +17,17 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiConsumer;
 
 import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
 
 
-public class SatelliteDishBlock extends Block {
+public class SatelliteDishBlock extends BlockWithEntity {
+    //All property definitions MUST be declared before the entry
+    public static final EnumProperty<MultiBlockPartStates> multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
     public SatelliteDishBlock(Settings settings) {
         super(settings);
 
@@ -29,7 +36,20 @@ public class SatelliteDishBlock extends Block {
                 .with(multiBlockPose, MultiBlockPartStates.NONE)
         );
     }
-    public static final SatelliteDishBlock ENTRY = new SatelliteDishBlock(FabricBlockSettings.create().hardness(0.5f));
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return createCodec(SatelliteDishBlock::new);
+    }
+
+    public static final SatelliteDishBlock ENTRY = new SatelliteDishBlock(AbstractBlock.Settings.create().hardness(0.5f));
+
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new SatelliteDishBlockEntity(pos,state);
+    }
+
     public enum MultiBlockPartStates implements StringIdentifiable {
         D1("d1"),
         D2("d2"),
@@ -57,34 +77,48 @@ public class SatelliteDishBlock extends Block {
         }
     }
 
-    public static EnumProperty<MultiBlockPartStates> multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
+
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
-        assignStates();
         stateManager.add(ASSEMBLED_BOOLEAN_PROPERTY);
         stateManager.add(multiBlockPose);
     }
 
-    static void assignStates(){
-        multiBlockPose = EnumProperty.of("multiblockpart", MultiBlockPartStates.class);
-    }
-
-    @SuppressWarnings("deprecation")
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
-        MultiBlockPartStates s=  state.get(multiBlockPose);
-        switch (s){
-            case D1 -> {return voxelD1();}
-            case D2 -> {return voxelD2();}
-            case D3 -> {return voxelD3();}
-            case D4 -> {return voxelD4();}
+        if(state.contains(multiBlockPose)) {
+            MultiBlockPartStates s = state.get(multiBlockPose);
+            switch (s) {
+                case D1 -> {
+                    return voxelD1();
+                }
+                case D2 -> {
+                    return voxelD2();
+                }
+                case D3 -> {
+                    return voxelD3();
+                }
+                case D4 -> {
+                    return voxelD4();
+                }
 
-            case U1 -> {return voxelU1();}
-            case U2 -> {return voxelU2();}
-            case U3 -> {return voxelU3();}
-            case U4 -> {return voxelU4();}
+                case U1 -> {
+                    return voxelU1();
+                }
+                case U2 -> {
+                    return voxelU2();
+                }
+                case U3 -> {
+                    return voxelU3();
+                }
+                case U4 -> {
+                    return voxelU4();
+                }
 
+            }
+            return VoxelShapes.union(VoxelShapes.empty(), VoxelShapes.cuboid(0, 0, 0, 1, 1, 1));
+        }else{
+            return VoxelShapes.cuboid(0,0,0,1,1,1);
         }
-        return VoxelShapes.union(VoxelShapes.empty(), VoxelShapes.cuboid(0, 0, 0, 1, 1, 1));
     }
 
     @Override
@@ -197,6 +231,52 @@ public class SatelliteDishBlock extends Block {
 
         }
 
+    }
+
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        //delete both ends of the connection when the block is broken
+        BlockEntity be = world.getBlockEntity(pos);
+        if(be instanceof SatelliteDishBlockEntity sbe) {
+            BlockEntity be2 = sbe.getActiveBlock();
+            if (be2 instanceof IWireNode self) {
+                for (int i = 0; i < self.getNodeCount(); i++) {
+                    if (!self.hasConnection(i)) {
+                        //Main.LOGGER.info("NO conncetion at "+i+" "+be2.getPos());
+                        continue;
+                    }
+                    //Main.LOGGER.info("Conncection at "+1);
+                    BlockEntity obe = world.getBlockEntity(self.getLocalNode(i).getTargetPos());
+                    //Main.LOGGER.info(obe.toString()+" "+self.getLocalNode(i).getTargetPos());
+                    if (obe instanceof IWireNode other) {
+                        other.removeNode(self.getOtherNodeIndex(i));
+                    }
+                }
+                self.removeNode(0);
+            }
+        }
+        return super.onBreak(world,pos,state,player);
+    }
+
+    @Override
+    protected void onExploded(BlockState state, World world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        //delete both ends of the connection when the block is broken
+        BlockEntity be = world.getBlockEntity(pos);
+        if(be instanceof SatelliteDishBlockEntity sbe) {
+            BlockEntity be2 = sbe.getActiveBlock();
+            if (be2 instanceof IWireNode self) {
+                self.removeNode(0);
+                for (int i = 0; i < self.getNodeCount(); i++) {
+                    if (!self.hasConnection(i)) continue;
+                    BlockEntity obe = world.getBlockEntity(self.getLocalNode(i).getTargetPos());
+                    if (obe instanceof IWireNode other) {
+                        other.removeNode(self.getOtherNodeIndex(i));
+                    }
+                }
+            }
+        }
+        super.onExploded(state, world, pos, explosion, stackMerger);
+        onBroken(world,pos,state);
     }
 
     public VoxelShape voxelD1(){
@@ -351,6 +431,8 @@ public class SatelliteDishBlock extends Block {
         return shape;
     }
 
-
-
+    @Override
+    protected BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
+    }
 }

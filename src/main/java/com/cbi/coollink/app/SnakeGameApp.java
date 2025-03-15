@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class SnakeGameApp extends AbstractPhoneApp{
-    static final Identifier appID = new Identifier("cool-link","snake-app");
+    static final Identifier appID = Identifier.of("cool-link","snake-app");
 
     ArrayList<SnakePart> snake = new ArrayList<>();
     ArrayList<int[]> apples = new ArrayList<>();
@@ -24,13 +24,13 @@ public class SnakeGameApp extends AbstractPhoneApp{
     int tickNum;
     Random r = new Random();
 
-    WLabel gameOverText = new WLabel(MutableText.of(new LiteralTextContent("Game OVER")).setStyle(Style.EMPTY.withBold(true).withUnderline(true).withColor(0xFFFF0000)));
+    WLabel gameOverText = new WLabel(MutableText.of(new PlainTextContent.Literal("Game OVER")).setStyle(Style.EMPTY.withBold(true).withUnderline(true).withColor(0xFFFF0000)));
     boolean gameOver =false,gameOverShown=false;
     public SnakeGameApp() {//constructor used to create a dummy instance of the class used for app registration
         super(appID);//the id of the app
 
         //set app icon here
-        icon = new Identifier("cool-link","textures/gui/app_snake_game.png");
+        icon = Identifier.of("cool-link","textures/gui/app_snake_game.png");
         //set app description here (this will be displayed in the app shop)
         description= Text.of("Snake Game!");
 
@@ -118,7 +118,7 @@ public class SnakeGameApp extends AbstractPhoneApp{
                 }
             }
 
-            Identifier apple = new Identifier("minecraft","textures/item/apple.png");
+            Identifier apple = Identifier.of("minecraft","textures/item/apple.png");
             for(int[] pos:apples){
                 ScreenDrawing.texturedRect(matrices,left+pos[0]*cellSize+start,top+pos[1]*cellSize,cellSize,cellSize,apple,0,0,1,1,0xFF_FFFFFF);
             }

@@ -1,32 +1,33 @@
 package com.cbi.coollink.net;
 
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
+
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public record OpenPhoneGuiPacket(RegistryKey<World> world, BlockPos block, ItemStack heldItem,boolean noBlockEntity) implements FabricPacket {
-    public static final PacketType<OpenPhoneGuiPacket> TYPE = PacketType.create(new Identifier("cool-link", "open-phone-gui"), OpenPhoneGuiPacket::new);
-
-    public OpenPhoneGuiPacket(PacketByteBuf buf) {
-        this(buf.readRegistryKey(RegistryKeys.WORLD),buf.readBlockPos(),buf.readItemStack(),buf.readBoolean());
-    }
-
-    @Override
-    public void write(PacketByteBuf buf) {
-        buf.writeRegistryKey(this.world);
-        buf.writeBlockPos(this.block);
-        buf.writeItemStack(this.heldItem);
-        buf.writeBoolean(this.noBlockEntity);
-    }
+public record OpenPhoneGuiPacket(RegistryKey<World> world, BlockPos block, ItemStack heldItem, boolean noBlockEntity, Vec3d playerPos) implements CustomPayload {
+    //public static final PacketType<OpenPhoneGuiPacket> TYPE = PacketType.create(new Identifier("cool-link", "open-phone-gui"), OpenPhoneGuiPacket::new);
+    public static final Id<OpenPhoneGuiPacket> ID = new CustomPayload.Id<>(Identifier.of("cool-link", "open-phone-gui"));
+    public static final PacketCodec<RegistryByteBuf, OpenPhoneGuiPacket> CODEC = PacketCodec.tuple(
+            PacketCodecs.registryCodec(World.CODEC), OpenPhoneGuiPacket::world,
+            BlockPos.PACKET_CODEC, OpenPhoneGuiPacket::block,
+            ItemStack.PACKET_CODEC, OpenPhoneGuiPacket::heldItem,
+            PacketCodecs.BOOL, OpenPhoneGuiPacket::noBlockEntity,
+            PacketCodecs.codec(Vec3d.CODEC), OpenPhoneGuiPacket::playerPos,
+            OpenPhoneGuiPacket::new
+    );
 
     @Override
-    public PacketType<?> getType() {
-        return TYPE;
+    public Id<? extends CustomPayload> getId() {
+
+        return ID;
     }
+
 }

@@ -1,9 +1,8 @@
 package com.cbi.coollink.blocks.cables;
 
-import com.cbi.coollink.Main;
-import com.cbi.coollink.blocks.CoaxWallPort;
-import com.cbi.coollink.blocks.SatelliteDishBlock;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import com.cbi.coollink.blocks.wallports.CoaxWallPortSingle;
+import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -23,13 +22,11 @@ import net.minecraft.world.BlockView;
 
 
 import static com.cbi.coollink.Main.ASSEMBLED_BOOLEAN_PROPERTY;
-import static com.cbi.coollink.blocks.SatelliteDishBlock.MultiBlockPartStates.D1;
-import static com.cbi.coollink.blocks.SatelliteDishBlock.multiBlockPose;
+import static com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock.MultiBlockPartStates.D1;
 import static net.minecraft.state.property.Properties.FACING;
 
 public class CoaxCable extends Block {
-
-    public static final CoaxCable ENTRY =new CoaxCable(FabricBlockSettings.create().hardness(0.5f));
+    //All property definitions MUST be declared before the entry
 
     public static BooleanProperty north = BooleanProperty.of("north");
     public static BooleanProperty east = BooleanProperty.of("east");
@@ -37,6 +34,10 @@ public class CoaxCable extends Block {
     public static BooleanProperty west = BooleanProperty.of("west");
     static BooleanProperty up = BooleanProperty.of("up");
     static BooleanProperty down = BooleanProperty.of("down");
+
+    public static final CoaxCable ENTRY =new CoaxCable(AbstractBlock.Settings.create().hardness(0.5f));
+
+
 
     public CoaxCable(Settings settings){
         super(settings);
@@ -85,7 +86,7 @@ public class CoaxCable extends Block {
                 world.setBlockState(pos.east(), world.getBlockState(pos.east()).with(west, true), NOTIFY_ALL);//set the neighbor block to point to this block
             }
             BlockState s = world.getBlockState(pos.east());
-            if (world.getBlockState(pos.east()).getBlock() instanceof CoaxWallPort&&(s.get(FACING).equals(Direction.WEST))) {//check if the neighbor block is a coax cable
+            if (world.getBlockState(pos.east()).getBlock() instanceof CoaxWallPortSingle &&(s.get(FACING).equals(Direction.WEST))) {//check if the neighbor block is a coax cable
                 //Main.LOGGER.info("Neighbor to east is coax");
                 world.setBlockState(pos, state.with(east, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
             }
@@ -103,7 +104,7 @@ public class CoaxCable extends Block {
                 world.setBlockState(pos.west(), world.getBlockState(pos.west()).with(east, true), NOTIFY_ALL);//set the neighbor block to point to this block
             }
             BlockState s = world.getBlockState(pos.west());
-            if (world.getBlockState(pos.west()).getBlock() instanceof CoaxWallPort&&(s.get(FACING).equals(Direction.EAST))) {//check if the neighbor block is a coax cable
+            if (world.getBlockState(pos.west()).getBlock() instanceof CoaxWallPortSingle &&(s.get(FACING).equals(Direction.EAST))) {//check if the neighbor block is a coax cable
                 //Main.LOGGER.info("Neighbor to east is coax");
                 world.setBlockState(pos, state.with(west, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
             }
@@ -119,7 +120,7 @@ public class CoaxCable extends Block {
             }
             BlockState s = world.getBlockState(pos.south());
             //Main.LOGGER.info(""+((world.getBlockState(pos.south()).getBlock() instanceof CoaxWallPort)+" | "+(s.get(FACING).equals(Direction.NORTH))));// && Objects.equals(CoaxWallPort.ENTRY.isFacing(), DirectionProperty.of("north"))));
-            if (world.getBlockState(pos.south()).getBlock() instanceof CoaxWallPort && (s.get(FACING).equals(Direction.NORTH))) {//check if the neighbor block is a coax cable
+            if (world.getBlockState(pos.south()).getBlock() instanceof CoaxWallPortSingle && (s.get(FACING).equals(Direction.NORTH))) {//check if the neighbor block is a coax cable
                 //Main.LOGGER.info("Neighbor to east is coax port");
                 world.setBlockState(pos, state.with(south, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
             }
@@ -138,7 +139,7 @@ public class CoaxCable extends Block {
                 world.setBlockState(pos.north(), world.getBlockState(pos.north()).with(south, true), NOTIFY_ALL);//set the neighbor block to point to this block
             }
             BlockState s = world.getBlockState(pos.north());
-            if (world.getBlockState(pos.north()).getBlock() instanceof CoaxWallPort&&(s.get(FACING).equals(Direction.SOUTH))) {//check if the neighbor block is a coax cable
+            if (world.getBlockState(pos.north()).getBlock() instanceof CoaxWallPortSingle &&(s.get(FACING).equals(Direction.SOUTH))) {//check if the neighbor block is a coax cable
                 //Main.LOGGER.info("Neighbor to east is coax");
                 world.setBlockState(pos, state.with(north, true), NOTIFY_ALL);//set this block as connecting to that neighbor block
             }
@@ -164,7 +165,7 @@ public class CoaxCable extends Block {
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
 
 
         state=world.getBlockState(pos);
@@ -214,6 +215,7 @@ public class CoaxCable extends Block {
             world.setBlockState(pos.down(),world.getBlockState(pos.down()).with(up,false),NOTIFY_ALL);//set the neighbor block to point to this block
         }
         super.onBreak(world, pos, state, player);
+        return state;
     }
     @SuppressWarnings("deprecation")
     @Override
