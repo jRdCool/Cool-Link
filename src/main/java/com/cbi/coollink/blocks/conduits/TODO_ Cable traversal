@@ -1,3 +1,17 @@
 When a cable is passed through a conduit. the cable should be auto passed through the whole conduit in the direction
 passed until meeting a junction box or the end of the cable. When a wall port is added that takes the cable out of the conduit
-at which point the ones further down the line should be updated that the cable is no longer heading to them.
+at which point the ones further down the line should be updated that the cable is no longer heading there but the slot is
+occupied further down the line to them.
+
+
+
+Tubes
+Small = 1
+Medium = 5
+Large = 13
+
+Slots
+per tubes are as follows:
+    Ethernet and Fiber = 4
+    Coax = 1
+

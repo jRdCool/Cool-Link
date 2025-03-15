@@ -1,0 +1,10 @@
+Devices should be able to send and recieve packets on the directed wire based on the ip and mac addresses of the packet
+
+
+Form the packet similar to an Ethernet packet
+
+
+
++---------+---------+--------+--------+------------------------------------------------------------+
+| Dst Mac | Src Mac | Dst IP | Src IP |                           DATA                             |
++---------+---------+--------+--------+------------------------------------------------------------+
