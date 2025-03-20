@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class SnakeGameApp extends AbstractPhoneApp{
-    static final Identifier appID = Identifier.of("cool-link","snake-app");
+    public static final Identifier appID = Identifier.of("cool-link","snake-app");
+    public static final Identifier ICON = Identifier.of("cool-link","textures/gui/app_snake_game.png");
 
     ArrayList<SnakePart> snake = new ArrayList<>();
     ArrayList<int[]> apples = new ArrayList<>();
@@ -26,18 +27,10 @@ public class SnakeGameApp extends AbstractPhoneApp{
 
     WLabel gameOverText = new WLabel(MutableText.of(new PlainTextContent.Literal("Game OVER")).setStyle(Style.EMPTY.withBold(true).withUnderline(true).withColor(0xFFFF0000)));
     boolean gameOver =false,gameOverShown=false;
-    public SnakeGameApp() {//constructor used to create a dummy instance of the class used for app registration
+
+    public SnakeGameApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData){
         super(appID);//the id of the app
-
-        //set app icon here
-        icon = Identifier.of("cool-link","textures/gui/app_snake_game.png");
-        //set app description here (this will be displayed in the app shop)
-        description= Text.of("Snake Game!");
-
-    }
-
-    public SnakeGameApp(World world, BlockEntity clickedOnBlockEntity){
-        super(appID);//the id of the app
+        icon = ICON;
         root=new WPlainPanel();//create the panel witch all widget will sit on
         timeColor=TIME_COLOR_BLACK;//set the color of the clock if necessary
         snake.add(new SnakePart());
@@ -67,10 +60,10 @@ public class SnakeGameApp extends AbstractPhoneApp{
         }
     }
 
-    @Override
-    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData) {
-        return new SnakeGameApp(world,clickedOnBlockEntity);
-    }
+//    @Override
+//    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData) {
+//        return new SnakeGameApp(world,clickedOnBlockEntity);
+//    }
 
     @Override
     public void addPainters() {

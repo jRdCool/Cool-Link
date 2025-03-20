@@ -274,6 +274,18 @@ public class PhoneGui extends LightweightGuiDescription {
 
     }
 
+    public boolean isAppInstalled(Identifier id){
+        return apps.stream().map(AbstractPhoneApp::getId).anyMatch(appId -> appId.equals(id));
+    }
+
+    public void installApp(Identifier appId){
+
+    }
+
+    public void uninstallApp(Identifier appId){
+
+    }
+
 
 
 }

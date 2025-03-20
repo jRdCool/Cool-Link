@@ -18,7 +18,6 @@ public abstract class AbstractPhoneApp {
     public boolean requestSave=false;
     public Identifier icon = Identifier.of("minecraft","textures/misc/unknown_pack.png");
     public final Identifier appId;
-    public Text description;
 
     public AbstractPhoneApp(Identifier appId) {
         this.appId = appId;
@@ -37,15 +36,15 @@ public abstract class AbstractPhoneApp {
      */
      abstract public void tick();
 
-    /**
-     * this function is used by the phone to initialize the app
-     *
-     * @param world                the world the phone is in
-     * @param clickedOnBlockEntity the block entity the phone clicked on (this may be null)
-     * @param appData contains data previously saved to the phone by this app. if no data has been saved it will be an empty NbtCompound
-     * @return a new instance of the app
-     */
-     abstract public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData);
+//    /**
+//     * this function is used by the phone to initialize the app
+//     *
+//     * @param world                the world the phone is in
+//     * @param clickedOnBlockEntity the block entity the phone clicked on (this may be null)
+//     * @param appData contains data previously saved to the phone by this app. if no data has been saved it will be an empty NbtCompound
+//     * @return a new instance of the app
+//     */
+//     abstract public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData);
 
     /**used to set what is painted by the app
      *
@@ -84,6 +83,14 @@ public abstract class AbstractPhoneApp {
      * @param modifiers modifier keys held down when the key was released(Shift Ctl ...)
      */
     public void keyReleased(int ch,int keyCode,int modifiers){}
+
+    public Identifier getIcon(){
+        return icon;
+    }
+
+    public Identifier getId(){
+        return appId;
+    }
 
 
 
