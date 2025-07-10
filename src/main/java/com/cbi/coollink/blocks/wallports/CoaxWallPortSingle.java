@@ -1,9 +1,7 @@
 package com.cbi.coollink.blocks.wallports;
 
-import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
 import com.cbi.coollink.blocks.blockentities.wallports.CoaxWallPortSingleBE;
 import com.cbi.coollink.blocks.cables.CoaxCable;
-import com.cbi.coollink.blocks.networkdevices.AIO_Network;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
