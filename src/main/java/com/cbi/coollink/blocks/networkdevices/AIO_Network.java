@@ -31,7 +31,7 @@ import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 
 public class AIO_Network extends BlockWithEntity implements BlockEntityProvider {
-	public static final Identifier ID = Identifier.of(Main.namespace,"medium_conduit");
+	public static final Identifier ID = Identifier.of(Main.namespace,"aio_network");
 	public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
 	public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
 	public static final AIO_Network ENTRY = new AIO_Network(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
