@@ -17,7 +17,7 @@ public record WireInfoDataPacket(int index, BlockPos originBlock, ItemStack held
             BlockPos.PACKET_CODEC, WireInfoDataPacket::originBlock,
             ItemStack.PACKET_CODEC, WireInfoDataPacket::heldItem,
             WireType.PACKET_CODEC, WireInfoDataPacket::wireType,
-            PacketCodecs.BOOL, WireInfoDataPacket::clear,
+            PacketCodecs.BOOLEAN, WireInfoDataPacket::clear,
             WireInfoDataPacket::new
     );
     @Override

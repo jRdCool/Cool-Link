@@ -9,20 +9,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.state.property.Properties;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 
 // Made with Blockbench 4.5.2
 // Exported for Minecraft version 1.17+ for Yarn
@@ -36,7 +35,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 			mac2 = new Mac(deviceID);
 		//}
 		this.localNodes = new LocalNode[getNodeCount()];
-		this.nodeCache = new IWireNode[getNodeCount()];
 		//setNode(0,1,pos,WireType.CAT6);
 		//setNode(1,2,pos,WireType.COAX);
 	}
@@ -49,7 +47,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public String netPass;
 
 	private final LocalNode[] localNodes;
-	private final IWireNode[] nodeCache;
 
 	private static final int deviceID = 0x11;
 	public Mac mac1,mac2;
@@ -59,52 +56,106 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public ArrayList<String> deviceIP=new ArrayList<>();
 
 	// Serialize the BlockEntity
+
+
 	@Override
-	public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-		// Save the current value of the number to the nbt
-		nbt.putInt("number", 89);
-		nbt.putString("password", Objects.requireNonNullElse(password, "password123546"));
-		nbt.putString("ssid", Objects.requireNonNullElse(ssid, "Unconfigured Network"));
-		nbt.putString("Wireless_Password", Objects.requireNonNullElse(netPass, ""));
-		nbt.putByteArray("MAC1",mac1.getBytes());
-		nbt.putByteArray("MAC2",mac2.getBytes());
-		NbtList nodeIDS = new NbtList();
+	protected void writeData(WriteView view) {
+		super.writeData(view);
+		view.putInt("number", 89);
+		view.putString("password", Objects.requireNonNullElse(password, "password123546"));
+		view.putString("ssid", Objects.requireNonNullElse(ssid, "Unconfigured Network"));
+		view.putString("Wireless_Password", Objects.requireNonNullElse(netPass, ""));
+		view.putIntArray("MAC1",mac1.getMac());
+		view.putIntArray("MAC2",mac2.getMac());
+		WriteView.ListView connections = view.getList("connections");
+		//WriteView.ListAppender<LocalNodeConnection> listAppender = view.getListAppender("connections", LocalNodeConnection.CODEC);
 		for(int i=0;i<nodeCount;i++){
-			NbtCompound compound = new NbtCompound();
 			if(localNodes[i]==null){
-				nodeIDS.add(compound);
-				continue;
+				connections.add();
+			}else{
+				WriteView connection = connections.add();
+				localNodes[i].write(connection);
 			}
-
-			localNodes[i].write(compound);
-			nodeIDS.add(compound);
 		}
-		nbt.put("connections",nodeIDS);
 
-		super.writeNbt(nbt,registryLookup);
+		//view.put("connections",,nodeIDS);
+	}
+
+//	@Override
+//	public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+//		// Save the current value of the number to the nbt
+//		nbt.putInt("number", 89);
+//		nbt.putString("password", Objects.requireNonNullElse(password, "password123546"));
+//		nbt.putString("ssid", Objects.requireNonNullElse(ssid, "Unconfigured Network"));
+//		nbt.putString("Wireless_Password", Objects.requireNonNullElse(netPass, ""));
+//		nbt.putByteArray("MAC1",mac1.getBytes());
+//		nbt.putByteArray("MAC2",mac2.getBytes());
+//		NbtList nodeIDS = new NbtList();
+//		for(int i=0;i<nodeCount;i++){
+//			NbtCompound compound = new NbtCompound();
+//			if(localNodes[i]==null){
+//				nodeIDS.add(compound);
+//				continue;
+//			}
+//
+//			localNodes[i].write(compound);
+//			nodeIDS.add(compound);
+//		}
+//		nbt.put("connections",nodeIDS);
+//
+//		super.writeNbt(nbt,registryLookup);
+//	}
+
+
+	@Override
+	protected void readData(ReadView view) {
+		super.readData(view);
+		password=view.getString("password","password123546");
+		ssid = view.getString("ssid","Unconfigured Network");
+		netPass = view.getString("Wireless_Password","");
+		int[] mac1Bytes = view.getOptionalIntArray("MAC1").get();
+		int[] mac2Bytes = view.getOptionalIntArray("MAC2").get();
+		setMacAddresses(mac1Bytes,mac2Bytes);
+		ReadView.ListReadView lrv = view.getListReadView("connections");
+		List<ReadView> connectionNodes = lrv.stream().toList();
+
+		for (int i=0;i<nodeCount;i++){
+			if(i < connectionNodes.size()){
+				ReadView cn = connectionNodes.get(i);
+
+				if(cn.getOptionalInt(LocalNode.ID).isEmpty()){
+					isNodeUsed[i] = false;
+				}else{
+					localNodes[i]=new LocalNode(this , cn);
+					isNodeUsed[i] = true;
+				}
+			}else{
+				isNodeUsed[i] = false;
+			}
+		}
 	}
 
 	// Deserialize the BlockEntity
-	@Override
-	public void readNbt(NbtCompound nbt,RegistryWrapper.WrapperLookup registryLookup) {
-		super.readNbt(nbt,registryLookup);
-		password=nbt.getString("password");
-		ssid = nbt.getString("ssid");
-		netPass = nbt.getString("Wireless_Password");
-		byte[] mac1Bytes = nbt.getByteArray("MAC1");
-		byte[] mac2Bytes = nbt.getByteArray("MAC2");
-		setMacAddresses(mac1Bytes,mac2Bytes);
-		NbtList nodeIDS = nbt.getList("connections",NbtCompound.COMPOUND_TYPE);
-		for (int i=0;i<nodeCount;i++){
-			NbtCompound compound = nodeIDS.getCompound(i);
-			if(compound==null || compound.isEmpty()){
-				isNodeUsed[i] = false;
-				continue;
-			}
-			localNodes[i]=new LocalNode(this , compound);
-			isNodeUsed[i] = true;
-		}
-	}
+//	@Override
+//	public void readNbt(NbtCompound nbt,RegistryWrapper.WrapperLookup registryLookup) {
+//		super.readNbt(nbt,registryLookup);
+//		password=nbt.getString("password");
+//		ssid = nbt.getString("ssid");
+//		netPass = nbt.getString("Wireless_Password");
+//		byte[] mac1Bytes = nbt.getByteArray("MAC1");
+//		byte[] mac2Bytes = nbt.getByteArray("MAC2");
+//		setMacAddresses(mac1Bytes,mac2Bytes);
+//		NbtList nodeIDS = nbt.getList("connections",NbtCompound.COMPOUND_TYPE);
+//		for (int i=0;i<nodeCount;i++){
+//			NbtCompound compound = nodeIDS.getCompound(i);
+//			if(compound==null || compound.isEmpty()){
+//				isNodeUsed[i] = false;
+//				continue;
+//			}
+//			localNodes[i]=new LocalNode(this , compound);
+//			isNodeUsed[i] = true;
+//		}
+//	}
 
 	@Nullable
 	@Override
@@ -154,7 +205,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		}
 	}
 
-	//TODO implement this
+	public void setMacAddresses(int[] mac1,int[] mac2){
+		this.mac1 = new Mac(mac1);
+		this.mac2 = new Mac(mac2);
+	}
+
 	public void setMacAddresses(byte[] mac1,byte[] mac2){
 		this.mac1 = new Mac(mac1);
 		this.mac2 = new Mac(mac2);
@@ -213,7 +268,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public void removeNode(int index, boolean dropWire) {
 		//LocalNode old = this.localNodes[index];
 		this.localNodes[index] = null;
-		this.nodeCache[index] = null;
 		markDirty();
         assert world != null;
         world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
@@ -259,7 +313,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 				", deviceName=" + deviceName +
 				", deviceIP=" + deviceIP +
 				", localNodes=" + Arrays.toString(localNodes) +
-				", nodeCache=" + Arrays.toString(nodeCache) +
 				'}';
 	}
 }

@@ -18,16 +18,18 @@ import com.cbi.coollink.items.*;
 import com.cbi.coollink.net.*;
 import com.cbi.coollink.rendering.IWireNode;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ConduitBlockEntity;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -56,25 +58,25 @@ public class Main implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("cool-link");
 
     public static final String namespace = "cool-link";
-    public static final String[] woodTypes = {"oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry","bamboo","crimson","warped"};
+    public static final String[] woodTypes = {"oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry","bamboo","crimson","warped","pale_oak"};
 
     public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
 
     //Block Entity Registry
-    public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "aio_block_entity"), BlockEntityType.Builder.create(AIOBlockEntity::new, AIO_Network.ENTRY).build());
-    public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "small_conduit_block_entity"), BlockEntityType.Builder.create(ConduitBlockEntity::new, SmallConduit.ENTRY).build());
-    public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "medium_conduit_block_entity"), BlockEntityType.Builder.create(ConduitBlockEntity::new, MediumConduit.ENTRY).build());
-    public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("cool-link", "large_conduit_block_entity"), BlockEntityType.Builder.create(ConduitBlockEntity::new, LargeConduit.ENTRY).build());
-    public static final BlockEntityType<ServerRackBlockEntity> SERVER_RACK_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(namespace,"server_rack_block_entity"), BlockEntityType.Builder.create(ServerRackBlockEntity::new,ServerRack.ENTRY).build());
+    public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "aio_block_entity"), AIOBlockEntity::new, AIO_Network.ENTRY);
+    public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "small_conduit_block_entity"), ConduitBlockEntity::new, SmallConduit.ENTRY);
+    public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "medium_conduit_block_entity"), ConduitBlockEntity::new, MediumConduit.ENTRY);
+    public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "large_conduit_block_entity"), ConduitBlockEntity::new, LargeConduit.ENTRY);
+    public static final BlockEntityType<ServerRackBlockEntity> SERVER_RACK_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"server_rack_block_entity"), ServerRackBlockEntity::new,ServerRack.ENTRY);
 
-    public static final BlockEntityType<SatelliteDishBlockEntity> SATELLITE_DISH_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(namespace,"satellite-dish-block-entity"),BlockEntityType.Builder.create(SatelliteDishBlockEntity::new,SatelliteDishBlock.ENTRY).build());
+    public static final BlockEntityType<SatelliteDishBlockEntity> SATELLITE_DISH_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"satellite-dish-block-entity"),SatelliteDishBlockEntity::new,SatelliteDishBlock.ENTRY);
     //public static final BlockEntityType<CoaxWallPortSingleBE> COAX_WALL_PORT_SINGLE_BLOCK_ENTITY =
 
 
 
     //Cable Registries
-    public static final Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "cat6_ethernet_cable"),new Cat6Cable(new Item.Settings()));
-    public static final CoaxialCable coaxialCableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "coaxial_cable"),new CoaxialCable(new Item.Settings()));
+    public static final Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, Cat6Cable.ITEM_KEY, new Cat6Cable(new Item.Settings().registryKey(Cat6Cable.ITEM_KEY)));
+    public static final CoaxialCable coaxialCableEntry = Registry.register(Registries.ITEM, CoaxialCable.ITEM_KEY,new CoaxialCable(new Item.Settings().registryKey(CoaxialCable.ITEM_KEY)));
 
     public static final ItemGroup COOL_LINK_ITEM_GROUP = FabricItemGroup.builder()
             .icon(() -> new ItemStack(AIO_Network.ENTRY))
@@ -99,51 +101,54 @@ public class Main implements ModInitializer {
 
 
 
-        Registry.register(Registries.BLOCK, Identifier.of("cool-link","test_block"),TestBlock.ENTRY);
-        Registry.register(Registries.ITEM, Identifier.of("cool-link", "test_block"),new BlockItem(TestBlock.ENTRY, new Item.Settings()));
-        Registry.register(Registries.BLOCK, Identifier.of("cool-link","aio_network"), AIO_Network.ENTRY);
-        BlockRenderLayerMap.INSTANCE.putBlock(AIO_Network.ENTRY, RenderLayer.getCutout());
-        Registry.register(Registries.ITEM, Identifier.of("cool-link", "aio_network"),new BlockItem(AIO_Network.ENTRY, new Item.Settings()));
-        SmartPhone smartPhoneEntry= Registry.register(Registries.ITEM, Identifier.of("cool-link", "smart_phone"),new SmartPhone(new Item.Settings()));
+        Registry.register(Registries.BLOCK, TestBlock.BLOCK_KEY,TestBlock.ENTRY);
+        Registry.register(Registries.ITEM, TestBlock.ITEM_KEY,new BlockItem(TestBlock.ENTRY, new Item.Settings().registryKey(TestBlock.ITEM_KEY)));
+        Registry.register(Registries.BLOCK, AIO_Network.BLOCK_KEY, AIO_Network.ENTRY);
+        BlockRenderLayerMap.putBlock(AIO_Network.ENTRY, BlockRenderLayer.CUTOUT);
+        Registry.register(Registries.ITEM, AIO_Network.ITEM_KEY,new BlockItem(AIO_Network.ENTRY, new Item.Settings().registryKey(AIO_Network.ITEM_KEY)));
+        SmartPhone smartPhoneEntry = Registry.register(Registries.ITEM, SmartPhone.ITEM_KEY,new SmartPhone(new Item.Settings().registryKey(SmartPhone.ITEM_KEY)));
 
 
-        WireTester wireTesterEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "wire_tester"),new WireTester(new Item.Settings()));
-        ProgramingCable programingCableEntry = Registry.register(Registries.ITEM, Identifier.of("cool-link", "programing_cable"),new ProgramingCable(new Item.Settings()));
+        WireTester wireTesterEntry = Registry.register(Registries.ITEM, WireTester.ITEM_KEY,new WireTester(new Item.Settings().registryKey(WireTester.ITEM_KEY)));
+        ProgramingCable programingCableEntry = Registry.register(Registries.ITEM, ProgramingCable.ITEM_KEY,new ProgramingCable(new Item.Settings().registryKey(ProgramingCable.ITEM_KEY)));
 
-        Registry.register(Registries.BLOCK, Identifier.of("cool-link","server_rack"), ServerRack.ENTRY);
-        BlockRenderLayerMap.INSTANCE.putBlock(ServerRack.ENTRY, RenderLayer.getCutout());
-        Registry.register(Registries.ITEM, Identifier.of("cool-link", "server_rack"),new BlockItem(ServerRack.ENTRY, new Item.Settings() ));
+        Registry.register(Registries.BLOCK, ServerRack.BLOCK_KEY, ServerRack.ENTRY);
+        BlockRenderLayerMap.putBlock(ServerRack.ENTRY, BlockRenderLayer.CUTOUT);
+        Registry.register(Registries.ITEM, ServerRack.ITEM_KEY,new BlockItem(ServerRack.ENTRY, new Item.Settings().registryKey(ServerRack.ITEM_KEY) ));
 
-        Registry.register(Registries.BLOCK, Identifier.of("cool-link","satellite_dish"), SatelliteDishBlock.ENTRY);
-        BlockRenderLayerMap.INSTANCE.putBlock(SatelliteDishBlock.ENTRY, RenderLayer.getCutout());
-        Registry.register(Registries.ITEM, Identifier.of("cool-link", "satellite_dish"),new BlockItem(SatelliteDishBlock.ENTRY, new Item.Settings()));
+        Registry.register(Registries.BLOCK, SatelliteDishBlock.BLOCK_KEY, SatelliteDishBlock.ENTRY);
+        BlockRenderLayerMap.putBlock(SatelliteDishBlock.ENTRY, BlockRenderLayer.CUTOUT);
+        Registry.register(Registries.ITEM, SatelliteDishBlock.ITEM_KEY,new BlockItem(SatelliteDishBlock.ENTRY, new Item.Settings().registryKey(SatelliteDishBlock.ITEM_KEY)));
 
-        Registry.register(Registries.BLOCK, Identifier.of("cool-link","small_conduit"),SmallConduit.ENTRY);
-        Registry.register(Registries.ITEM, Identifier.of("cool-link", "small_conduit"),new BlockItem(SmallConduit.ENTRY, new Item.Settings()));
+        Registry.register(Registries.BLOCK, SmallConduit.BLOCK_KEY,SmallConduit.ENTRY);
+        Registry.register(Registries.ITEM, SmallConduit.ITEM_KEY,new BlockItem(SmallConduit.ENTRY, new Item.Settings().registryKey(SmallConduit.ITEM_KEY)));
 
-        Registry.register(Registries.BLOCK, Identifier.of("cool-link","medium_conduit"), MediumConduit.ENTRY);
-        Registry.register(Registries.ITEM, Identifier.of("cool-link", "medium_conduit"),new BlockItem(MediumConduit.ENTRY, new Item.Settings()));
+        Registry.register(Registries.BLOCK, MediumConduit.BLOCK_KEY, MediumConduit.ENTRY);
+        Registry.register(Registries.ITEM, MediumConduit.ITEM_KEY,new BlockItem(MediumConduit.ENTRY, new Item.Settings().registryKey(MediumConduit.ITEM_KEY)));
 
-        Registry.register(Registries.BLOCK, Identifier.of("cool-link","large_conduit"), LargeConduit.ENTRY);
-        Registry.register(Registries.ITEM, Identifier.of("cool-link", "large_conduit"),new BlockItem(LargeConduit.ENTRY, new Item.Settings()));
+        Registry.register(Registries.BLOCK, LargeConduit.BLOCK_KEY, LargeConduit.ENTRY);
+        Registry.register(Registries.ITEM, LargeConduit.ITEM_KEY,new BlockItem(LargeConduit.ENTRY, new Item.Settings().registryKey(LargeConduit.ITEM_KEY)));
 
-        Registry.register(Registries.BLOCK,Identifier.of("cool-link","coax_cable"), CoaxCable.ENTRY);
-        BlockRenderLayerMap.INSTANCE.putBlock(CoaxCable.ENTRY, RenderLayer.getCutout());
+        Registry.register(Registries.BLOCK, CoaxCable.BLOCK_KEY, CoaxCable.ENTRY);
+        BlockRenderLayerMap.putBlock(CoaxCable.ENTRY, BlockRenderLayer.CUTOUT);
 
-        Registry.register(Registries.BLOCK, Identifier.of(namespace,"aio_cable_bundle"), AIOCableBundle.ENTRY);
-        Registry.register(Registries.ITEM,Identifier.of(namespace,"aio_cable_bundle"),new BlockItem(AIOCableBundle.ENTRY,new Item.Settings()));
+        Registry.register(Registries.BLOCK, AIOCableBundle.BLOCK_KEY, AIOCableBundle.ENTRY);
+        Registry.register(Registries.ITEM,AIOCableBundle.ITEM_KEY,new BlockItem(AIOCableBundle.ENTRY,new Item.Settings().registryKey(AIOCableBundle.ITEM_KEY)));
 
         for(String wood:woodTypes) {
             //Main.LOGGER.info("Registering coax wall port of type: "+ wood);
-            CoaxWallPortSingle block = new CoaxWallPortSingle(FabricBlockSettings.create().hardness(0.5f),wood);
+            Identifier ID = Identifier.of(Main.namespace,"wall_ports/coax_wall_port_"+wood);
+            RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+            RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+            CoaxWallPortSingle block = new CoaxWallPortSingle(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY),wood);
             coaxWallPortVarients.put(wood,block);
-            Registry.register(Registries.BLOCK, Identifier.of("cool-link", "wall_ports/coax_wall_port_"+wood), block);
-            Registry.register(Registries.ITEM, Identifier.of("cool-link", "wall_ports/coax_wall_port_"+wood), new BlockItem(block, new Item.Settings()));
-            coaxWallPortSingleBlockEntities.put(wood, Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(namespace,"coax_wall_port_single_block_entity_"+wood), BlockEntityType.Builder.create(CoaxWallPortSingleBE.of(wood),block).build()));
+            Registry.register(Registries.BLOCK, BLOCK_KEY, block);
+            Registry.register(Registries.ITEM, ITEM_KEY, new BlockItem(block, new Item.Settings().registryKey(ITEM_KEY)));
+            coaxWallPortSingleBlockEntities.put(wood, registerBlockEntity(Identifier.of(namespace,"coax_wall_port_single_block_entity_"+wood), CoaxWallPortSingleBE.of(wood),block));
         }
 
-        Registry.register(Registries.BLOCK,Identifier.of("cool-link","aio_wall_port"),AIOWallPort.ENTRY);
-        Registry.register(Registries.ITEM,Identifier.of("cool-link","aio_wall_port"),new BlockItem(AIOWallPort.ENTRY,new Item.Settings()));
+        Registry.register(Registries.BLOCK,AIOWallPort.BLOCK_KEY,AIOWallPort.ENTRY);
+        Registry.register(Registries.ITEM,AIOWallPort.ITEM_KEY,new BlockItem(AIOWallPort.ENTRY,new Item.Settings().registryKey(AIOWallPort.ITEM_KEY)));
 
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
@@ -230,7 +235,8 @@ public class Main implements ModInitializer {
             ItemStack itemFromClient = payload.phone();
             context.server().execute(() -> {
                 ItemStack heldItem = null;
-                for (ItemStack itemStack : context.player().getHandItems()) {
+                //they removed the get both hands at the same time method so saving them both into a tmp array is a good enough for now solution
+                for (ItemStack itemStack : new ItemStack[]{context.player().getMainHandStack(),context.player().getOffHandStack()}) {
                     if (itemStack.getItem().equals(itemFromClient.getItem())) {
                         heldItem = itemStack;
                         break;
@@ -252,7 +258,8 @@ public class Main implements ModInitializer {
             }
             context.server().execute(() -> {
                 ItemStack heldItem = null;
-                for (ItemStack itemStack : context.player().getHandItems()) {
+                //they removed the get both hands at the same time method so saving them both into a tmp array is a good enough for now solution
+                for (ItemStack itemStack : new ItemStack[]{context.player().getMainHandStack(),context.player().getOffHandStack()}) {
                     if (itemStack.getItem().equals(itemFromClient.getItem())) {
                         heldItem = itemStack;
                         break;
@@ -302,5 +309,24 @@ public class Main implements ModInitializer {
 
     public static void setKnownMacs(int[] mac){
         //todo
+    }
+
+    /**Register a new block entity to minecraft
+     * @param id The id of the block entity
+     * @param entityFactory The constructor for the block entity (MyBlockEntity::new)
+     * @param blocks A reference to the block object this block entity will be attaching to
+     * @return The registered block entity type
+     * @param <T> The type of the block entity class
+     */
+    public static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(Identifier id, FabricBlockEntityTypeBuilder.Factory<? extends T> entityFactory, Block... blocks){
+        return Registry.register(Registries.BLOCK_ENTITY_TYPE, id, FabricBlockEntityTypeBuilder.<T>create(entityFactory, blocks).build());
+    }
+
+    public static RegistryKey<Block> createBlockRegistryKey(Identifier id) {
+        return RegistryKey.of(RegistryKeys.BLOCK, id);
+    }
+
+    public static RegistryKey<Item> createItemRegistryKey(Identifier id) {
+        return RegistryKey.of(RegistryKeys.ITEM, id);
     }
 }

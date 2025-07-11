@@ -15,6 +15,13 @@ public class Mac {
         setMac(generateMac(deviceType));
     }
 
+    public Mac(int[] addrIn){
+        mac = new int[3];
+        mac[0] = addrIn[0];
+        mac[1] = addrIn[1];
+        mac[2] = addrIn[2];
+    }
+
     public Mac(byte[] bytes){
         mac = new int[3];
         //if the passed in array is empty then something went wrong in the transfer process so to avoid error just generate a new mac

@@ -3,8 +3,8 @@ package com.cbi.coollink.blocks.blockentities.wallports;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.AWallPortBlockEntity;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -12,7 +12,7 @@ public class CoaxWallPortSingleBE extends AWallPortBlockEntity {
 
     /**used to get the constructor with entries for the various wood types
      */
-    public static BlockEntityType.BlockEntityFactory<CoaxWallPortSingleBE> of(String woodType){
+    public static FabricBlockEntityTypeBuilder.Factory<CoaxWallPortSingleBE> of(String woodType){
         return ((pos1, state) -> new CoaxWallPortSingleBE(woodType,pos1,state));
     }
     public CoaxWallPortSingleBE(String woodType,BlockPos pos, BlockState state) {

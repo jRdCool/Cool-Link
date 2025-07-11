@@ -20,6 +20,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import static net.minecraft.state.property.Properties.*;
 
@@ -157,7 +158,7 @@ public abstract class Conduit extends BlockWithEntity {
 
     @SuppressWarnings({"deprecation","all"})
     @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
         BlockPos neighbor1= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//E//the location of the nigher block you want to check this should be reassigned for every block you want to check
         BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());//W
         BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);//S
@@ -167,7 +168,7 @@ public abstract class Conduit extends BlockWithEntity {
 
         onUpdate(state,world,pos);
         state=world.getBlockState(pos);
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
     public void onBroken(WorldAccess world, BlockPos pos, BlockState state){

@@ -1,5 +1,6 @@
 package com.cbi.coollink.blocks.cables;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.wallports.CoaxWallPortSingle;
 import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
 import net.minecraft.block.AbstractBlock;
@@ -8,12 +9,16 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -35,7 +40,11 @@ public class CoaxCable extends Block {
     static BooleanProperty up = BooleanProperty.of("up");
     static BooleanProperty down = BooleanProperty.of("down");
 
-    public static final CoaxCable ENTRY =new CoaxCable(AbstractBlock.Settings.create().hardness(0.5f));
+    public static final Identifier ID = Identifier.of(Main.namespace,"coax_cable");
+    public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+    //public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+
+    public static final CoaxCable ENTRY = new CoaxCable(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
 
 
 
@@ -244,7 +253,7 @@ public class CoaxCable extends Block {
     }
 
     @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
         {
             BlockState s = world.getBlockState(pos.east());
             if (state.get(east)) {
@@ -269,6 +278,6 @@ public class CoaxCable extends Block {
                 }
             }
         }
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation , notify);
     }
 }

@@ -3,12 +3,14 @@ package com.cbi.coollink.rendering.blockentities;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.ServerRack;
 import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
+import com.cbi.coollink.rendering.RenderType;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 
 public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<ServerRackBlockEntity> {
     public ServerRackBlockEntityRenderer(BlockEntityRendererFactory.Context context){
@@ -17,9 +19,9 @@ public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<Server
 
     private static final Identifier SERVER_RACK_TEXTURE = Identifier.of(Main.namespace, "textures/test.png");
     @Override
-    public void render(ServerRackBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(ServerRackBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, Vec3d cameraPos) {
         if(entity.getCachedState().get(ServerRack.half)== ServerRack.Half.BOTTOM) {
-            RenderLayer layer = RenderLayer.of("serverrack", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS, 256, RenderLayer.of(RenderPhase.COLOR_PROGRAM));
+            RenderLayer layer = RenderType.SERVER_RACK;
 
 
            // RenderSystem.setShader(GameRenderer::getPositionTexProgram);

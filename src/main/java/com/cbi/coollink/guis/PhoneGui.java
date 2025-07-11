@@ -76,25 +76,26 @@ public class PhoneGui extends LightweightGuiDescription {
             NbtList nbtApps= (NbtList) nbt.get("apps");
             if(nbtApps!=null&&!nbtApps.isEmpty()){
                 for(int i=0;i<nbtApps.size();i++){
-                    Identifier tmpName=Identifier.of(nbtApps.getString(i));
+                    Identifier tmpName=Identifier.of(nbtApps.getString(i,null));
                     //if(AppRegistry.get(tmpName)==null)
                     //    continue;
                     apps.add(AppRegistry.get(tmpName));
                 }
             }
-            appData=nbt.getCompound("appData");
+            appData=nbt.getCompoundOrEmpty("appData");
             if(appData==null){
                 appData=new NbtCompound();
             }
-            backgroundNumber= nbt.getInt("background");
-            if (nbt.getInt("clock type") == 1) {
+            backgroundNumber= nbt.getInt("background",0);
+            if (nbt.getInt("clock type",0) == 1) {
                 clockTimeType = ClockTimeType.HOUR24;
             } else {
                 clockTimeType = ClockTimeType.AMPM;
             }
-            phoneName=nbt.getString("Name");
-            if(phoneName==null||phoneName.equals(""))
-                phoneName="UnNamed phone";
+            phoneName=nbt.getString("Name",null);
+            if(phoneName==null || phoneName.isEmpty()) {
+                phoneName = "UnNamed phone";
+            }
 
         }else{
             Main.LOGGER.info("no NBT data");
@@ -202,7 +203,7 @@ public class PhoneGui extends LightweightGuiDescription {
         }else{
             root.remove(appPanel);
         }
-        NbtCompound dataForApp=appData.getCompound(app.appId.toString());
+        NbtCompound dataForApp = appData.getCompoundOrEmpty(app.appId.toString());
         if(dataForApp==null){
             dataForApp=new NbtCompound();
         }
@@ -222,7 +223,7 @@ public class PhoneGui extends LightweightGuiDescription {
         mouseY-=top;
         //Main.LOGGER.info("mouse clicked at: "+mouseX+" "+mouseY);
         if(currentApp==null) {
-            for (int i = 0; i < apps.size(); i++) {
+            for (int i = 0; i < apps.size(); i++) {//                                             The integer division here is intentional
                 if (mouseX >= 20 + 25 * (i%15) && mouseX <= 20 + 25 * (i%15) + 20 && mouseY >= 20+25*(i/15) && mouseY <= 20 + 20+25*(i/15)) {
                     openApp(apps.get(i));
                 }

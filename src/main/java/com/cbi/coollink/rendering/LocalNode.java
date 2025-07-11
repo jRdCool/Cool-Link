@@ -2,8 +2,13 @@ package com.cbi.coollink.rendering;
 
 import com.cbi.coollink.blocks.cables.createadditons.NodeRotation;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Encoder;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
@@ -52,21 +57,42 @@ public class LocalNode {
         this.relativePos = position.subtract(entity.getPos());
     }
 
-    public LocalNode(BlockEntity entity, NbtCompound tag) {
+    public LocalNode(BlockEntity entity, LocalNodeConnection read) {
         this.entity = entity;
-        this.index = tag.getInt(ID);
-        this.otherIndex = tag.getInt(OTHER);
-        this.type = WireType.fromIndex(tag.getInt(TYPE));
-        this.relativePos = new Vec3i(tag.getInt(X), tag.getInt(Y), tag.getInt(Z));
+        this.index = read.index();
+        this.otherIndex = read.otherIndex();
+        this.type = WireType.fromIndex(read.type());
+        this.relativePos = new Vec3i(read.x(), read.y(), read.z());
     }
 
-    public void write(NbtCompound tag) {
-        tag.putInt(ID, this.index);
-        tag.putInt(OTHER, this.otherIndex);
-        tag.putInt(TYPE, this.type.getIndex());
-        tag.putInt(X, this.relativePos.getX());
-        tag.putInt(Y, this.relativePos.getY());
-        tag.putInt(Z, this.relativePos.getZ());
+    public LocalNode(BlockEntity entity, ReadView read) {
+        this.entity = entity;
+        this.index = read.getInt(ID,-1);
+        this.otherIndex = read.getInt(OTHER,-1);
+        this.type = WireType.fromIndex(read.getInt(TYPE,-1));
+        this.relativePos = new Vec3i(read.getInt(X,0), read.getInt(Y,0), read.getInt(Z,0));
+    }
+
+//    public void write(NbtCompound tag) {
+//        tag.putInt(ID, this.index);
+//        tag.putInt(OTHER, this.otherIndex);
+//        tag.putInt(TYPE, this.type.getIndex());
+//        tag.putInt(X, this.relativePos.getX());
+//        tag.putInt(Y, this.relativePos.getY());
+//        tag.putInt(Z, this.relativePos.getZ());
+//    }
+
+    public LocalNodeConnection write(){
+        return new LocalNodeConnection(index,otherIndex,type.getIndex(),relativePos.getX(),relativePos.getY(),relativePos.getZ());
+    }
+
+    public void write(WriteView writer){
+        writer.putInt(ID, this.index);
+        writer.putInt(OTHER, this.otherIndex);
+        writer.putInt(TYPE, this.type.getIndex());
+        writer.putInt(X, this.relativePos.getX());
+        writer.putInt(Y, this.relativePos.getY());
+        writer.putInt(Z, this.relativePos.getZ());
     }
 
     public void updateRelative(NodeRotation rotation) {
@@ -100,4 +126,6 @@ public class LocalNode {
     public void invalid() {
         this.invalid = true;
     }
+
+
 }

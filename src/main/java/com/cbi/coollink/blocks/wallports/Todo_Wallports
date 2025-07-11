@@ -1,0 +1,16 @@
+Wall ports to create:
+
+1. Cat 6 wall port x1
+2. Cat 6 wall port x2
+3. Cat 6 wall port x4
+4. Fiber x1
+5. Fiber x2
+6. Fiber x4
+7. Fiber x8
+
+
+Features to Implement:
+
+1. Get wall ports to either be placed on or connect to conduits
+    1a. If connected to it will take on the properties of the largest conduit connected
+2. When clicked on, the wall port lets you select which tube/slot and in which direction the cable should be connected

@@ -10,9 +10,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.state.property.Properties;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public abstract class AWallPortBlockEntity extends BlockEntity implements IWireNode {
     public AWallPortBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -27,30 +31,29 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
     private final LocalNode[] localNodes;
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        NbtList nodeIDS = new NbtList();
+    protected void writeData(WriteView view) {
+        WriteView.ListView nodeIDS = view.getList("connections");
         for(int i=0;i<nodeCount;i++){
-            NbtCompound compound = new NbtCompound();
+            WriteView compound = nodeIDS.add();
             if(localNodes[i]==null){
-                nodeIDS.add(compound);
                 continue;
             }
 
             localNodes[i].write(compound);
-            nodeIDS.add(compound);
         }
-        nbt.put("connections",nodeIDS);
 
-        super.writeNbt(nbt, registryLookup);
+
+        super.writeData(view);
     }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+    protected void readData(ReadView view) {
 
-        NbtList nodeIDS = nbt.getList("connections",NbtCompound.COMPOUND_TYPE);
+        List<ReadView> nodeIDS = view.getListReadView("connections").stream().toList();
+
         for (int i=0;i<nodeCount;i++){
-            NbtCompound compound = nodeIDS.getCompound(i);
-            if(compound==null || compound.isEmpty()){
+            ReadView compound = nodeIDS.get(i);
+            if(compound == null || compound.getOptionalInt(LocalNode.ID).isEmpty()){
                 isNodeUsed[i] = false;
                 continue;
             }
@@ -58,7 +61,7 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
             isNodeUsed[i] = true;
         }
 
-        super.readNbt(nbt, registryLookup);
+        super.readData(view);
     }
 
     @Override
@@ -107,12 +110,21 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
 
     @Override
     public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
-
+        this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
+        isNodeUsed[index]=true;
+        markDirty();
+        assert world != null;
+        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
     }
 
     @Override
     public void removeNode(int index, boolean dropWire) {
-
+        //LocalNode old = this.localNodes[index];
+        this.localNodes[index] = null;
+        //this.nodeCache[index] = null;
+        markDirty();
+        assert world != null;
+        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
     }
 
     @Override

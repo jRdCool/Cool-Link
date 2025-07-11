@@ -2,10 +2,14 @@ package com.cbi.coollink.blocks.conduits;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.item.Item;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -14,7 +18,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class LargeConduit extends Conduit {
 
-    public static final LargeConduit ENTRY = new LargeConduit(FabricBlockSettings.create().hardness(0.5f));
+    public static final Identifier ID = Identifier.of(Main.namespace,"large_conduit");
+    public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+    public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+    public static final LargeConduit ENTRY = new LargeConduit(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
 
     //cableShape is an integer that is used to switch between the models
     //  0 = NS
