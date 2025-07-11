@@ -7,11 +7,14 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -30,7 +33,10 @@ public class ServerRack extends BlockWithEntity implements BlockEntityProvider {
     public static final EnumProperty<ServerRack.Half> half = EnumProperty.of("half", ServerRack.Half.class);
     public static final EnumProperty<ServerRack.Direction> direction = EnumProperty.of("direction", ServerRack.Direction.class);
 
-    public static final ServerRack ENTRY = new ServerRack(AbstractBlock.Settings.create().hardness(0.5f));
+    public static final Identifier ID = Identifier.of(Main.namespace,"server_rack");
+    public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+    public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+    public static final ServerRack ENTRY = new ServerRack(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
 
     @Nullable
     @Override

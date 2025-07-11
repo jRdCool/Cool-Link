@@ -1,5 +1,6 @@
 package com.cbi.coollink.blocks.cables;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.wallports.CoaxWallPortSingle;
 import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
 import net.minecraft.block.AbstractBlock;
@@ -8,10 +9,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.block.WireOrientation;
@@ -36,7 +40,11 @@ public class CoaxCable extends Block {
     static BooleanProperty up = BooleanProperty.of("up");
     static BooleanProperty down = BooleanProperty.of("down");
 
-    public static final CoaxCable ENTRY =new CoaxCable(AbstractBlock.Settings.create().hardness(0.5f));
+    public static final Identifier ID = Identifier.of(Main.namespace,"coax_cable");
+    public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+    //public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+
+    public static final CoaxCable ENTRY = new CoaxCable(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
 
 
 

@@ -9,10 +9,13 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -28,7 +31,10 @@ import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 
 public class AIO_Network extends BlockWithEntity implements BlockEntityProvider {
-	public static final AIO_Network ENTRY = new AIO_Network(AbstractBlock.Settings.create().hardness(0.5f));
+	public static final Identifier ID = Identifier.of(Main.namespace,"medium_conduit");
+	public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+	public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+	public static final AIO_Network ENTRY = new AIO_Network(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
 	public AIO_Network(Settings settings) {
 		super(settings);
 	}
