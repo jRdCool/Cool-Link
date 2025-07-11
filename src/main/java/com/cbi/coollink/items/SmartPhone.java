@@ -14,7 +14,6 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -33,7 +32,7 @@ public class SmartPhone extends Item {
 
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand){
+    public ActionResult use(World world, PlayerEntity user, Hand hand){
 
         String currentThread = Thread.currentThread().getName();
         //check witch thread the code is being executed on the server
@@ -46,7 +45,7 @@ public class SmartPhone extends Item {
                 mac=new Mac(deviceID);
             }
 
-            for (ItemStack itemStack : user.getHandItems()) {
+            for (ItemStack itemStack : new ItemStack[]{user.getMainHandStack(),user.getOffHandStack()}) {
                 if(itemStack.getItem().equals(this)){
                     heldItem=itemStack;
                     break;

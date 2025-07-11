@@ -35,7 +35,7 @@ public class ExampleApp extends AbstractPhoneApp{
 
     @Override
     public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData) {//this function is called by the phone when attempting to open the app
-        Main.LOGGER.info(appData.asString());
+        Main.LOGGER.info(appData.asString().orElse("ERROR: NULL NBT COMPOUND PASSED INTO APP"));
         return new ExampleApp(world,clickedOnBlockEntity);//this should return a new instance of this class with all necessary arguments
     }
 

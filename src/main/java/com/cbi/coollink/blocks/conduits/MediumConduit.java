@@ -2,7 +2,6 @@ package com.cbi.coollink.blocks.conduits;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class MediumConduit extends Conduit {
 
-    public static final MediumConduit ENTRY = new MediumConduit(FabricBlockSettings.create().hardness(0.5f));
+    public static final MediumConduit ENTRY = new MediumConduit(AbstractBlock.Settings.create().hardness(0.5f));
 
 
     //cableShape is an integer that is used to switch between the models

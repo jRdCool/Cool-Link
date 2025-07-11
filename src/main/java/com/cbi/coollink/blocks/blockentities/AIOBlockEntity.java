@@ -207,8 +207,12 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		}
 	}
 
-	//TODO implement this
 	public void setMacAddresses(int[] mac1,int[] mac2){
+		this.mac1 = new Mac(mac1);
+		this.mac2 = new Mac(mac2);
+	}
+
+	public void setMacAddresses(byte[] mac1,byte[] mac2){
 		this.mac1 = new Mac(mac1);
 		this.mac2 = new Mac(mac2);
 	}
