@@ -27,7 +27,7 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 
 	@Override
 	public void render(T tileEntityIn, float partialTicks, MatrixStack matrixStackIn, VertexConsumerProvider bufferIn,
-					   int combinedLightIn, int combinedOverlayIn) {
+					   int combinedLightIn, int combinedOverlayIn, Vec3d cameraPos) {
 		IWireNode te = (IWireNode) tileEntityIn;
 		World world = tileEntityIn.getWorld();
 		IWireNode otherBlock;

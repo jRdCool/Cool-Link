@@ -13,9 +13,13 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
     public SatelliteDishBlockEntity(BlockPos pos, BlockState state) {
@@ -25,24 +29,23 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
     LocalNode connection;
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
+    protected void readData(ReadView view) {
+        super.readData(view);
         if(hasNode(getCachedState())){
-            NbtCompound connectionCompound = nbt.getCompound("connection");
-            if(connectionCompound != null && !connectionCompound.isEmpty()){
-                connection = new LocalNode(this,connectionCompound);
+            Optional<ReadView> connectionCompound = view.getOptionalReadView("connection");
+            if(connectionCompound.isPresent() && connectionCompound.get().getOptionalInt(LocalNode.ID).isPresent()){
+                connection = new LocalNode(this,connectionCompound.get());
             }
         }
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        NbtCompound connectionCompound = new NbtCompound();
+    protected void writeData(WriteView view) {
         if(hasNode(getCachedState()) && connection != null){
+            WriteView connectionCompound = view.get("connection");
             connection.write(connectionCompound);
-            nbt.put("connection",connectionCompound);
         }
-        super.writeNbt(nbt, registryLookup);
+        super.writeData(view);
     }
 
     @Nullable

@@ -2,15 +2,17 @@ package com.cbi.coollink.blocks.cables;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.wallports.CoaxWallPortSingle;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -33,9 +35,12 @@ public class AIOCableBundle extends Block {
     public static BooleanProperty west=BooleanProperty.of("west");
     public static BooleanProperty up=BooleanProperty.of("up");
     public static BooleanProperty down=BooleanProperty.of("down");
-    public static DirectionProperty wallPortDir=DirectionProperty.of("wall_port_dir");
 
-    public static final AIOCableBundle ENTRY = new AIOCableBundle(FabricBlockSettings.create().hardness(0.5f));
+    public static final Identifier ID = Identifier.of(Main.namespace,"aio_cable_bundle");
+    public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+    public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+
+    public static final AIOCableBundle ENTRY = new AIOCableBundle(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
 
     public AIOCableBundle(Settings settings){
         super(settings);

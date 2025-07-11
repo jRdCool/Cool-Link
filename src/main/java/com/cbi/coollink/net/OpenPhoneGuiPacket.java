@@ -19,7 +19,7 @@ public record OpenPhoneGuiPacket(RegistryKey<World> world, BlockPos block, ItemS
             PacketCodecs.registryCodec(World.CODEC), OpenPhoneGuiPacket::world,
             BlockPos.PACKET_CODEC, OpenPhoneGuiPacket::block,
             ItemStack.PACKET_CODEC, OpenPhoneGuiPacket::heldItem,
-            PacketCodecs.BOOL, OpenPhoneGuiPacket::noBlockEntity,
+            PacketCodecs.BOOLEAN, OpenPhoneGuiPacket::noBlockEntity,
             PacketCodecs.codec(Vec3d.CODEC), OpenPhoneGuiPacket::playerPos,
             OpenPhoneGuiPacket::new
     );
