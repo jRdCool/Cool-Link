@@ -2,7 +2,7 @@ package com.cbi.coollink.blocks.wallports;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.AIOCableBundle;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -21,7 +21,7 @@ import static net.minecraft.state.property.Properties.FACING;
 @Deprecated
 public class AIOWallPort extends Block {
 
-    public static final AIOWallPort ENTRY = new AIOWallPort(FabricBlockSettings.create().hardness(0.5f));
+    public static final AIOWallPort ENTRY = new AIOWallPort(AbstractBlock.Settings.create().hardness(0.5f));
 
     public AIOWallPort(Settings settings){
         super(settings);

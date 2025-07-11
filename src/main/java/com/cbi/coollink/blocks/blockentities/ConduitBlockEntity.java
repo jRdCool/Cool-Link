@@ -9,6 +9,8 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,13 +19,15 @@ public class ConduitBlockEntity extends BlockEntity {
                 super(type, pos, state);
     }
 
-    public void writeNbt(NbtCompound nbt,RegistryWrapper.WrapperLookup registryLookup){
-        super.writeNbt(nbt,registryLookup);
+    @Override
+    public void writeData(WriteView view){
+        super.writeData(view);
     }
 
 
-    public void readNbt(NbtCompound nbt,RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt,registryLookup);
+    @Override
+    public void readData(ReadView view) {
+        super.readData(view);
     }
 
     @Nullable

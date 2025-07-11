@@ -9,6 +9,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.StringIdentifiable;
@@ -117,7 +118,7 @@ static boolean presented = false;
             if(placer!=null) {
                 if(placer instanceof PlayerEntity player){
                     if(!player.isCreative()) {
-                        placer.dropItem(ServerRack.ENTRY);
+                        player.dropItem(new ItemStack(ServerRack.ENTRY),true);
                     }
                 }
 
@@ -135,7 +136,7 @@ static boolean presented = false;
     }
 
     @Override
-    protected void onExploded(BlockState state, World world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+    protected void onExploded(BlockState state, ServerWorld world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
         super.onExploded(state, world, pos, explosion, stackMerger);
         onBroken(world,pos,state);
     }
