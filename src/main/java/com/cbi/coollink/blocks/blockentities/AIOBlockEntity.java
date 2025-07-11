@@ -36,7 +36,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 			mac2 = new Mac(deviceID);
 		//}
 		this.localNodes = new LocalNode[getNodeCount()];
-		this.nodeCache = new IWireNode[getNodeCount()];
 		//setNode(0,1,pos,WireType.CAT6);
 		//setNode(1,2,pos,WireType.COAX);
 	}
@@ -49,7 +48,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public String netPass;
 
 	private final LocalNode[] localNodes;
-	private final IWireNode[] nodeCache;
 
 	private static final int deviceID = 0x11;
 	public Mac mac1,mac2;
@@ -213,7 +211,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public void removeNode(int index, boolean dropWire) {
 		//LocalNode old = this.localNodes[index];
 		this.localNodes[index] = null;
-		this.nodeCache[index] = null;
 		markDirty();
         assert world != null;
         world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
@@ -259,7 +256,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 				", deviceName=" + deviceName +
 				", deviceIP=" + deviceIP +
 				", localNodes=" + Arrays.toString(localNodes) +
-				", nodeCache=" + Arrays.toString(nodeCache) +
 				'}';
 	}
 }

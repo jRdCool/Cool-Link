@@ -107,12 +107,21 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
 
     @Override
     public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
-
+        this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
+        isNodeUsed[index]=true;
+        markDirty();
+        assert world != null;
+        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
     }
 
     @Override
     public void removeNode(int index, boolean dropWire) {
-
+        //LocalNode old = this.localNodes[index];
+        this.localNodes[index] = null;
+        //this.nodeCache[index] = null;
+        markDirty();
+        assert world != null;
+        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
     }
 
     @Override
