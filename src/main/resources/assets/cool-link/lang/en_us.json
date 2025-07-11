@@ -42,5 +42,7 @@
   "block.cool-link.wall_ports.coax_wall_port_cherry":   "Coax Wall Port",
   "block.cool-link.wall_ports.coax_wall_port_bamboo":   "Coax Wall Port",
   "block.cool-link.wall_ports.coax_wall_port_crimson":  "Coax Wall Port",
-  "block.cool-link.wall_ports.coax_wall_port_warped":   "Coax Wall Port"
+  "block.cool-link.wall_ports.coax_wall_port_warped":   "Coax Wall Port",
+  "item.cool-link.wall_ports.coax_wall_port_pale_oak":  "Coax Wall Port",
+  "block.cool-link.wall_ports.coax_wall_port_pale_oak":  "Coax Wall Port"
 }
