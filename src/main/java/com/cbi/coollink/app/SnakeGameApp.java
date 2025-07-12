@@ -1,5 +1,6 @@
 package com.cbi.coollink.app;
 
+import com.cbi.coollink.terminal.CommandContext;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
@@ -28,7 +29,7 @@ public class SnakeGameApp extends AbstractPhoneApp{
     WLabel gameOverText = new WLabel(MutableText.of(new PlainTextContent.Literal("Game OVER")).setStyle(Style.EMPTY.withBold(true).withUnderline(true).withColor(0xFFFF0000)));
     boolean gameOver =false,gameOverShown=false;
 
-    public SnakeGameApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData){
+    public SnakeGameApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, CommandContext commandRunner){
         super(appID);//the id of the app
         icon = ICON;
         root=new WPlainPanel();//create the panel witch all widget will sit on

@@ -3,6 +3,7 @@ package com.cbi.coollink.guis;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.app.*;
 import com.cbi.coollink.net.SavePhoneDataPacket;
+import com.cbi.coollink.terminal.PhoneCommandContext;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
@@ -53,11 +54,11 @@ public class PhoneGui extends LightweightGuiDescription {
     public Vec3d playerPosition;
 
     public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance, Vec3d playerPosition) {
-        installedApps.add(new PhoneAppInfo(SettingsPhoneApp.ID, (world1, blockEntity, nbtCompound) -> new SettingsPhoneApp(world1,blockEntity,this), SettingsPhoneApp.ICON,true, (be) -> false));
+        installedApps.add(new PhoneAppInfo(SettingsPhoneApp.ID, (world1, blockEntity, nbtCompound, commandContext) -> new SettingsPhoneApp(world1,blockEntity,this), SettingsPhoneApp.ICON,true, (be) -> false));
 
-        installedApps.add(new PhoneAppInfo(AIOSettingApp.ID,(world1, blockEntity, nbtCompound) -> new AIOSettingApp(world1, blockEntity), AIOSettingApp.ICON,true, AIOSettingApp::openOnBlockEntity));
+        installedApps.add(new PhoneAppInfo(AIOSettingApp.ID,(world1, blockEntity, nbtCompound, commandContext) -> new AIOSettingApp(world1, blockEntity), AIOSettingApp.ICON,true, AIOSettingApp::openOnBlockEntity));
 
-        installedApps.add(new PhoneAppInfo(AppStore.ID,(world1, blockEntity, nbtCompound) -> new AppStore(this), AppStore.ICON,true, (be)-> false));
+        installedApps.add(new PhoneAppInfo(AppStore.ID,(world1, blockEntity, nbtCompound, commandContext) -> new AppStore(this), AppStore.ICON,true, (be)-> false));
 
 
         numberOfPreinstalledApps = installedApps.size();
@@ -215,7 +216,7 @@ public class PhoneGui extends LightweightGuiDescription {
             dataForApp = new NbtCompound();
         }
 
-        currentApp = appInfo.launcher.launch(world, clickedOnBLockEntity, dataForApp);//launch the app and get a reference to it
+        currentApp = appInfo.launcher.launch(world, clickedOnBLockEntity, dataForApp,new PhoneCommandContext());//launch the app and get a reference to it
 
         root.add(currentApp.getPanel(),0,0,400,200);//add the app panel to the display stack
         root.add(notchAndTimePanel,0,0,0,0);//re add the notch
