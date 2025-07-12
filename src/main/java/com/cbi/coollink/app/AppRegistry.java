@@ -18,7 +18,17 @@ public final class AppRegistry {
         //    throw new RuntimeException("attempted to register app with root permissions to app registry");
 
         //check if the app was already registered
-        Container app = new Container(appId,launcher,icon,description);
+        Container app = new Container(appId,launcher,icon,description, (be)->false);
+        registeredApps2.put(appId,app);
+        registeredApps.add(app);
+    }
+
+    public static void registerApp(Identifier appId,AppLauncher launcher, Identifier icon, Text description, OpenOnBlockEntityCheck blockEntityCheck){
+        //if(app instanceof AbstractRootApp)
+        //    throw new RuntimeException("attempted to register app with root permissions to app registry");
+
+        //check if the app was already registered
+        Container app = new Container(appId,launcher,icon,description, blockEntityCheck);
         registeredApps2.put(appId,app);
         registeredApps.add(app);
     }
@@ -75,6 +85,14 @@ public final class AppRegistry {
         return container.launcher();
     }
 
+    public static OpenOnBlockEntityCheck getOpensOnBlockEntity(Identifier id){
+        Container container = registeredApps2.get(id);
+        if(container == null){
+            return null;
+        }
+        return container.blockEntityCheck;
+    }
+
     public static int size(){
         return registeredApps.size();
     }
@@ -83,7 +101,16 @@ public final class AppRegistry {
         AbstractPhoneApp launch(World world, @Nullable BlockEntity clickedOmBlockEntity, NbtCompound appData);
     }
 
-    private record Container(Identifier appId, AppLauncher launcher, Identifier icon, Text description){}
+    /**Function to check if an app should open when the phone click on a block entity
+     */
+    public interface OpenOnBlockEntityCheck{
+        /**Check if this app should open when the device is opened while clicking on a block entity
+         * @param be The block entity that was clicked on
+         * @return true If this app should open when the device clicks on a block entity of that type
+         */
+        boolean openOnBlockEntity(BlockEntity be);
+    }
+    private record Container(Identifier appId, AppLauncher launcher, Identifier icon, Text description, OpenOnBlockEntityCheck blockEntityCheck){}
 }
 
 

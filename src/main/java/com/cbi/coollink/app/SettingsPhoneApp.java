@@ -27,12 +27,15 @@ public class SettingsPhoneApp extends AbstractRootApp{
     WLabel networks= new WLabel(Text.of("Networks"));
     boolean settingPhoneName=false;
 
+    public static final Identifier ID = Identifier.of("cool-link","settings");
+    public static final Identifier ICON = Identifier.of("cool-link","textures/gui/setting_app_icon.png");
+
     /**do not use this constructor to initialize the app
      * only use to get an instance of this app
      */
     private SettingsPhoneApp(){
-        super(Identifier.of("cool-link","settings"));
-        icon=Identifier.of("cool-link","textures/gui/setting_app_icon.png");
+        super(ID);
+        icon = ICON;
     }
     public SettingsPhoneApp(World world, BlockEntity clickedOnBlockEntity,PhoneGui phone){
         super(Identifier.of("cool-link","settings"));
@@ -156,21 +159,7 @@ public class SettingsPhoneApp extends AbstractRootApp{
     }
 
     @Override
-    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData) {
-        return null;
-    }
-
-    @Override
     public void addPainters() {
         root.setBackgroundPainter((matrices, left, top, panel) -> ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_FFFFFF));
-    }
-
-    public static SettingsPhoneApp getDummyInstance(){
-        return new SettingsPhoneApp();
-    }
-
-    @Override
-    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, PhoneGui phone) {
-        return new SettingsPhoneApp(world,clickedOnBlockEntity,phone);
     }
 }

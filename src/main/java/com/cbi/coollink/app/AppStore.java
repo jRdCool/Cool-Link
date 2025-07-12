@@ -5,27 +5,23 @@ import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 public final class AppStore extends AbstractRootApp{
     WScrollBar scrollBar;
     WText[] descriptions =new WText[4];
     WButton[] installButtons =new WButton[4];
     PhoneGui phone;
-    public AppStore() {
-        super(Identifier.of("cool-link","app-store"));
-        icon=Identifier.of("cool-link","textures/gui/app_shop_icon.png");
-    }
 
-    public AppStore(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData,PhoneGui phone) {
-        super(Identifier.of("cool-link","app-store"));
+    public static final Identifier ID = Identifier.of("cool-link","app-store");
+    public static final Identifier ICON = Identifier.of("cool-link","textures/gui/app_shop_icon.png");
+
+    public AppStore(PhoneGui phone) {
+        super(ID);
         this.phone=phone;
-        icon=Identifier.of("cool-link","textures/gui/app_shop_icon.png");
-        root=new WPlainPanel();
+        icon = ICON;
+        root = new WPlainPanel();
         WPlainPanel panel=(WPlainPanel)root;
         WLabel title=new WLabel(Text.of("App Shop"));
         title.setHorizontalAlignment(HorizontalAlignment.CENTER);
@@ -56,21 +52,13 @@ public final class AppStore extends AbstractRootApp{
             }
         }
         for(int i=0;i<4;i++){
-            installButtons[i].setEnabled(i + scrollBar.getValue() < AppRegistry.size() && (phone.apps.size()<105 || phone.isAppInstalled(AppRegistry.getId(i+scrollBar.getValue()))));
+            installButtons[i].setEnabled(i + scrollBar.getValue() < AppRegistry.size() && (phone.installedApps.size()<105 || phone.isAppInstalled(AppRegistry.getId(i+scrollBar.getValue()))));
             if(installButtons[i].isEnabled()){
                 installButtons[i].setLabel(phone.isAppInstalled(AppRegistry.getId(i+scrollBar.getValue())) ? Text.of("Uninstall") : Text.of("Install"));
             }
         }
     }
 
-//    @Override
-//    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData) {
-//        return null;
-//    }
-    @Override
-    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, PhoneGui phone) {
-        return new AppStore(world,clickedOnBlockEntity,appData,phone);
-    }
     @Override
     public void addPainters() {
         root.setBackgroundPainter((matrices, left, top, panel) -> {

@@ -40,7 +40,8 @@ public class PhoneGui extends LightweightGuiDescription {
     public ItemStack phoneInstance;
 
     WButton homeButton;
-    public ArrayList<AbstractPhoneApp> apps = new ArrayList<>();
+    public ArrayList<PhoneAppInfo> installedApps = new ArrayList<>();
+
 
     public NbtCompound appData;
     public int backgroundNumber=0;
@@ -52,11 +53,14 @@ public class PhoneGui extends LightweightGuiDescription {
     public Vec3d playerPosition;
 
     public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance, Vec3d playerPosition) {
-        apps.add(SettingsPhoneApp.getDummyInstance());
-        apps.add(AIOSettingApp.getDummyInstance());
-        apps.add(new AppStore());
+        installedApps.add(new PhoneAppInfo(SettingsPhoneApp.ID, (world1, blockEntity, nbtCompound) -> new SettingsPhoneApp(world1,blockEntity,this), SettingsPhoneApp.ICON,true, (be) -> false));
 
-        numberOfPreinstalledApps =apps.size();
+        installedApps.add(new PhoneAppInfo(AIOSettingApp.ID,(world1, blockEntity, nbtCompound) -> new AIOSettingApp(world1, blockEntity), AIOSettingApp.ICON,true, AIOSettingApp::openOnBlockEntity));
+
+        installedApps.add(new PhoneAppInfo(AppStore.ID,(world1, blockEntity, nbtCompound) -> new AppStore(this), AppStore.ICON,true, (be)-> false));
+
+
+        numberOfPreinstalledApps = installedApps.size();
         this.world=world;
         this.clickedOnBLockEntity=clickedOnBLockEntity;
         this.phoneInstance=phoneInstance;
@@ -73,13 +77,13 @@ public class PhoneGui extends LightweightGuiDescription {
 
         if(!nbt.isEmpty()){
             Main.LOGGER.info("NBT data found\n"+nbt.asString());
-            NbtList nbtApps= (NbtList) nbt.get("apps");
-            if(nbtApps!=null&&!nbtApps.isEmpty()){
-                for(int i=0;i<nbtApps.size();i++){
-                    Identifier tmpName=Identifier.of(nbtApps.getString(i,null));
+            NbtList nbtApps = (NbtList) nbt.get("apps");
+            if(nbtApps != null && !nbtApps.isEmpty()){
+                for(int i=0; i < nbtApps.size(); i++){
+                    Identifier tmpName = Identifier.of(nbtApps.getString(i,null));
                     //if(AppRegistry.get(tmpName)==null)
                     //    continue;
-                    apps.add(AppRegistry.get(tmpName));
+                    installedApps.add(new PhoneAppInfo(tmpName, AppRegistry.getLauncher(tmpName), AppRegistry.getIcon(tmpName),false, AppRegistry.getOpensOnBlockEntity(tmpName)));
                 }
             }
             appData=nbt.getCompoundOrEmpty("appData");
@@ -135,9 +139,9 @@ public class PhoneGui extends LightweightGuiDescription {
 
         //open a specific app based on the block that was clicked on
         if(clickedOnBLockEntity!=null) {
-            for (AbstractPhoneApp app : apps) {
-                if (app.openOnBlockEntity(clickedOnBLockEntity)) {
-                    openApp(app);
+            for (PhoneAppInfo appInfo : installedApps) {
+                if (appInfo.openOnBlockEntityCheck().openOnBlockEntity(clickedOnBLockEntity)) {
+                    openApp(appInfo);
                     break;
                 }
             }
@@ -169,8 +173,8 @@ public class PhoneGui extends LightweightGuiDescription {
             });
             //paint the app panel
             appPanel.setBackgroundPainter((matrices, left, top, panel) -> {
-                for(int i=0;i<apps.size();i++){
-                    ScreenDrawing.texturedRect(matrices,left+20+25*(i%15),top+20+25*(i/15),20,20,apps.get(i).icon,0,0,1,1,0xFF_FFFFFF);
+                for(int i = 0; i< installedApps.size(); i++){
+                    ScreenDrawing.texturedRect(matrices,left+20+25*(i%15),top+20+25*(i/15),20,20, installedApps.get(i).icon,0,0,1,1,0xFF_FFFFFF);
                 }
             });
 
@@ -192,30 +196,30 @@ public class PhoneGui extends LightweightGuiDescription {
         }
     }
 
-    /**
-     * @param app the app to open. note: this instance is only used to create a new instance of this app
+    /**Launch an app and open its GUI for the user
+     * @param appInfo the information about the app to open
      */
-    public void openApp(AbstractPhoneApp app){
-        if(currentApp!=null){
-            root.remove(currentApp.getPanel());
-            root.remove(notchAndTimePanel);
-            root.remove(homeButtonPanel);
-        }else{
-            root.remove(appPanel);
+    protected void openApp(PhoneAppInfo appInfo){
+        if(currentApp!=null){//if an app was open previously
+            root.remove(currentApp.getPanel());//remove that apps panel
+            root.remove(notchAndTimePanel);//tmp remove the notch
+            root.remove(homeButtonPanel);//tmp remove the home button
+        }else{//if no app had opened pervously
+            root.remove(appPanel);//remove what was in the app slot
         }
-        NbtCompound dataForApp = appData.getCompoundOrEmpty(app.appId.toString());
-        if(dataForApp==null){
-            dataForApp=new NbtCompound();
+
+        NbtCompound dataForApp = appData.getCompoundOrEmpty(appInfo.appId.toString());//get any stored data for the app
+
+        if(dataForApp == null){//this should not happen but just encase
+            dataForApp = new NbtCompound();
         }
-        if(app instanceof AbstractRootApp rootApp){
-            currentApp=rootApp.init(world,clickedOnBLockEntity,dataForApp,this);
-        }else {
-            currentApp = app.init(world, clickedOnBLockEntity, dataForApp);
-        }
-        root.add(currentApp.getPanel(),0,0,400,200);
-        root.add(notchAndTimePanel,0,0,0,0);
-        root.add(homeButtonPanel,190,180,20,20);
-        currentApp.getPanel().setHost(this);
+
+        currentApp = appInfo.launcher.launch(world, clickedOnBLockEntity, dataForApp);//launch the app and get a reference to it
+
+        root.add(currentApp.getPanel(),0,0,400,200);//add the app panel to the display stack
+        root.add(notchAndTimePanel,0,0,0,0);//re add the notch
+        root.add(homeButtonPanel,190,180,20,20);//re add the home button
+        currentApp.getPanel().setHost(this);//set this as the host for the apps panel
     }
 
     public void mouseClicked(double mouseX,double mouseY){
@@ -223,9 +227,9 @@ public class PhoneGui extends LightweightGuiDescription {
         mouseY-=top;
         //Main.LOGGER.info("mouse clicked at: "+mouseX+" "+mouseY);
         if(currentApp==null) {
-            for (int i = 0; i < apps.size(); i++) {//                                             The integer division here is intentional
+            for (int i = 0; i < installedApps.size(); i++) {//                                             The integer division here is intentional
                 if (mouseX >= 20 + 25 * (i%15) && mouseX <= 20 + 25 * (i%15) + 20 && mouseY >= 20+25*(i/15) && mouseY <= 20 + 20+25*(i/15)) {
-                    openApp(apps.get(i));
+                    openApp(installedApps.get(i));
                 }
             }
         }
@@ -248,24 +252,25 @@ public class PhoneGui extends LightweightGuiDescription {
      *
      */
     void saveData(){
-        NbtCompound nbt=new NbtCompound();
-        NbtList nbtApps=new NbtList();
-        for(int i=numberOfPreinstalledApps;i<apps.size();i++){
-            if(apps.get(i).appId==null)
-                Main.LOGGER.info(apps.get(i).getClass().getName());
-            nbtApps.add(NbtString.of(apps.get(i).appId.toString()));
+        NbtCompound nbt = new NbtCompound();
+        NbtList nbtApps = new NbtList();
+        for(int i = numberOfPreinstalledApps; i < installedApps.size(); i++){
+            if(installedApps.get(i).appId == null) {
+                Main.LOGGER.info("Null app id for: "+installedApps.get(i).getClass().getName());
+            }
+            nbtApps.add(NbtString.of(installedApps.get(i).appId.toString()));
         }
         nbt.put("apps",nbtApps);
-        if(currentApp!=null) {
-            NbtCompound dataFromApp=currentApp.saveData();
-            if(dataFromApp!=null && !dataFromApp.isEmpty()){
+        if(currentApp != null) {//if an app is currently open
+            NbtCompound dataFromApp = currentApp.saveData();//get the save data from that app
+            if(dataFromApp !=null && !dataFromApp.isEmpty()){
                 appData.put(currentApp.appId.toString(),dataFromApp);
             }
         }
         if(!appData.isEmpty()){
             nbt.put("appData",appData);
         }
-        nbt.putInt("background",backgroundNumber);
+        nbt.putInt("background", backgroundNumber);
         nbt.putInt("clock type",(clockTimeType==ClockTimeType.AMPM)? 0: 1);
         nbt.putString("Name",phoneName);
 
@@ -276,7 +281,7 @@ public class PhoneGui extends LightweightGuiDescription {
     }
 
     public boolean isAppInstalled(Identifier id){
-        return apps.stream().map(AbstractPhoneApp::getId).anyMatch(appId -> appId.equals(id));
+        return installedApps.stream().map(PhoneAppInfo::appId).anyMatch(appId -> appId.equals(id));
     }
 
     public void installApp(Identifier appId){
@@ -286,6 +291,8 @@ public class PhoneGui extends LightweightGuiDescription {
     public void uninstallApp(Identifier appId){
 
     }
+
+    protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){};
 
 
 

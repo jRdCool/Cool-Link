@@ -51,14 +51,14 @@ public abstract class AbstractPhoneApp {
      */
     abstract public void addPainters();
 
-    /**determines weather this app should open on the phone when the phone is activated while clicking on a specific block entity
-     *
-     * @param blockEntity the block entity that was clicked on
-     * @return weather or not this app should open
-     */
-    public boolean openOnBlockEntity(BlockEntity blockEntity){
-        return false;
-    }
+//    /**determines weather this app should open on the phone when the phone is activated while clicking on a specific block entity
+//     *
+//     * @param blockEntity the block entity that was clicked on
+//     * @return weather or not this app should open
+//     */
+//    public boolean openOnBlockEntity(BlockEntity blockEntity){
+//        return false;
+//    }
 
     /**NEVER CALL THIS METHOD!!!!
      * this method is called by the phone every time it attempts to save while an app is open

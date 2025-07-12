@@ -11,5 +11,4 @@ public abstract class AbstractRootApp extends AbstractPhoneApp{
         super(appId);
     }
 
-    abstract public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, PhoneGui phone);
 }
