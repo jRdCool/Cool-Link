@@ -22,8 +22,8 @@ public final class AppStore extends AbstractRootApp{
         this.phone=phone;
         icon = ICON;
         root = new WPlainPanel();
-        WPlainPanel panel=(WPlainPanel)root;
-        WLabel title=new WLabel(Text.of("App Shop"));
+        WPlainPanel panel = (WPlainPanel)root;
+        WLabel title = new WLabel(Text.of("App Shop"));
         title.setHorizontalAlignment(HorizontalAlignment.CENTER);
         panel.add(title,phoneWidth/2,3);
         timeColor=TIME_COLOR_BLACK;
@@ -52,7 +52,7 @@ public final class AppStore extends AbstractRootApp{
             }
         }
         for(int i=0;i<4;i++){
-            installButtons[i].setEnabled(i + scrollBar.getValue() < AppRegistry.size() && (phone.installedApps.size()<105 || phone.isAppInstalled(AppRegistry.getId(i+scrollBar.getValue()))));
+            installButtons[i].setEnabled(i + scrollBar.getValue() < AppRegistry.size() && (phone.getNumInstalledApps() < 105 || phone.isAppInstalled(AppRegistry.getId(i+scrollBar.getValue()))));
             if(installButtons[i].isEnabled()){
                 installButtons[i].setLabel(phone.isAppInstalled(AppRegistry.getId(i+scrollBar.getValue())) ? Text.of("Uninstall") : Text.of("Install"));
             }

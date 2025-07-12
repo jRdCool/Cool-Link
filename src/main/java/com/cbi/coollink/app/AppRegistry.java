@@ -17,6 +17,9 @@ public final class AppRegistry {
         //if(app instanceof AbstractRootApp)
         //    throw new RuntimeException("attempted to register app with root permissions to app registry");
 
+        if(icon == null){//use the default icon if none was set
+            icon = Identifier.of("minecraft","textures/misc/unknown_pack.png");
+        }
         //check if the app was already registered
         Container app = new Container(appId,launcher,icon,description, (be)->false);
         registeredApps2.put(appId,app);
@@ -27,6 +30,9 @@ public final class AppRegistry {
         //if(app instanceof AbstractRootApp)
         //    throw new RuntimeException("attempted to register app with root permissions to app registry");
 
+        if(icon == null){//use the default icon if none was set
+            icon = Identifier.of("minecraft","textures/misc/unknown_pack.png");
+        }
         //check if the app was already registered
         Container app = new Container(appId,launcher,icon,description, blockEntityCheck);
         registeredApps2.put(appId,app);

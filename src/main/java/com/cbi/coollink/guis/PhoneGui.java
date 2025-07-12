@@ -40,7 +40,7 @@ public class PhoneGui extends LightweightGuiDescription {
     public ItemStack phoneInstance;
 
     WButton homeButton;
-    public ArrayList<PhoneAppInfo> installedApps = new ArrayList<>();
+    private ArrayList<PhoneAppInfo> installedApps = new ArrayList<>();
 
 
     public NbtCompound appData;
@@ -76,11 +76,12 @@ public class PhoneGui extends LightweightGuiDescription {
         }
 
         if(!nbt.isEmpty()){
-            Main.LOGGER.info("NBT data found\n"+nbt.asString());
+            Main.LOGGER.info("NBT data found\n"+nbt);
             NbtList nbtApps = (NbtList) nbt.get("apps");
             if(nbtApps != null && !nbtApps.isEmpty()){
                 for(int i=0; i < nbtApps.size(); i++){
                     Identifier tmpName = Identifier.of(nbtApps.getString(i,null));
+                    Main.LOGGER.info("Found APP: "+tmpName);
                     //if(AppRegistry.get(tmpName)==null)
                     //    continue;
                     installedApps.add(new PhoneAppInfo(tmpName, AppRegistry.getLauncher(tmpName), AppRegistry.getIcon(tmpName),false, AppRegistry.getOpensOnBlockEntity(tmpName)));
@@ -285,11 +286,20 @@ public class PhoneGui extends LightweightGuiDescription {
     }
 
     public void installApp(Identifier appId){
-
+        installedApps.add(new PhoneAppInfo(appId, AppRegistry.getLauncher(appId), AppRegistry.getIcon(appId),false, AppRegistry.getOpensOnBlockEntity(appId)));
     }
 
     public void uninstallApp(Identifier appId){
+        for(int i=0;i<installedApps.size();i++){
+            if(installedApps.get(i).appId.equals(appId)){
+                installedApps.remove(i);
+                break;
+            }
+        }
+    }
 
+    public int getNumInstalledApps(){
+        return installedApps.size();
     }
 
     protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){};
