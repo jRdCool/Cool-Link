@@ -4,6 +4,8 @@ import com.cbi.coollink.cli.CliProgram;
 import com.cbi.coollink.cli.CliProgramInit;
 import com.cbi.coollink.cli.InternalCommands;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,11 +25,25 @@ public class PhoneCommandLineContext extends CommandLineContext {
         //set the initial environment variables
         enviormentVariables.put("PWD","/");
         enviormentVariables.put("ECHO","true");
+        enviormentVariables.put("PLATFORM","phone");
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        String playerUUID;
+        String username;
+        if(player == null){
+            playerUUID = "";
+            username = "";
+        }else{
+            playerUUID = player.getUuidAsString();
+            username = player.getName().getString();
+        }
+        enviormentVariables.put("USER", playerUUID);
+        enviormentVariables.put("USERNAME",username);
 
         //load the programs that can be executed from this command line
         programRepository.put("echo", InternalCommands.initOf(InternalCommands.ECHO));
         programRepository.put("export", InternalCommands.initOf(InternalCommands.EXPORT));
         programRepository.put("env", InternalCommands.initOf(InternalCommands.ENV));
+
     }
 
     private final CommandTextOutputArea textOut;

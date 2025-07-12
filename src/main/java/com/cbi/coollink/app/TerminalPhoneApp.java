@@ -41,7 +41,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         title.setColor(0xFF_FFFFFF);
         title.setDarkmodeColor(0xFF_FFFFFF);
         panel.add(title,180,3);
-
+        inputBox.requestFocus();
     }
 
     @Override
