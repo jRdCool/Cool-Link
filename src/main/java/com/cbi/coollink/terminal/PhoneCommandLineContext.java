@@ -15,7 +15,7 @@ import java.util.Objects;
 public class PhoneCommandLineContext extends CommandLineContext {
 
     private final HashMap<String, CliProgramInit> programRepository = new HashMap<>();
-    private final HashMap<String, String> enviormentVariables = new HashMap<>();
+    private final HashMap<String, String> environmentVariables = new HashMap<>();
     private CliProgram currentExecutingProgram;
 
 
@@ -23,9 +23,9 @@ public class PhoneCommandLineContext extends CommandLineContext {
     public PhoneCommandLineContext(){
         textOut = new CommandTextOutputArea(375,130,100,"CBi Phone OS 1.0 (C) CBi-games 2025, All rights reserved");
         //set the initial environment variables
-        enviormentVariables.put("PWD","/");
-        enviormentVariables.put("ECHO","true");
-        enviormentVariables.put("PLATFORM","phone");
+        environmentVariables.put("PWD","/");
+        environmentVariables.put("ECHO","true");
+        environmentVariables.put("PLATFORM","phone");
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         String playerUUID;
         String username;
@@ -36,13 +36,15 @@ public class PhoneCommandLineContext extends CommandLineContext {
             playerUUID = player.getUuidAsString();
             username = player.getName().getString();
         }
-        enviormentVariables.put("USER", playerUUID);
-        enviormentVariables.put("USERNAME",username);
+        environmentVariables.put("USER", playerUUID);
+        environmentVariables.put("USERNAME",username);
 
         //load the programs that can be executed from this command line
-        programRepository.put("echo", InternalCommands.initOf(InternalCommands.ECHO));
-        programRepository.put("export", InternalCommands.initOf(InternalCommands.EXPORT));
-        programRepository.put("env", InternalCommands.initOf(InternalCommands.ENV));
+        programRepository.put("echo", InternalCommands.initOf(InternalCommands.ECHO,"Print the passed in arguments to the output"));
+        programRepository.put("export", InternalCommands.initOf(InternalCommands.EXPORT,"Usage: export <var>=<value>\nSet an environment variable"));
+        programRepository.put("env", InternalCommands.initOf(InternalCommands.ENV,"List all environment variables"));
+        programRepository.put("cmds", InternalCommands.initOf((args, env, stdOut) -> printCommands(),"List all installed commands"));
+        programRepository.put("help", InternalCommands.initOf((args, env, stdOut) -> printHelpText(args),"Usage: help <command>\nGet the help text for a given command"));
 
     }
 
@@ -51,7 +53,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
     @Override
     public void executeCommand(String command) {
         //check if the command should be echoed back to the user
-        String echoValue = enviormentVariables.get("ECHO");//get the value of the environment variable
+        String echoValue = environmentVariables.get("ECHO");//get the value of the environment variable
         boolean echo = true;
         if(echoValue!=null){
             echo = echoValue.equalsIgnoreCase("true");//if it is ture or not set then set echoing to true
@@ -74,7 +76,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
         args = Arrays.stream(args).map(in ->
             String.join(" ",Arrays.stream(in.split(" ")).map( inner -> {
                 if(inner.startsWith("$")){
-                    String envVal = enviormentVariables.get(inner.substring(1));
+                    String envVal = environmentVariables.get(inner.substring(1));
                     return Objects.requireNonNullElse(envVal, "");
                 }
                 return inner;
@@ -82,7 +84,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
         ).toArray(String[]::new);
         //run the program
 
-        currentExecutingProgram = initProgram.main(args,enviormentVariables, textOut);
+        currentExecutingProgram = initProgram.main(args, environmentVariables, textOut);
 
     }
 
@@ -103,6 +105,30 @@ public class PhoneCommandLineContext extends CommandLineContext {
     @Override
     public boolean commandExecuting() {
         return currentExecutingProgram != null && currentExecutingProgram.isProgramRunning();
+    }
+
+    public void printCommands(){
+        String[] programs = programRepository.keySet().toArray(String[]::new);
+        textOut.addLine("Installed commands:");
+        for(String program:programs){
+            textOut.addLine(program);
+        }
+    }
+
+    public void printHelpText(String[] args){
+        if(args.length < 1){
+            textOut.addLine("Missing parameter command");
+            return;
+        }
+        CliProgramInit commandInit = programRepository.get(args[0]);
+        if(commandInit == null){
+            textOut.addLine("Unknown command: "+args[0]);
+            return;
+        }
+        String[] helpText = commandInit.helpText().split("\n");
+        for(String help:helpText){
+            textOut.addLine(help);
+        }
     }
 
 }

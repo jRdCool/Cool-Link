@@ -1,5 +1,9 @@
 package com.cbi.coollink.cli;
 
+import com.cbi.coollink.terminal.CommandTextOutputArea;
+
+import java.util.HashMap;
+
 public class InternalCommands {
 
     /**Repeat the users args back to them on the output
@@ -33,10 +37,17 @@ public class InternalCommands {
     };
 
 
-    public static CliProgramInit initOf(BareCliProgram program){
-        return (args, env, stdOut) -> {
-            program.init(args,env,stdOut);
-            return program;
+    public static CliProgramInit initOf(BareCliProgram program, String helpText){
+        return new CliProgramInit(){
+            @Override
+            public CliProgram main(String[] args, HashMap<String, String> env, CommandTextOutputArea stdOut) {
+                program.init(args,env,stdOut);
+                return program;
+            }
+            @Override
+            public String helpText() {
+                return helpText;
+            }
         };
     }
 }
