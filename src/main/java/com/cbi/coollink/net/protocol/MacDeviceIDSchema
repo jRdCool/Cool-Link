@@ -1,0 +1,18 @@
+0x1X = Routers
+    0x11 = AIO
+    0x12 = Simple Router
+    0x13 = Rack mount Router
+
+0x2X = Switches
+
+0x3X = Wireless Devices
+    0x31 = Cell Phone
+    0x32 = Laptop Wifi card
+    0x33 = Redstone Controller (Wireless)
+
+0x4X = Servers
+    0x41 = NAS (Simple)
+
+0x5X = General Wired Devices
+    0x51 = Desktop / Laptop NIC
+    0x52 = Redstone Controller (Wired)

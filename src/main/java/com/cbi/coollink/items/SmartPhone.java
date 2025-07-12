@@ -30,7 +30,6 @@ public class SmartPhone extends Item {
 
     }
     public BlockEntity usedBlockEntity;
-    public Mac mac;
     private static final int deviceID = 0x31;
 
 
@@ -45,9 +44,6 @@ public class SmartPhone extends Item {
             //open the phone GUI
             ItemStack heldItem = null;
 
-            if(mac==null){
-                mac=new Mac(deviceID);
-            }
 
             for (ItemStack itemStack : new ItemStack[]{user.getMainHandStack(),user.getOffHandStack()}) {
                 if(itemStack.getItem().equals(this)){

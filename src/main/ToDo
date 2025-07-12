@@ -1,0 +1,12 @@
+Simple NAS
+Redstone Control Blocks
+    Wired
+    Wireless
+Simple 5 port Switch (unmanaged/no mac address)
+Mirror wood texture
+Conduit Functionality
+    Wall Ports
+        Placement on conduits
+        Selecting the slot to use
+    routing cables through the conduit network
+    Working out how networks logically move over the network
