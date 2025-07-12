@@ -1,5 +1,8 @@
 {
   "variants": {
-    "": { "model": "cool-link:block/switch_simple" }
+    "facing=north": { "model": "cool-link:block/switch_simple", "uvlock": true },
+    "facing=east":  { "model": "cool-link:block/switch_simple", "y":  90},
+    "facing=south": { "model": "cool-link:block/switch_simple", "y": 180},
+    "facing=west":  { "model": "cool-link:block/switch_simple", "y": 270}
   }
 }

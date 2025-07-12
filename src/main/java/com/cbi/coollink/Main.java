@@ -61,7 +61,7 @@ public class Main implements ModInitializer {
     public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "medium_conduit_block_entity"), ConduitBlockEntity::new, MediumConduit.ENTRY);
     public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "large_conduit_block_entity"), ConduitBlockEntity::new, LargeConduit.ENTRY);
     public static final BlockEntityType<ServerRackBlockEntity> SERVER_RACK_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"server_rack_block_entity"), ServerRackBlockEntity::new,ServerRack.ENTRY);
-
+    public static final BlockEntityType<SwitchSimpleBE> SWITCH_SIMPLE_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "switch_simple_be"), SwitchSimpleBE::new, SwitchSimple.ENTRY);
     public static final BlockEntityType<SatelliteDishBlockEntity> SATELLITE_DISH_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"satellite-dish-block-entity"),SatelliteDishBlockEntity::new,SatelliteDishBlock.ENTRY);
     //public static final BlockEntityType<CoaxWallPortSingleBE> COAX_WALL_PORT_SINGLE_BLOCK_ENTITY =
 
@@ -142,7 +142,7 @@ public class Main implements ModInitializer {
 
         //Switch(Simple)
         Registry.register(Registries.BLOCK, SwitchSimple.BLOCK_KEY, SwitchSimple.ENTRY);
-        //BlockRenderLayerMap.putBlock(SwitchSimple.ENTRY, BlockRenderLayer.CUTOUT);
+        BlockRenderLayerMap.putBlock(SwitchSimple.ENTRY, BlockRenderLayer.CUTOUT);
         Registry.register(Registries.ITEM, SwitchSimple.ITEM_KEY,new BlockItem(SwitchSimple.ENTRY, new Item.Settings().registryKey(SwitchSimple.ITEM_KEY)));
 
         //legacy Items
@@ -181,6 +181,7 @@ public class Main implements ModInitializer {
             ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(coaxWallPortVarients.get(wood)));
         }
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIOWallPort.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(SwitchSimple.ENTRY));
 
 
         //register network packets

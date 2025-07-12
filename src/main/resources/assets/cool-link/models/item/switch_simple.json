@@ -1,5 +1,5 @@
 {
-	"credit": "Made with Blockbench by jRdCool",
+	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
 	"textures": {
 		"0": "cool-link:block/switch_simple",
@@ -27,7 +27,7 @@
 			"to": [5.2, 0.4, 10],
 			"rotation": {"angle": 0, "axis": "y", "origin": [4, 0, 9]},
 			"faces": {
-				"up": {"uv": [8, 0, 12, 4], "texture": "#1"}
+				"up": {"uv": [8, 0, 12, 4], "texture": "#1", "cullface": "down"}
 			}
 		},
 		{
@@ -72,7 +72,7 @@
 			"to": [6.8, 0.4, 10],
 			"rotation": {"angle": 0, "axis": "y", "origin": [4, 0, 9]},
 			"faces": {
-				"up": {"uv": [8, 0, 12, 4], "texture": "#1"}
+				"up": {"uv": [8, 0, 12, 4], "texture": "#1", "cullface": "down"}
 			}
 		},
 		{
@@ -117,7 +117,7 @@
 			"to": [8.4, 0.4, 10],
 			"rotation": {"angle": 0, "axis": "y", "origin": [4, 0, 9]},
 			"faces": {
-				"up": {"uv": [8, 0, 12, 4], "texture": "#1"}
+				"up": {"uv": [8, 0, 12, 4], "texture": "#1", "cullface": "down"}
 			}
 		},
 		{
@@ -162,7 +162,7 @@
 			"to": [10, 0.4, 10],
 			"rotation": {"angle": 0, "axis": "y", "origin": [4, 0, 9]},
 			"faces": {
-				"up": {"uv": [8, 0, 12, 4], "texture": "#1"}
+				"up": {"uv": [8, 0, 12, 4], "texture": "#1", "cullface": "down"}
 			}
 		},
 		{
@@ -207,7 +207,7 @@
 			"to": [11.6, 0.4, 10],
 			"rotation": {"angle": 0, "axis": "y", "origin": [4, 0, 9]},
 			"faces": {
-				"up": {"uv": [8, 0, 12, 4], "texture": "#1"}
+				"up": {"uv": [8, 0, 12, 4], "texture": "#1", "cullface": "down"}
 			}
 		},
 		{

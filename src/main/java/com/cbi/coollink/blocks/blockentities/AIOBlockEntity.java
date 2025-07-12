@@ -37,27 +37,24 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		this.localNodes = new LocalNode[getNodeCount()];
 		//setNode(0,1,pos,WireType.CAT6);
 		//setNode(1,2,pos,WireType.COAX);
-	}
+	}//Constructor
 
+	//Variable definitions
 	private static final int nodeCount = 3;
 	private final boolean[] isNodeUsed = new boolean[nodeCount];
-
 	public String password;
 	public String ssid;
 	public String netPass;
-
 	private final LocalNode[] localNodes;
-
 	private static final int deviceID = 0x11;
 	public Mac mac1,mac2;
-
 	public ArrayList<String> connectedDevices=new ArrayList<>();
 	public ArrayList<String> deviceName=new ArrayList<>();
 	public ArrayList<String> deviceIP=new ArrayList<>();
 
+
+
 	// Serialize the BlockEntity
-
-
 	@Override
 	protected void writeData(WriteView view) {
 		super.writeData(view);
@@ -79,7 +76,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		}
 
 		//view.put("connections",,nodeIDS);
-	}
+	}//Writing data
 
 //	@Override
 //	public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
@@ -133,7 +130,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 				isNodeUsed[i] = false;
 			}
 		}
-	}
+	}//reading data
 
 	// Deserialize the BlockEntity
 //	@Override
@@ -172,10 +169,10 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//Main.LOGGER.info(be.password);
 		be.createConnectedDevices();
-	}
+	}//run on tick
 	public void updateStates(){
 		if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
-	}
+	}//notifies the world of updates to the block state
 
 	void createConnectedDevices() {
 		if(deviceName.isEmpty() && deviceIP.isEmpty()) {
@@ -188,7 +185,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		{
 			if(deviceName.size() < deviceIP.size())
 			{
-				//TODO: Call a function that assigns ip addresses to devices that don't have them
+				//TODO: Call a function that assigns ip addresses to devices that don't have them (DHCP Server)
 				//return;
 			}
 			else {
@@ -203,17 +200,18 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 				connectedDevices.set(i,deviceName.get(i)+ sb +deviceIP.get(i));
 			}
 		}
-	}
+	}//WIFI
 
 	public void setMacAddresses(int[] mac1,int[] mac2){
 		this.mac1 = new Mac(mac1);
 		this.mac2 = new Mac(mac2);
-	}
+	}//mac addresses new
 
+	@Deprecated
 	public void setMacAddresses(byte[] mac1,byte[] mac2){
 		this.mac1 = new Mac(mac1);
 		this.mac2 = new Mac(mac2);
-	}
+	}//mac addresses old
 
 
 	@Override
@@ -238,22 +236,22 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		}
 
 		return nodes[dir][node];
-	}
+	}//Getting the offset from the block origin for the nodes
 
 	@Override
 	public IWireNode getWireNode(int index) {
 		return this;
-	}
+	}//returns the wire node
 
 	@Override
 	public int getOtherNodeIndex(int index) {
 		return localNodes[index].getOtherIndex();
-	}
+	}//returns the index of the remote connection
 
 	@Override
 	public @Nullable LocalNode getLocalNode(int index) {
 		return localNodes[index];
-	}
+	}//returns the local node
 
 	@Override
 	public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
@@ -262,7 +260,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		markDirty();
         assert world != null;
         world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
-	}
+	}//Sets the node connection
 
 	@Override
 	public void removeNode(int index, boolean dropWire) {
@@ -271,34 +269,34 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		markDirty();
         assert world != null;
         world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
-	}
+	}//Breaks the wire
 
 	@Override
 	public WireType getPortType(int index) {
 		if(index <= 1) return WireType.CAT6;
 		else return WireType.COAX;
-	}
+	}//Gathers the type of each port
 
 	@Override
 	public boolean isNodeInUse(int index) {
 		return isNodeUsed[index];
-	}
+	}//Checks if the requested node is in use
 
 	public void setIsNodeUsed(int index,boolean set){
 		isNodeUsed[index]=set;
-	}
+	}//set the node usage
 
 
 	@Override
 	public boolean hasConnection(int index) {
 		//Main.LOGGER.info(index+"");
 		return localNodes[index] != null;
-	}
+	}//checks if the connection is null
 
 	@Override
 	public int getNodeCount() {
 		return nodeCount;
-	}
+	}//returns the number of nodes the device has
 
 	@Override
 	public String toString() {
