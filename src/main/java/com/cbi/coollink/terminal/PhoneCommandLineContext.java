@@ -1,6 +1,5 @@
 package com.cbi.coollink.terminal;
 
-import com.cbi.coollink.Main;
 import com.cbi.coollink.cli.CliProgram;
 import com.cbi.coollink.cli.CliProgramInit;
 import com.cbi.coollink.cli.InternalCommands;
@@ -21,9 +20,14 @@ public class PhoneCommandLineContext extends CommandLineContext {
 
     public PhoneCommandLineContext(){
         textOut = new CommandTextOutputArea(375,130,100,"CBi Phone OS 1.0 (C) CBi-games 2025, All rights reserved");
+        //set the initial environment variables
         enviormentVariables.put("PWD","/");
         enviormentVariables.put("ECHO","true");
-        programRepository.put("echo", InternalCommands.initOf(InternalCommands.echo));
+
+        //load the programs that can be executed from this command line
+        programRepository.put("echo", InternalCommands.initOf(InternalCommands.ECHO));
+        programRepository.put("export", InternalCommands.initOf(InternalCommands.EXPORT));
+        programRepository.put("env", InternalCommands.initOf(InternalCommands.ENV));
     }
 
     private final CommandTextOutputArea textOut;
