@@ -10,7 +10,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +21,10 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiConsumer;
 
 import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
@@ -91,6 +96,22 @@ public class SwitchSimple extends BlockWithEntity implements BlockEntityProvider
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         //delete both ends of the connection when the block is broken
         BlockEntity be = world.getBlockEntity(pos);
+        if (be instanceof IWireNode self) {
+            for (int i = 0; i < self.getNodeCount(); i++) {
+                if (!self.hasConnection(i)) continue;
+                BlockEntity obe = world.getBlockEntity(self.getLocalNode(i).getTargetPos());
+                if (obe instanceof IWireNode other) {
+                    other.removeNode(self.getOtherNodeIndex(i));
+                }
+            }
+        }
+        return super.onBreak(world, pos, state, player);
+    }
+
+    @Override
+    protected void onExploded(BlockState state, ServerWorld world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        //delete both ends of the connection when the block is broken
+        BlockEntity be = world.getBlockEntity(pos);
         if(be instanceof IWireNode self){
             for(int i=0;i<self.getNodeCount();i++){
                 if(!self.hasConnection(i)) continue;
@@ -100,7 +121,7 @@ public class SwitchSimple extends BlockWithEntity implements BlockEntityProvider
                 }
             }
         }
-        return super.onBreak(world,pos,state,player);
+        super.onExploded(state, world, pos, explosion, stackMerger);
     }
 
 }

@@ -163,7 +163,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 	@Override
 	public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
 		return createNbt(registryLookup);
-	}
+	}//Rendering Crucial
 
 	@SuppressWarnings("unused")
 	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {

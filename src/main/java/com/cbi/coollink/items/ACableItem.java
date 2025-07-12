@@ -6,6 +6,7 @@ import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.net.OpenPortSelectGuiPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;

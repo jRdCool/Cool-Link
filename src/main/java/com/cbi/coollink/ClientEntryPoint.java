@@ -96,6 +96,7 @@ public class ClientEntryPoint implements ClientModInitializer {
         });
 
         BlockEntityRendererFactories.register(Main.AIO_BLOCK_ENTITY,WireNodeRenderer::new);
+        BlockEntityRendererFactories.register(Main.SWITCH_SIMPLE_BLOCK_ENTITY,WireNodeRenderer::new);
 
 
     }
