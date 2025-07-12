@@ -12,6 +12,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import org.lwjgl.glfw.GLFW;
 
 public class TerminalPhoneApp extends AbstractPhoneApp{
 
@@ -34,17 +35,20 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         this.commandContext = commandRunner;
         executeButton = new WButton(Text.of("Execute"));
         panel.add(executeButton,250,180,80,20);
-        executeButton.setOnClick(() ->{
-           commandContext.executeCommand(inputBox.getText());
-           inputBox.setText("");
-           inputBox.requestFocus();
-        });
+        executeButton.setOnClick(this::executeCommand);
         panel.add(commandContext.getTextOutput(),20,15,375,135);
         title = new WLabel(Text.of("Terminal"));
         title.setColor(0xFF_FFFFFF);
         title.setDarkmodeColor(0xFF_FFFFFF);
         panel.add(title,180,3);
 
+    }
+
+    @Override
+    public void keyPressed(int ch, int keyCode, int modifiers) {
+        if(ch == GLFW.GLFW_KEY_ENTER){
+            executeCommand();
+        }
     }
 
     /**
@@ -64,5 +68,14 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         root.setBackgroundPainter((matrices, left, top, panel) -> {
             ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_000000);
         });
+    }
+
+    void executeCommand(){
+        String command = inputBox.getText().trim();
+        if(!commandContext.commandExecuting() && !command.isEmpty()) {
+            commandContext.executeCommand(command);
+            inputBox.setText("");
+        }
+        inputBox.requestFocus();
     }
 }

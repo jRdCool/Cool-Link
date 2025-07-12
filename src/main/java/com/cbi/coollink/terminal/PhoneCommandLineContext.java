@@ -1,13 +1,11 @@
 package com.cbi.coollink.terminal;
 
-import com.cbi.coollink.Main;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
-import org.w3c.dom.html.HTMLParagraphElement;
 
-public class PhoneCommandContext extends CommandContext{
+public class PhoneCommandLineContext extends CommandContext{
 
-    public PhoneCommandContext(){
-        textOut = new CommandTextOutputArea(375,130,100,"CBi Phone OS 1.0 (C) CBi 2025, All rights reserved");
+    public PhoneCommandLineContext(){
+        textOut = new CommandTextOutputArea(375,130,100,"CBi Phone OS 1.0 (C) CBi-games 2025, All rights reserved");
     }
 
     private final CommandTextOutputArea textOut;

@@ -64,7 +64,12 @@ public class CommandTextOutputArea {
             textContent.removeFirst();
         }
         text.calculateHeight();
+
+        boolean atBottom = scrollPanel.getVerticalScrollBar().getValue() == scrollPanel.getVerticalScrollBar().getMaxScrollValue();
         scrollPanel.layout();
-        //TODO keep the scroll bar at the bottom if it already was at the bottom
+        if(atBottom){
+            scrollPanel.getVerticalScrollBar().setValue(scrollPanel.getVerticalScrollBar().getMaxScrollValue());
+        }
+
     }
 }
