@@ -17,6 +17,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -26,8 +27,8 @@ public class ClientEntryPoint implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         //register client things here
-        AppRegistry.registerApp(new ExampleApp());
-        AppRegistry.registerApp(new SnakeGameApp());
+        AppRegistry.registerApp(ExampleApp.ID,ExampleApp::new,null, Text.of("this is a test app\nlets try 2 lines"));
+        AppRegistry.registerApp(SnakeGameApp.appID, SnakeGameApp::new, SnakeGameApp.ICON,Text.of("Snake Game!"));
 
 
         BlockEntityRendererFactories.register(Main.SERVER_RACK_BLOCK_ENTITY, ServerRackBlockEntityRenderer::new);

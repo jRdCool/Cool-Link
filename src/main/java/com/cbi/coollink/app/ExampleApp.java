@@ -10,18 +10,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 public class ExampleApp extends AbstractPhoneApp{
-    public ExampleApp() {//constructor used to create a dummy instance of the class used for app registration
-        super(Identifier.of("cool-link","example-app"));//the id of the app
+    public static Identifier ID = Identifier.of("cool-link","example-app");
 
-        //set app icon here
-
-        //set app description here (this will be displayed in the app shop)
-        description= Text.of("this is a test app\nlets try 2 lines");
-
-    }
-
-    public ExampleApp(World world, BlockEntity clickedOnBlockEntity){
-        super(Identifier.of("cool-link","example-app"));//the id of the app
+    public ExampleApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData){
+        super(ID);//the id of the app
         root=new WPlainPanel();//create the panel witch all widget will sit on
         timeColor=TIME_COLOR_BLACK;//set the color of the clock if necessary
         requestSave=true;//requests the phone to save data
@@ -33,11 +25,11 @@ public class ExampleApp extends AbstractPhoneApp{
 
     }
 
-    @Override
-    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData) {//this function is called by the phone when attempting to open the app
-        Main.LOGGER.info(appData.asString().orElse("ERROR: NULL NBT COMPOUND PASSED INTO APP"));
-        return new ExampleApp(world,clickedOnBlockEntity);//this should return a new instance of this class with all necessary arguments
-    }
+//    @Override
+//    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData) {//this function is called by the phone when attempting to open the app
+//        Main.LOGGER.info(appData.asString());
+//        return new ExampleApp(world,clickedOnBlockEntity);//this should return a new instance of this class with all necessary arguments
+//    }
 
     @Override
     public void addPainters() {//this function gets called by the phone to set the background of the phone while the app is open

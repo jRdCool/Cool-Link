@@ -42,10 +42,13 @@ public class AIOSettingApp extends AbstractPhoneApp{
     WPlainPanel changeAdminPassPanel=new WPlainPanel();
 
 
+    public static final Identifier ID = Identifier.of("cool-link","aio-app");
+    public static final Identifier ICON = Identifier.of("cool-link","textures/gui/aio_app_icon.png");
+
     public AIOSettingApp(World world, BlockEntity clickedOnBlockEntity){
-        super(Identifier.of("cool-link","aio-app"));
+        super(ID);
         this.world=world;
-        icon=Identifier.of("cool-link","textures/gui/aio_app_icon.png");
+        icon = ICON;
         root=new WPlainPanel();
         root.setSize(phoneWidth,phoneHeight);
         timeColor=TIME_COLOR_BLACK;
@@ -73,11 +76,6 @@ public class AIOSettingApp extends AbstractPhoneApp{
     }
 
     @Override
-    public AbstractPhoneApp init(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData) {
-        return new AIOSettingApp(world,clickedOnBlockEntity);
-    }
-
-    @Override
     public void addPainters() {
         root.setBackgroundPainter((matrices, left, top, panel) -> {
             ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_FFFFFF);
@@ -100,7 +98,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
         return new AIOSettingApp();
     }
 
-    public boolean openOnBlockEntity(BlockEntity blockEntity){
+    public static boolean openOnBlockEntity(BlockEntity blockEntity){
         return blockEntity instanceof AIOBlockEntity;
     }
 
