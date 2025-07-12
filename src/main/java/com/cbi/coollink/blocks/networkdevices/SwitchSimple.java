@@ -1,7 +1,6 @@
 package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.blocks.blockentities.SwitchSimpleBE;
 import com.cbi.coollink.rendering.IWireNode;
 import com.mojang.serialization.MapCodec;
@@ -53,15 +52,10 @@ public class SwitchSimple extends BlockWithEntity implements BlockEntityProvider
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
         Direction dir = state.get(HORIZONTAL_FACING);
         //use a different hit box based on the rotation of the block
-        switch(dir) {
-            case WEST:
-            case EAST:
-                return makeShapeEW();
-            case SOUTH:
-            case NORTH:
-            default:
-                return makeShapeNS();
-        }
+        return switch (dir) {
+            case WEST, EAST -> makeShapeEW();
+            default -> makeShapeNS();
+        };
 
     }
 

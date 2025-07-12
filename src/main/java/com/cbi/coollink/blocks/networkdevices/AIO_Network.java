@@ -50,17 +50,12 @@ public class AIO_Network extends BlockWithEntity implements BlockEntityProvider 
 	public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
 		Direction dir = state.get(HORIZONTAL_FACING);
 		//use a different hit box based on the rotation of the block
-		switch(dir) {
-			case SOUTH:
-				return makeShapeS();
-			case EAST:
-				return makeShapeE();
-			case WEST:
-				return makeShapeW();
-			case NORTH:
-			default:
-				return makeShapeN();
-		}
+		return switch (dir) {
+			case SOUTH -> makeShapeS();
+			case EAST -> makeShapeE();
+			case WEST -> makeShapeW();
+			default -> makeShapeN();
+		};
 
 	}
 

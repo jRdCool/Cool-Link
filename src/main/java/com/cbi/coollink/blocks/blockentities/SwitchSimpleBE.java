@@ -2,13 +2,11 @@ package com.cbi.coollink.blocks.blockentities;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
-import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -21,9 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class SwitchSimpleBE extends BlockEntity implements IWireNode {
 

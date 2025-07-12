@@ -83,7 +83,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 //		// Save the current value of the number to the nbt
 //		nbt.putInt("number", 89);
 //		nbt.putString("password", Objects.requireNonNullElse(password, "password123546"));
-//		nbt.putString("ssid", Objects.requireNonNullElse(ssid, "Unconfigured Network"));
+////		nbt.putString("ssid", Objects.requireNonNullElse(ssid, "Un-configured Network"));
 //		nbt.putString("Wireless_Password", Objects.requireNonNullElse(netPass, ""));
 //		nbt.putByteArray("MAC1",mac1.getBytes());
 //		nbt.putByteArray("MAC2",mac2.getBytes());
