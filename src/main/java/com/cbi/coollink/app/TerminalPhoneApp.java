@@ -30,11 +30,14 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         inputBox = new WTextField();
         WPlainPanel panel = (WPlainPanel)root;
         panel.add(inputBox,40,155,350,20);
+        inputBox.setMaxLength(1024);
         this.commandContext = commandRunner;
         executeButton = new WButton(Text.of("Execute"));
         panel.add(executeButton,250,180,80,20);
         executeButton.setOnClick(() ->{
            commandContext.executeCommand(inputBox.getText());
+           inputBox.setText("");
+           inputBox.requestFocus();
         });
         panel.add(commandContext.getTextOutput(),20,15,375,135);
         title = new WLabel(Text.of("Terminal"));

@@ -10,12 +10,12 @@ public class PhoneCommandContext extends CommandContext{
         textOut = new CommandTextOutputArea(375,130,100,"CBi Phone OS 1.0 (C) CBi 2025, All rights reserved");
     }
 
-    private CommandTextOutputArea textOut;
+    private final CommandTextOutputArea textOut;
     int tmcCnt = 0;
     @Override
     public void executeCommand(String command) {
-        Main.LOGGER.info("Phone attempted to execute command: "+command);
-        tmcCnt = 20;
+        textOut.addLine("user attempted to execute command: "+command);
+        tmcCnt = 20;//tmp countdown to make it look like something is running
     }
 
     @Override

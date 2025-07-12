@@ -25,7 +25,7 @@ public class CommandTextOutputArea {
         scrollPanel = new WScrollPanel(text);
         scrollPanel.setSize(width,height);
         scrollPanel.setScrollingHorizontally(TriState.FALSE);
-        scrollPanel.setScrollingVertically(TriState.TRUE);
+        //scrollPanel.setScrollingVertically(TriState.TRUE);
         text.setSize(width,9*maxLines);
 
         maxTextWidth = width - 5;
