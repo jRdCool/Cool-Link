@@ -1,6 +1,6 @@
 package com.cbi.coollink.app;
 
-import com.cbi.coollink.terminal.CommandContext;
+import com.cbi.coollink.terminal.CommandLineContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -105,7 +105,7 @@ public final class AppRegistry {
     }
 
     public interface AppLauncher{
-        AbstractPhoneApp launch(World world, @Nullable BlockEntity clickedOmBlockEntity, NbtCompound appData, CommandContext commandRunner);
+        AbstractPhoneApp launch(World world, @Nullable BlockEntity clickedOmBlockEntity, NbtCompound appData, CommandLineContext commandRunner);
     }
 
     /**Function to check if an app should open when the phone click on a block entity

@@ -1,7 +1,7 @@
 package com.cbi.coollink.app;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.terminal.CommandContext;
+import com.cbi.coollink.terminal.CommandLineContext;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WButton;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
@@ -21,9 +21,9 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
 
     WTextField inputBox;
     WButton executeButton;
-    CommandContext commandContext;
+    CommandLineContext commandLineContext;
     WLabel title;
-    public TerminalPhoneApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, CommandContext commandRunner) {
+    public TerminalPhoneApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, CommandLineContext commandRunner) {
         super(ID);
         root=new WPlainPanel();//create the panel witch all widget will sit on
         timeColor=TIME_COLOR_WHITE;//set the color of the clock if necessary
@@ -32,11 +32,11 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         WPlainPanel panel = (WPlainPanel)root;
         panel.add(inputBox,40,155,350,20);
         inputBox.setMaxLength(1024);
-        this.commandContext = commandRunner;
+        this.commandLineContext = commandRunner;
         executeButton = new WButton(Text.of("Execute"));
         panel.add(executeButton,250,180,80,20);
         executeButton.setOnClick(this::executeCommand);
-        panel.add(commandContext.getTextOutput(),20,15,375,135);
+        panel.add(commandLineContext.getTextOutput(),20,15,375,135);
         title = new WLabel(Text.of("Terminal"));
         title.setColor(0xFF_FFFFFF);
         title.setDarkmodeColor(0xFF_FFFFFF);
@@ -56,8 +56,8 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
      */
     @Override
     public void tick() {
-        commandContext.tick();
-        executeButton.setEnabled(!commandContext.commandExecuting());
+        commandLineContext.tick();
+        executeButton.setEnabled(!commandLineContext.commandExecuting());
     }
 
     /**
@@ -72,8 +72,8 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
 
     void executeCommand(){
         String command = inputBox.getText().trim();
-        if(!commandContext.commandExecuting() && !command.isEmpty()) {
-            commandContext.executeCommand(command);
+        if(!commandLineContext.commandExecuting() && !command.isEmpty()) {
+            commandLineContext.executeCommand(command);
             inputBox.setText("");
         }
         inputBox.requestFocus();
