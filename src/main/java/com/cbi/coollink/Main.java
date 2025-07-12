@@ -1,19 +1,12 @@
 package com.cbi.coollink;
 
 import com.cbi.coollink.blocks.*;
-import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
-import com.cbi.coollink.blocks.blockentities.SatelliteDishBlockEntity;
-import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
-import com.cbi.coollink.blocks.blockentities.wallports.CoaxWallPortSingleBE;
-import com.cbi.coollink.blocks.cables.AIOCableBundle;
-import com.cbi.coollink.blocks.cables.CoaxCable;
-import com.cbi.coollink.blocks.conduits.LargeConduit;
-import com.cbi.coollink.blocks.conduits.MediumConduit;
-import com.cbi.coollink.blocks.conduits.SmallConduit;
-import com.cbi.coollink.blocks.networkdevices.AIO_Network;
-import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
-import com.cbi.coollink.blocks.wallports.AIOWallPort;
-import com.cbi.coollink.blocks.wallports.CoaxWallPortSingle;
+import com.cbi.coollink.blocks.blockentities.*;
+import com.cbi.coollink.blocks.blockentities.wallports.*;
+import com.cbi.coollink.blocks.cables.*;
+import com.cbi.coollink.blocks.conduits.*;
+import com.cbi.coollink.blocks.networkdevices.*;
+import com.cbi.coollink.blocks.wallports.*;
 import com.cbi.coollink.items.*;
 import com.cbi.coollink.net.*;
 import com.cbi.coollink.rendering.IWireNode;
@@ -100,38 +93,59 @@ public class Main implements ModInitializer {
         Registry.register(Registries.ITEM_GROUP, ITEM_GROUP, COOL_LINK_ITEM_GROUP);//post 1.20 changes to item groups
 
 
-
+        //test block
         Registry.register(Registries.BLOCK, TestBlock.BLOCK_KEY,TestBlock.ENTRY);
         Registry.register(Registries.ITEM, TestBlock.ITEM_KEY,new BlockItem(TestBlock.ENTRY, new Item.Settings().registryKey(TestBlock.ITEM_KEY)));
+
+        //aio network
         Registry.register(Registries.BLOCK, AIO_Network.BLOCK_KEY, AIO_Network.ENTRY);
         BlockRenderLayerMap.putBlock(AIO_Network.ENTRY, BlockRenderLayer.CUTOUT);
         Registry.register(Registries.ITEM, AIO_Network.ITEM_KEY,new BlockItem(AIO_Network.ENTRY, new Item.Settings().registryKey(AIO_Network.ITEM_KEY)));
+
+        //smartphone
         SmartPhone smartPhoneEntry = Registry.register(Registries.ITEM, SmartPhone.ITEM_KEY,new SmartPhone(new Item.Settings().registryKey(SmartPhone.ITEM_KEY)));
 
+        //redstone controller wired
+        Registry.register(Registries.BLOCK, RedstoneControllerWired.BLOCK_KEY, RedstoneControllerWired.ENTRY);
+        //BlockRenderLayerMap.putBlock(RedstoneControllerWired.ENTRY, BlockRenderLayer.CUTOUT);
+        Registry.register(Registries.ITEM, RedstoneControllerWired.ITEM_KEY,new BlockItem(RedstoneControllerWired.ENTRY, new Item.Settings().registryKey(RedstoneControllerWired.ITEM_KEY)));
 
+        //wire tester
         WireTester wireTesterEntry = Registry.register(Registries.ITEM, WireTester.ITEM_KEY,new WireTester(new Item.Settings().registryKey(WireTester.ITEM_KEY)));
         ProgramingCable programingCableEntry = Registry.register(Registries.ITEM, ProgramingCable.ITEM_KEY,new ProgramingCable(new Item.Settings().registryKey(ProgramingCable.ITEM_KEY)));
 
+        //server Rack
         Registry.register(Registries.BLOCK, ServerRack.BLOCK_KEY, ServerRack.ENTRY);
         BlockRenderLayerMap.putBlock(ServerRack.ENTRY, BlockRenderLayer.CUTOUT);
         Registry.register(Registries.ITEM, ServerRack.ITEM_KEY,new BlockItem(ServerRack.ENTRY, new Item.Settings().registryKey(ServerRack.ITEM_KEY) ));
 
+        //satellite dish
         Registry.register(Registries.BLOCK, SatelliteDishBlock.BLOCK_KEY, SatelliteDishBlock.ENTRY);
         BlockRenderLayerMap.putBlock(SatelliteDishBlock.ENTRY, BlockRenderLayer.CUTOUT);
         Registry.register(Registries.ITEM, SatelliteDishBlock.ITEM_KEY,new BlockItem(SatelliteDishBlock.ENTRY, new Item.Settings().registryKey(SatelliteDishBlock.ITEM_KEY)));
 
+        //small conduit
         Registry.register(Registries.BLOCK, SmallConduit.BLOCK_KEY,SmallConduit.ENTRY);
         Registry.register(Registries.ITEM, SmallConduit.ITEM_KEY,new BlockItem(SmallConduit.ENTRY, new Item.Settings().registryKey(SmallConduit.ITEM_KEY)));
 
+        //medium conduit
         Registry.register(Registries.BLOCK, MediumConduit.BLOCK_KEY, MediumConduit.ENTRY);
         Registry.register(Registries.ITEM, MediumConduit.ITEM_KEY,new BlockItem(MediumConduit.ENTRY, new Item.Settings().registryKey(MediumConduit.ITEM_KEY)));
 
+        //large conduit
         Registry.register(Registries.BLOCK, LargeConduit.BLOCK_KEY, LargeConduit.ENTRY);
         Registry.register(Registries.ITEM, LargeConduit.ITEM_KEY,new BlockItem(LargeConduit.ENTRY, new Item.Settings().registryKey(LargeConduit.ITEM_KEY)));
 
+        //coax cable
         Registry.register(Registries.BLOCK, CoaxCable.BLOCK_KEY, CoaxCable.ENTRY);
         BlockRenderLayerMap.putBlock(CoaxCable.ENTRY, BlockRenderLayer.CUTOUT);
 
+        //Switch(Simple)
+        Registry.register(Registries.BLOCK, SwitchSimple.BLOCK_KEY, SwitchSimple.ENTRY);
+        //BlockRenderLayerMap.putBlock(SwitchSimple.ENTRY, BlockRenderLayer.CUTOUT);
+        Registry.register(Registries.ITEM, SwitchSimple.ITEM_KEY,new BlockItem(SwitchSimple.ENTRY, new Item.Settings().registryKey(SwitchSimple.ITEM_KEY)));
+
+        //legacy Items
         Registry.register(Registries.BLOCK, AIOCableBundle.BLOCK_KEY, AIOCableBundle.ENTRY);
         Registry.register(Registries.ITEM,AIOCableBundle.ITEM_KEY,new BlockItem(AIOCableBundle.ENTRY,new Item.Settings().registryKey(AIOCableBundle.ITEM_KEY)));
 
@@ -150,6 +164,7 @@ public class Main implements ModInitializer {
         Registry.register(Registries.BLOCK,AIOWallPort.BLOCK_KEY,AIOWallPort.ENTRY);
         Registry.register(Registries.ITEM,AIOWallPort.ITEM_KEY,new BlockItem(AIOWallPort.ENTRY,new Item.Settings().registryKey(AIOWallPort.ITEM_KEY)));
 
+        //item registration
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(smartPhoneEntry));
