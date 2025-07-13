@@ -17,18 +17,16 @@ import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.state.property.Properties.*;
 
-public class CoaxWallPortSingle extends BlockWithEntity implements BlockEntityProvider{
+public class CoaxWallPortSingle extends AWallPort{
     //public static final CoaxWallPortSingle ENTRY = new CoaxWallPortSingle(AbstractBlock.Settings.create().hardness(0.5f));
 
     public CoaxWallPortSingle(Settings settings,String woodType){
-        super(settings);
+        super(settings,woodType);
         setDefaultState(getDefaultState()
                 .with(FACING,Direction.NORTH)
         );
-        this.woodType=woodType;
-    }
 
-    private final String woodType;
+    }
 
     @Override
     protected MapCodec<? extends BlockWithEntity> getCodec() {
