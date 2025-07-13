@@ -47,21 +47,11 @@ public class ClientEntryPoint implements ClientModInitializer {
                 Main.LOGGER.error("Something has gon massively wrong client world does not match 💀");
                 return;
             }
-            BlockPos blockEntityPos = payload.block();
 
             ItemStack heldItem = payload.heldItem();
 
-            boolean noBLockEntity = payload.noBlockEntity();
-            BlockEntity usedBlockEntity;
-            if(!noBLockEntity)
-                usedBlockEntity = Objects.requireNonNull(world).getBlockEntity(blockEntityPos);
-            else {
-                usedBlockEntity = null;
-            }
-
-
             context.client().execute( () -> {
-                context.client().setScreen(new PhoneScreen(new PhoneGui(world, usedBlockEntity, heldItem,payload.playerPos())));
+                context.client().setScreen(new PhoneScreen(new PhoneGui(world, heldItem,payload.playerPos())));
             });
         });
 

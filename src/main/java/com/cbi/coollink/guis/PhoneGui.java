@@ -18,12 +18,14 @@ import net.minecraft.text.PlainTextContent.Literal;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Optional;
 
 
 public class PhoneGui extends LightweightGuiDescription {
@@ -52,7 +54,7 @@ public class PhoneGui extends LightweightGuiDescription {
 
     public Vec3d playerPosition;
 
-    public PhoneGui(World world, BlockEntity clickedOnBLockEntity, ItemStack phoneInstance, Vec3d playerPosition) {
+    public PhoneGui(World world, ItemStack phoneInstance, Vec3d playerPosition) {
         installedApps.add(new PhoneAppInfo(SettingsPhoneApp.ID, (world1, blockEntity, nbtCompound) -> new SettingsPhoneApp(world1,blockEntity,this), SettingsPhoneApp.ICON,true, (be) -> false));
 
         installedApps.add(new PhoneAppInfo(AIOSettingApp.ID,(world1, blockEntity, nbtCompound) -> new AIOSettingApp(world1, blockEntity), AIOSettingApp.ICON,true, AIOSettingApp::openOnBlockEntity));
@@ -62,7 +64,6 @@ public class PhoneGui extends LightweightGuiDescription {
 
         numberOfPreinstalledApps = installedApps.size();
         this.world=world;
-        this.clickedOnBLockEntity=clickedOnBLockEntity;
         this.phoneInstance=phoneInstance;
         this.playerPosition = playerPosition;
 
@@ -102,10 +103,21 @@ public class PhoneGui extends LightweightGuiDescription {
                 phoneName = "UnNamed phone";
             }
 
+            Optional<int[]> optionalBlockEntityPos = nbt.getIntArray("BePos");
+            if(optionalBlockEntityPos.isPresent()){//if block entity pos was found
+                int[] posI = optionalBlockEntityPos.get();
+                clickedOnBLockEntity = world.getBlockEntity(new BlockPos(posI[0],posI[1],posI[2]));
+                nbt.remove("BePos");
+                phoneInstance.set(DataComponentTypes.CUSTOM_DATA,NbtComponent.of(nbt));//remove the block info from the phone
+            }else{
+                this.clickedOnBLockEntity = null;
+            }
+
         }else{
             Main.LOGGER.info("no NBT data");
             appData=new NbtCompound();
             phoneName="UnNamed phone";
+            this.clickedOnBLockEntity = null;
         }
 
         root = new WPlainPanel();//.setBackgroundPainter(new BackgroundPainter());
