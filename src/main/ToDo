@@ -8,4 +8,4 @@ Conduit Functionality
         Placement on conduits
         Selecting the slot to use
     routing cables through the conduit network
-    Working out how networks logically move over the network
+    Working out how packets logically move over the network
