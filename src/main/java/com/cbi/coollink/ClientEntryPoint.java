@@ -10,6 +10,7 @@ import com.cbi.coollink.net.AioSyncMacPacket;
 import com.cbi.coollink.net.OpenConduitGuiPacket;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import com.cbi.coollink.net.OpenPortSelectGuiPacket;
+import com.cbi.coollink.rendering.blockentities.SatelliteDishBlockEntityRenderer;
 import com.cbi.coollink.rendering.blockentities.ServerRackBlockEntityRenderer;
 import com.cbi.coollink.rendering.WireNodeRenderer;
 import net.fabricmc.api.ClientModInitializer;
@@ -89,6 +90,7 @@ public class ClientEntryPoint implements ClientModInitializer {
 
         BlockEntityRendererFactories.register(Main.AIO_BLOCK_ENTITY,WireNodeRenderer::new);
         BlockEntityRendererFactories.register(Main.SWITCH_SIMPLE_BLOCK_ENTITY,WireNodeRenderer::new);
+        BlockEntityRendererFactories.register(Main.SATELLITE_DISH_BLOCK_ENTITY, SatelliteDishBlockEntityRenderer::new);
 
 
     }
