@@ -27,7 +27,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
     private final HashMap<String, String> environmentVariables = new HashMap<>();
     private CliProgram currentExecutingProgram;
 
-    private NbtCompound terminalData;
+    private final NbtCompound terminalData;
     private boolean requestSave = false;
     private final ArrayList<Identifier> installedPackages = new ArrayList<>();
 
@@ -138,17 +138,17 @@ public class PhoneCommandLineContext extends CommandLineContext {
     public void installPackage(CliCommandPackage commands, boolean addToStorage) {
         //add these commands to the currently usable commands
         for(int i=0;i<commands.size();i++){
-            CliProgramInit prev = programRepository.put(commands.getCommandName(i),commands.getProgram(i));
+            programRepository.put(commands.getCommandName(i),commands.getProgram(i));
             textOut.addLine("Warning! Duplicate command: "+commands.getCommandName(i));
         }
         if(addToStorage){//if this command is being installed from the package manager
             //check if this package has already been installed
-            NbtList installedPackages = terminalData.getListOrEmpty("installed_packages");
-            for(int i=0;i<installedPackages.size();i++){
-                if(installedPackages.getString(i,"").equals(commands.getId().toString())){
-                    break;
+            for (Identifier installedPackage : installedPackages) {
+                if (installedPackage.equals(commands.getId())) {
+                    return;
                 }
             }
+            installedPackages.add(commands.getId());
             requestSave = true;
             terminalData.getListOrEmpty("installed_packages").add(NbtString.of(commands.getId().toString()));
         }
@@ -157,6 +157,8 @@ public class PhoneCommandLineContext extends CommandLineContext {
     @Override
     public void unInstallPackage(Identifier packageId) {
         requestSave = true;
+        installedPackages.remove(packageId);
+        //this is not confusing at all
         NbtList installedPackages = terminalData.getListOrEmpty("installed_packages");
         for(int i=0;i<installedPackages.size();i++){
             if(installedPackages.getString(i,"").equals(packageId.toString())){
@@ -169,9 +171,8 @@ public class PhoneCommandLineContext extends CommandLineContext {
     @Override
     public void listPackages() {
         textOut.addLine("Installed packages:");
-        NbtList installedPackages = terminalData.getListOrEmpty("installed_packages");
-        for(int i=0;i<installedPackages.size();i++){
-            textOut.addLine(installedPackages.getString(i,"ERROR"));
+        for (Identifier installedPackage : installedPackages) {
+            textOut.addLine(installedPackage.toString());
         }
     }
 

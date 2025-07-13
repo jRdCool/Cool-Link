@@ -1,7 +1,6 @@
 package com.cbi.coollink.app;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.terminal.CommandLineContext;
 import com.cbi.coollink.terminal.PhoneCommandLineContext;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WButton;

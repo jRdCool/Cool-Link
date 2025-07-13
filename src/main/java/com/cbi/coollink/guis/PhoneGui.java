@@ -3,7 +3,6 @@ package com.cbi.coollink.guis;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.app.*;
 import com.cbi.coollink.net.SavePhoneDataPacket;
-import com.cbi.coollink.terminal.PhoneCommandLineContext;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
@@ -41,7 +40,7 @@ public class PhoneGui extends LightweightGuiDescription {
     public ItemStack phoneInstance;
 
     WButton homeButton;
-    private ArrayList<PhoneAppInfo> installedApps = new ArrayList<>();
+    private final ArrayList<PhoneAppInfo> installedApps = new ArrayList<>();
 
 
     public NbtCompound appData;
@@ -303,7 +302,7 @@ public class PhoneGui extends LightweightGuiDescription {
         return installedApps.size();
     }
 
-    protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){};
+    protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){}
 
 
 
