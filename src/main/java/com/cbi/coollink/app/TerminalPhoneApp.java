@@ -20,7 +20,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
     public static final Identifier ICON = Identifier.of(Main.namespace,"textures/gui/terminal.png");
 
     WTextField inputBox;
-    WButton executeButton;
+    WButton executeButton, terminateButton;
     PhoneCommandLineContext commandLineContext;
     WLabel title;
     public TerminalPhoneApp(World ignoredWorld, BlockEntity ignoredClickedOnBlockEntity, NbtCompound appData) {
@@ -42,6 +42,10 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         title.setColor(0xFF_FFFFFF);
         title.setDarkmodeColor(0xFF_FFFFFF);
         panel.add(title,180,3);
+        terminateButton = new WButton(Text.of("Terminate"));
+        panel.add(terminateButton,70,180,80,20);
+        terminateButton.setOnClick(() -> commandLineContext.terminateRunningProgram());
+
     }
 
     @Override
@@ -58,6 +62,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
     public void tick() {
         commandLineContext.tick();
         executeButton.setEnabled(!commandLineContext.commandExecuting());
+        terminateButton.setEnabled(commandLineContext.commandExecuting());
         if(commandLineContext.requestSave()){
             requestSave = true;
         }

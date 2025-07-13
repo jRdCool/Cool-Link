@@ -10,7 +10,6 @@ public abstract class CommandLineContext {
     abstract public WWidget getTextOutput();
     abstract public void tick();
 
-    @SuppressWarnings("all")
     abstract public boolean commandExecuting();
 
     abstract public void installPackage(CliCommandPackage commands, boolean addToStorage);
@@ -20,4 +19,5 @@ public abstract class CommandLineContext {
 
     abstract public void printHelpText(String[] args);
     abstract public void listPackages();
+    abstract public void terminateRunningProgram();
 }

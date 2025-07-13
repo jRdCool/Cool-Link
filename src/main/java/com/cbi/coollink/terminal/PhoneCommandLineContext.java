@@ -138,8 +138,10 @@ public class PhoneCommandLineContext extends CommandLineContext {
     public void installPackage(CliCommandPackage commands, boolean addToStorage) {
         //add these commands to the currently usable commands
         for(int i=0;i<commands.size();i++){
-            programRepository.put(commands.getCommandName(i),commands.getProgram(i));
-            textOut.addLine("Warning! Duplicate command: "+commands.getCommandName(i));
+            CliProgramInit prev = programRepository.put(commands.getCommandName(i),commands.getProgram(i));
+            if(prev != null) {
+                textOut.addLine("Warning! Duplicate command: " + commands.getCommandName(i));
+            }
         }
         if(addToStorage){//if this command is being installed from the package manager
             //check if this package has already been installed
@@ -151,6 +153,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
             installedPackages.add(commands.getId());
             requestSave = true;
             terminalData.getListOrEmpty("installed_packages").add(NbtString.of(commands.getId().toString()));
+            textOut.addLine("Installed package: "+commands.getId());
         }
     }
 
@@ -163,6 +166,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
         for(int i=0;i<installedPackages.size();i++){
             if(installedPackages.getString(i,"").equals(packageId.toString())){
                 installedPackages.remove(i);
+                textOut.addLine("Removed package: "+packageId+" Restart your terminal to apply changes");
                 break;
             }
         }
@@ -174,6 +178,12 @@ public class PhoneCommandLineContext extends CommandLineContext {
         for (Identifier installedPackage : installedPackages) {
             textOut.addLine(installedPackage.toString());
         }
+    }
+
+    @Override
+    public void terminateRunningProgram() {
+        currentExecutingProgram = null;
+        textOut.addLine("^C");
     }
 
     public void printCommands(){

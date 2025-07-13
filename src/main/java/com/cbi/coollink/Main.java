@@ -14,6 +14,11 @@ import com.cbi.coollink.blocks.networkdevices.AIO_Network;
 import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
 import com.cbi.coollink.blocks.wallports.AIOWallPort;
 import com.cbi.coollink.blocks.wallports.CoaxWallPortSingle;
+import com.cbi.coollink.cli.CliProgramInit;
+import com.cbi.coollink.cli.example.HelloWorld;
+import com.cbi.coollink.cli.example.Loading;
+import com.cbi.coollink.cli.repo.CliCommandPackage;
+import com.cbi.coollink.cli.repo.CliPackageRepository;
 import com.cbi.coollink.items.*;
 import com.cbi.coollink.net.*;
 import com.cbi.coollink.rendering.IWireNode;
@@ -299,6 +304,15 @@ public class Main implements ModInitializer {
 
         });
 
+
+        //Register Cli program packages
+        CliPackageRepository.registerPackage(new CliCommandPackage(
+                    Identifier.of(namespace,"example"),
+                    "Examples of how the cli program system can be used with external packages",
+                    new CliCommandPackage.CommandInfo("helloworld",CliProgramInit.of(HelloWorld::new,"Simple hello world program")),
+                    new CliCommandPackage.CommandInfo("load",CliProgramInit.of(Loading::new,"Loading example of how a command can execute over time"))
+                ),
+            CliPackageRepository.ANY_ENVIRONMENT);//end of example package
 
     }
 
