@@ -2,6 +2,7 @@ package com.cbi.coollink.app;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.terminal.CommandLineContext;
+import com.cbi.coollink.terminal.PhoneCommandLineContext;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WButton;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
@@ -21,10 +22,11 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
 
     WTextField inputBox;
     WButton executeButton;
-    CommandLineContext commandLineContext;
+    PhoneCommandLineContext commandLineContext;
     WLabel title;
-    public TerminalPhoneApp(World ignoredWorld, BlockEntity ignoredClickedOnBlockEntity, NbtCompound ignoredAppData, CommandLineContext commandRunner) {
+    public TerminalPhoneApp(World ignoredWorld, BlockEntity ignoredClickedOnBlockEntity, NbtCompound appData) {
         super(ID);
+        PhoneCommandLineContext commandRunner = new PhoneCommandLineContext(appData);
         root=new WPlainPanel();//create the panel witch all widget will sit on
         timeColor=TIME_COLOR_WHITE;//set the color of the clock if necessary
         icon = ICON;
@@ -57,6 +59,9 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
     public void tick() {
         commandLineContext.tick();
         executeButton.setEnabled(!commandLineContext.commandExecuting());
+        if(commandLineContext.requestSave()){
+            requestSave = true;
+        }
     }
 
     /**
@@ -74,5 +79,10 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
             inputBox.setText("");
         }
         inputBox.requestFocus();
+    }
+
+    @Override
+    public NbtCompound saveData() {
+        return commandLineContext.getSaveData();
     }
 }

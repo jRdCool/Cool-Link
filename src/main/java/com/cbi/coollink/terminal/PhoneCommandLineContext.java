@@ -1,15 +1,21 @@
 package com.cbi.coollink.terminal;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.cli.CliProgram;
 import com.cbi.coollink.cli.CliProgramInit;
 import com.cbi.coollink.cli.InternalCommands;
 import com.cbi.coollink.cli.PackageManager;
 import com.cbi.coollink.cli.repo.CliCommandPackage;
+import com.cbi.coollink.cli.repo.CliPackageRepository;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -21,9 +27,13 @@ public class PhoneCommandLineContext extends CommandLineContext {
     private final HashMap<String, String> environmentVariables = new HashMap<>();
     private CliProgram currentExecutingProgram;
 
+    private NbtCompound terminalData;
+    private boolean requestSave = false;
+    private final ArrayList<Identifier> installedPackages = new ArrayList<>();
 
 
-    public PhoneCommandLineContext(){
+    public PhoneCommandLineContext(NbtCompound terminalData){
+        this.terminalData = terminalData;
         textOut = new CommandTextOutputArea(375,130,100,"CBi Phone OS 1.0 (C) CBi-games 2025, All rights reserved");
         //set the initial environment variables
         environmentVariables.put("PWD","/");
@@ -50,7 +60,19 @@ public class PhoneCommandLineContext extends CommandLineContext {
         programRepository.put("help", InternalCommands.initOf((args, env, stdOut) -> printHelpText(args),"Usage: help <command>\nGet the help text for a given command"));
         programRepository.put("package", InternalCommands.initOf((args, env, stdOut) -> new PackageManager(args,env,stdOut,this),"Usage: package <install | uninstall | search | list>\nInstall and manage packages of command line programs\n\ninstall <packageId> - install new packages\nuninstall <packageId> - uninstall a package\nsearch <searchString> - search for available packages\nlist - list installed packages"));
         //load commands from packages here
-        //installPackage(blablabla,false);
+        NbtList installedPackages = terminalData.getListOrEmpty("installed_packages");
+        if(installedPackages.isEmpty()){
+            terminalData.put("installed_packages",installedPackages);
+        }
+        for(int i=0;i<installedPackages.size();i++){
+            try {
+                Identifier packageId = Identifier.of(installedPackages.getString(i, ""));
+                installPackage(CliPackageRepository.getPackage(packageId, CliPackageRepository.PHONE_ENVIRONMENT), false);
+                this.installedPackages.add(packageId);
+            }catch (Exception e){
+                Main.LOGGER.error("Exception while installing terminal packages",e);
+            }
+        }
     }
 
     private final CommandTextOutputArea textOut;
@@ -120,18 +142,37 @@ public class PhoneCommandLineContext extends CommandLineContext {
             textOut.addLine("Warning! Duplicate command: "+commands.getCommandName(i));
         }
         if(addToStorage){//if this command is being installed from the package manager
-            //TODO figure out adding packages to storage
+            //check if this package has already been installed
+            NbtList installedPackages = terminalData.getListOrEmpty("installed_packages");
+            for(int i=0;i<installedPackages.size();i++){
+                if(installedPackages.getString(i,"").equals(commands.getId().toString())){
+                    break;
+                }
+            }
+            requestSave = true;
+            terminalData.getListOrEmpty("installed_packages").add(NbtString.of(commands.getId().toString()));
         }
     }
 
     @Override
     public void unInstallPackage(Identifier packageId) {
-
+        requestSave = true;
+        NbtList installedPackages = terminalData.getListOrEmpty("installed_packages");
+        for(int i=0;i<installedPackages.size();i++){
+            if(installedPackages.getString(i,"").equals(packageId.toString())){
+                installedPackages.remove(i);
+                break;
+            }
+        }
     }
 
     @Override
     public void listPackages() {
-
+        textOut.addLine("Installed packages:");
+        NbtList installedPackages = terminalData.getListOrEmpty("installed_packages");
+        for(int i=0;i<installedPackages.size();i++){
+            textOut.addLine(installedPackages.getString(i,"ERROR"));
+        }
     }
 
     public void printCommands(){
@@ -156,6 +197,15 @@ public class PhoneCommandLineContext extends CommandLineContext {
         for(String help:helpText){
             textOut.addLine(help);
         }
+    }
+
+    public NbtCompound getSaveData(){
+        requestSave = false;
+        return terminalData;
+    }
+
+    public boolean requestSave(){
+        return requestSave;
     }
 
 
