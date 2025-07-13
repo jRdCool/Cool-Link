@@ -13,8 +13,10 @@ public abstract class AWallPort extends BlockWithEntity implements BlockEntityPr
                 .with(FACING, Direction.NORTH)
         );
         this.woodType=woodType;
-    }
+    }//Constructor
 
+
+    //Variables
     protected final String woodType;
 
 }

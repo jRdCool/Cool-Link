@@ -26,7 +26,7 @@ public class CoaxWallPortSingle extends AWallPort{
                 .with(FACING,Direction.NORTH)
         );
 
-    }
+    }//Constructor
 
     @Override
     protected MapCodec<? extends BlockWithEntity> getCodec() {
@@ -37,7 +37,7 @@ public class CoaxWallPortSingle extends AWallPort{
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
         super.appendProperties(stateManager);
         stateManager.add(FACING);
-    }
+    }//add properties
 
     @Nullable
     @Override
@@ -48,19 +48,19 @@ public class CoaxWallPortSingle extends AWallPort{
             case WEST -> {return this.getDefaultState().with(FACING, Direction.EAST);}
             default -> {return this.getDefaultState().with(FACING, Direction.NORTH);}
         }
-    }
+    }//Placement State
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
         editOtherBlock(world,pos,state,true);
-    }
+    }//Actions when placed
 
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         editOtherBlock(world,pos,state,false);
         return state;
-    }
+    }//Actions when broken
 
     private void editOtherBlock(World world, BlockPos pos, BlockState state,Boolean create){
         switch (state.get(FACING)){
@@ -89,17 +89,17 @@ public class CoaxWallPortSingle extends AWallPort{
                 }
             }
         }
-    }
+    }//Actions when Broken
 
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new CoaxWallPortSingleBE(woodType,pos,state);
-    }
+    }//Creating the block Entity
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
         // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
         return BlockRenderType.MODEL;
-    }
+    }//Getting the render INFO
 }
