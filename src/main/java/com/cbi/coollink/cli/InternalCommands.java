@@ -8,9 +8,7 @@ public class InternalCommands {
 
     /**Repeat the users args back to them on the output
      */
-    public static final BareCliProgram ECHO = (args, env, stdOut) -> {
-        stdOut.addLine(String.join(" ",args));
-    };
+    public static final BareCliProgram ECHO = (args, env, stdOut) -> stdOut.addLine(String.join(" ",args));
 
     /**Set an environment variable
      */

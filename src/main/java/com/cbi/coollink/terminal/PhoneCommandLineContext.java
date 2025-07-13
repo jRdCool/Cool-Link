@@ -49,7 +49,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
     }
 
     private final CommandTextOutputArea textOut;
-    int tmcCnt = 0;
+
     @Override
     public void executeCommand(String command) {
         //check if the command should be echoed back to the user

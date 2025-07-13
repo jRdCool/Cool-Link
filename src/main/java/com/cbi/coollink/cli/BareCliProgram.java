@@ -13,7 +13,7 @@ public interface BareCliProgram extends CliProgram{
     @Override
     default boolean isProgramRunning(){
       return false;
-    };
+    }
 
     @Override
     default void tick(){

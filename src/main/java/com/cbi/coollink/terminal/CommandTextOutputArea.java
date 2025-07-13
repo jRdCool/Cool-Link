@@ -1,8 +1,6 @@
 package com.cbi.coollink.terminal;
 
-import com.cbi.coollink.Main;
 import com.cbi.coollink.net.mic.WDynamicLabelMultyLine;
-import io.github.cottonmc.cotton.gui.widget.WDynamicLabel;
 import io.github.cottonmc.cotton.gui.widget.WScrollPanel;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
 import net.fabricmc.fabric.api.util.TriState;

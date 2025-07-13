@@ -23,7 +23,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
     WButton executeButton;
     CommandLineContext commandLineContext;
     WLabel title;
-    public TerminalPhoneApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, CommandLineContext commandRunner) {
+    public TerminalPhoneApp(World ignoredWorld, BlockEntity ignoredClickedOnBlockEntity, NbtCompound ignoredAppData, CommandLineContext commandRunner) {
         super(ID);
         root=new WPlainPanel();//create the panel witch all widget will sit on
         timeColor=TIME_COLOR_WHITE;//set the color of the clock if necessary
@@ -64,9 +64,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
      */
     @Override
     public void addPainters() {
-        root.setBackgroundPainter((matrices, left, top, panel) -> {
-            ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_000000);
-        });
+        root.setBackgroundPainter((matrices, left, top, panel) -> ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_000000));
     }
 
     void executeCommand(){

@@ -8,5 +8,6 @@ public abstract class CommandLineContext {
     abstract public WWidget getTextOutput();
     abstract public void tick();
 
+    @SuppressWarnings("all")
     abstract public boolean commandExecuting();
 }
