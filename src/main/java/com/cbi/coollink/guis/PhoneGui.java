@@ -40,7 +40,7 @@ public class PhoneGui extends LightweightGuiDescription {
     public ItemStack phoneInstance;
 
     WButton homeButton;
-    private ArrayList<PhoneAppInfo> installedApps = new ArrayList<>();
+    private final ArrayList<PhoneAppInfo> installedApps = new ArrayList<>();
 
 
     public NbtCompound appData;
@@ -302,7 +302,7 @@ public class PhoneGui extends LightweightGuiDescription {
         return installedApps.size();
     }
 
-    protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){};
+    protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){}
 
 
 
