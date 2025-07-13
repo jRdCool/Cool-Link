@@ -3,9 +3,12 @@ package com.cbi.coollink.terminal;
 import com.cbi.coollink.cli.CliProgram;
 import com.cbi.coollink.cli.CliProgramInit;
 import com.cbi.coollink.cli.InternalCommands;
+import com.cbi.coollink.cli.PackageManager;
+import com.cbi.coollink.cli.repo.CliCommandPackage;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.Identifier;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,7 +48,9 @@ public class PhoneCommandLineContext extends CommandLineContext {
         programRepository.put("env", InternalCommands.initOf(InternalCommands.ENV,"List all environment variables"));
         programRepository.put("cmds", InternalCommands.initOf((args, env, stdOut) -> printCommands(),"List all installed commands"));
         programRepository.put("help", InternalCommands.initOf((args, env, stdOut) -> printHelpText(args),"Usage: help <command>\nGet the help text for a given command"));
-
+        programRepository.put("package", InternalCommands.initOf((args, env, stdOut) -> new PackageManager(args,env,stdOut,this),"Usage: package <install | uninstall | search | list>\nInstall and manage packages of command line programs\n\ninstall <packageId> - install new packages\nuninstall <packageId> - uninstall a package\nsearch <searchString> - search for available packages\nlist - list installed packages"));
+        //load commands from packages here
+        //installPackage(blablabla,false);
     }
 
     private final CommandTextOutputArea textOut;
@@ -107,6 +112,28 @@ public class PhoneCommandLineContext extends CommandLineContext {
         return currentExecutingProgram != null && currentExecutingProgram.isProgramRunning();
     }
 
+    @Override
+    public void installPackage(CliCommandPackage commands, boolean addToStorage) {
+        //add these commands to the currently usable commands
+        for(int i=0;i<commands.size();i++){
+            CliProgramInit prev = programRepository.put(commands.getCommandName(i),commands.getProgram(i));
+            textOut.addLine("Warning! Duplicate command: "+commands.getCommandName(i));
+        }
+        if(addToStorage){//if this command is being installed from the package manager
+            //TODO figure out adding packages to storage
+        }
+    }
+
+    @Override
+    public void unInstallPackage(Identifier packageId) {
+
+    }
+
+    @Override
+    public void listPackages() {
+
+    }
+
     public void printCommands(){
         String[] programs = programRepository.keySet().toArray(String[]::new);
         textOut.addLine("Installed commands:");
@@ -130,5 +157,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
             textOut.addLine(help);
         }
     }
+
+
 
 }
