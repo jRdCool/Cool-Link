@@ -159,6 +159,7 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode {
                 '}';
     }
 
+    @SuppressWarnings("unused")
     public void updateStates(){
         if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
     }//notifies the world of updates to the block state

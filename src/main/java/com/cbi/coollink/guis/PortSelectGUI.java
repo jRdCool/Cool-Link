@@ -21,7 +21,8 @@ public class PortSelectGUI extends LightweightGuiDescription implements WantsScr
     CottonClientScreen screen;
     public PortSelectGUI(ArrayList<Integer> ofType, WireType type, BlockEntity usedOnBlock, ItemStack heldItem){
         if(usedOnBlock instanceof IWireNode node) {
-            Main.LOGGER.info(usedOnBlock.toString());
+            //Main.LOGGER.info(usedOnBlock.toString());
+            Main.blank();
 
             //figure out the total number of possible ports that can be connected to
             WButton[] portButtons = new WButton[ofType.size()];

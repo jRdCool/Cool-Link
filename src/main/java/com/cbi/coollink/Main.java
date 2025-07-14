@@ -53,6 +53,7 @@ import java.util.HashMap;
 
 
 public class Main implements ModInitializer {
+    public static void blank(){}//This is to kill warnings for unused import of the main class when debug lines are commented out
     public static final Logger LOGGER = LoggerFactory.getLogger("cool-link");
 
     public static final String namespace = "cool-link";
