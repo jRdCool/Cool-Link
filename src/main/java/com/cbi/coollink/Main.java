@@ -105,10 +105,13 @@ public class Main implements ModInitializer {
         //smartphone
         SmartPhone smartPhoneEntry = Registry.register(Registries.ITEM, SmartPhone.ITEM_KEY,new SmartPhone(new Item.Settings().registryKey(SmartPhone.ITEM_KEY)));
 
-        //redstone controller wired
-        Registry.register(Registries.BLOCK, RedstoneControllerWired.BLOCK_KEY, RedstoneControllerWired.ENTRY);
-        //BlockRenderLayerMap.putBlock(RedstoneControllerWired.ENTRY, BlockRenderLayer.CUTOUT);
-        Registry.register(Registries.ITEM, RedstoneControllerWired.ITEM_KEY,new BlockItem(RedstoneControllerWired.ENTRY, new Item.Settings().registryKey(RedstoneControllerWired.ITEM_KEY)));
+        //redstone controllers wired
+        Registry.register(Registries.BLOCK, RSReceiverWired.BLOCK_KEY, RSReceiverWired.ENTRY);
+        //BlockRenderLayerMap.putBlock(RSReceiverWired.ENTRY, BlockRenderLayer.CUTOUT);
+        Registry.register(Registries.ITEM, RSReceiverWired.ITEM_KEY,new BlockItem(RSReceiverWired.ENTRY, new Item.Settings().registryKey(RSReceiverWired.ITEM_KEY)));
+        Registry.register(Registries.BLOCK, RSSenderWired.BLOCK_KEY, RSSenderWired.ENTRY);
+        //BlockRenderLayerMap.putBlock(RSReceiverWired.ENTRY, BlockRenderLayer.CUTOUT);
+        Registry.register(Registries.ITEM, RSSenderWired.ITEM_KEY,new BlockItem(RSSenderWired.ENTRY, new Item.Settings().registryKey(RSSenderWired.ITEM_KEY)));
 
         //wire tester
         WireTester wireTesterEntry = Registry.register(Registries.ITEM, WireTester.ITEM_KEY,new WireTester(new Item.Settings().registryKey(WireTester.ITEM_KEY)));
@@ -168,7 +171,8 @@ public class Main implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(SwitchSimple.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
-        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(RedstoneControllerWired.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(RSSenderWired.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(RSReceiverWired.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(smartPhoneEntry));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(cat6CableEntry));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(coaxialCableEntry));

@@ -29,13 +29,17 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
-public class RedstoneControllerWired extends BlockWithEntity implements BlockEntityProvider {
-    public static final Identifier ID = Identifier.of(Main.namespace,"redstone_ctrl_wired");
-    public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
-    public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
-    public static final RedstoneControllerWired ENTRY = new RedstoneControllerWired(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
-    private static final int REGULAR_POWER_DELAY = 8;
+public abstract class RedstoneControllerWired extends BlockWithEntity implements BlockEntityProvider {
+
     private static final IntProperty POWER;
+    static {
+        POWER = Properties.POWER;
+    }
+
+
+    //public static final RedstoneControllerWired ENTRY = new RedstoneControllerWired(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
+    private static final int REGULAR_POWER_DELAY = 8;
+
     private static final int RECOVERABLE_POWER_DELAY = 20;
 
     protected RedstoneControllerWired(AbstractBlock.Settings settings) {
@@ -88,7 +92,5 @@ public class RedstoneControllerWired extends BlockWithEntity implements BlockEnt
     }
 
 
-    static {
-        POWER = Properties.POWER;
-    }
+
 }
