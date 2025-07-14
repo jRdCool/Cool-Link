@@ -13,16 +13,17 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.render.model.BlockModelPart;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.CheckedRandom;
+import net.minecraft.util.math.random.ChunkRandom;
 import net.minecraft.util.math.random.LocalRandom;
 import net.minecraft.util.math.random.Random;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ConduitBlockEntityRender extends WireNodeRenderer<ConduitBlockEntity> {
 
     private final BlockRenderManager blockRenderManager = MinecraftClient.getInstance().getBlockRenderManager();
-    private final Random random = new LocalRandom(0);
+    private final Random random = new ChunkRandom(new LocalRandom(0));//used for textures that can have random rotations(dirt, grass, ect...) no idea how the game makes it no spaz out
 
     public ConduitBlockEntityRender(BlockEntityRendererFactory.Context context) {
         super(context);
@@ -35,6 +36,7 @@ public class ConduitBlockEntityRender extends WireNodeRenderer<ConduitBlockEntit
             //get the random just necessary to render as a block
             RenderLayer blockRenderingLayer = RenderLayers.getMovingBlockLayer(coverState);
             VertexConsumer vertexConsumer = bufferIn.getBuffer(blockRenderingLayer);
+            random.setSeed((long) conduit.getPos().getX() *3L*conduit.getPos().getY()*17L+conduit.getPos().getZ()* 23L);//make the texture rotation constant based on location
             List<BlockModelPart> parts = blockRenderManager.getModel(coverState).getParts(random);
             //render the cover block
             blockRenderManager.renderBlock(conduit.getCoverBlock(),conduit.getPos(),conduit.getWorld(),matrixStackIn, vertexConsumer, true, parts);
