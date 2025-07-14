@@ -1,28 +1,20 @@
 package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.blocks.blockentities.RedstoneControllerWiredBE;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -37,7 +29,6 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
     }
 
 
-    //public static final RedstoneControllerWired ENTRY = new RedstoneControllerWired(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
     private static final int REGULAR_POWER_DELAY = 8;
 
     private static final int RECOVERABLE_POWER_DELAY = 20;
@@ -55,7 +46,7 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return null;
+        return new RedstoneControllerWiredBE(pos,state);
     }
 
     private static void setPower(WorldAccess world, BlockState state, int power, BlockPos pos, int delay) {
@@ -74,9 +65,7 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
         return (Integer)state.get(POWER);
     }
 
-    protected boolean emitsRedstonePower(BlockState state) {
-        return true;
-    }
+    protected abstract boolean emitsRedstonePower(BlockState state);
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(new Property[]{POWER});

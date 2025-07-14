@@ -17,8 +17,8 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
 
     private static final int deviceID = 0x52;
 
-    public RedstoneControllerWiredBE(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(Main.AIO_BLOCK_ENTITY, pos, state);
+    public RedstoneControllerWiredBE( BlockPos pos, BlockState state) {
+        super(Main.RS_CONTROLLER_WIRED_BLOCK_ENTITY, pos, state);
         //String currentThread = Thread.currentThread().getName();
         //if(currentThread.equals("Server thread")) {
             mac = new Mac(deviceID);

@@ -63,6 +63,7 @@ public class Main implements ModInitializer {
     public static final BlockEntityType<ServerRackBlockEntity> SERVER_RACK_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"server_rack_block_entity"), ServerRackBlockEntity::new,ServerRack.ENTRY);
     public static final BlockEntityType<SwitchSimpleBE> SWITCH_SIMPLE_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "switch_simple_be"), SwitchSimpleBE::new, SwitchSimple.ENTRY);
     public static final BlockEntityType<SatelliteDishBlockEntity> SATELLITE_DISH_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"satellite-dish-block-entity"),SatelliteDishBlockEntity::new,SatelliteDishBlock.ENTRY);
+    public static final BlockEntityType<RedstoneControllerWiredBE> RS_CONTROLLER_WIRED_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"rs_controller_wired_block_entity"),RedstoneControllerWiredBE::new);
     //public static final BlockEntityType<CoaxWallPortSingleBE> COAX_WALL_PORT_SINGLE_BLOCK_ENTITY =
 
 
