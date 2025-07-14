@@ -17,6 +17,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.client.render.block.entity.ConduitBlockEntityRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
@@ -91,6 +92,9 @@ public class ClientEntryPoint implements ClientModInitializer {
         BlockEntityRendererFactories.register(Main.AIO_BLOCK_ENTITY,WireNodeRenderer::new);
         BlockEntityRendererFactories.register(Main.SWITCH_SIMPLE_BLOCK_ENTITY,WireNodeRenderer::new);
         BlockEntityRendererFactories.register(Main.SATELLITE_DISH_BLOCK_ENTITY, SatelliteDishBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(Main.LARGE_CONDUIT_BLOCK_ENTITY, ConduitBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(Main.SMALL_CONDUIT_BLOCK_ENTITY, ConduitBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(Main.MEDIUM_CONDUIT_BLOCK_ENTITY, ConduitBlockEntityRenderer::new);
 
 
     }

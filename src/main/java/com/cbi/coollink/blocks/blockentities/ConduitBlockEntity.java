@@ -19,15 +19,21 @@ public class ConduitBlockEntity extends BlockEntity {
                 super(type, pos, state);
     }
 
+    private BlockState coverBlock;
+
     @Override
     public void writeData(WriteView view){
         super.writeData(view);
+        if(coverBlock != null){
+            view.put("cover",BlockState.CODEC,coverBlock);
+        }
     }
 
 
     @Override
     public void readData(ReadView view) {
         super.readData(view);
+        coverBlock = view.read("cover",BlockState.CODEC).orElse(null);
     }
 
     @Nullable
@@ -44,6 +50,14 @@ public class ConduitBlockEntity extends BlockEntity {
 
     public void updateStates(){
         world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+    }
+
+    public boolean isCovered(){
+        return coverBlock != null;
+    }
+
+    public BlockState getCoverBlock(){
+        return coverBlock;
     }
 
 }
