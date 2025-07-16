@@ -41,34 +41,38 @@ public class SmallConduit extends Conduit {
         );
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
         VoxelShape shape= VoxelShapes.empty();
-        //use a different hit box based on the rotation of the block
-        if(state.get(cableShape)==0){
-            shape=VoxelShapes.union(shape,makeShapeNS());
+        if(state.get(Conduit.HIDDEN)){
+            shape = VoxelShapes.cuboid(0,0,0,1,1,1);
+        }else {
+            //use a different hit box based on the rotation of the block
+            if (state.get(cableShape) == 0) {
+                shape = VoxelShapes.union(shape, makeShapeNS());
+            }
+            if (state.get(cableShape) == 1) {
+                shape = VoxelShapes.union(shape, makeShapeEW());
+            }
+            if (state.get(cableShape) == 2) {
+                shape = junctionBoxVoxel();
+            }
+            if (state.get(cableShape) == 4) {
+                shape = VoxelShapes.union(shape, makeShapeNE());
+            }
+            if (state.get(cableShape) == 5) {
+                shape = VoxelShapes.union(shape, makeShapeSE());
+            }
+            if (state.get(cableShape) == 6) {
+                shape = VoxelShapes.union(shape, makeShapeSW());
+            }
+            if (state.get(cableShape) == 7) {
+                shape = VoxelShapes.union(shape, makeShapeNW());
+            }
+            if (shape.isEmpty()) {
+                shape = makeShapeNS();
+            }
         }
-        if(state.get(cableShape)==1){
-            shape=VoxelShapes.union(shape,makeShapeEW());
-        }
-        if(state.get(cableShape)==2){
-            shape=junctionBoxVoxel();
-        }
-        if(state.get(cableShape)==4){
-            shape=VoxelShapes.union(shape,makeShapeNE());
-        }
-        if(state.get(cableShape)==5){
-            shape=VoxelShapes.union(shape,makeShapeSE());
-        }
-        if(state.get(cableShape)==6){
-            shape=VoxelShapes.union(shape,makeShapeSW());
-        }
-        if(state.get(cableShape)==7){
-            shape=VoxelShapes.union(shape,makeShapeNW());
-        }
-        if (shape.isEmpty())
-            shape=makeShapeNS();
         return shape;
     }
 
