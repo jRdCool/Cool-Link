@@ -1,16 +1,16 @@
 package com.cbi.coollink;
 
-import com.cbi.coollink.app.AppRegistry;
-import com.cbi.coollink.app.ExampleApp;
-import com.cbi.coollink.app.SnakeGameApp;
+import com.cbi.coollink.app.*;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.guis.*;
 import com.cbi.coollink.net.AioSyncMacPacket;
 import com.cbi.coollink.net.OpenConduitGuiPacket;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import com.cbi.coollink.net.OpenPortSelectGuiPacket;
+import com.cbi.coollink.rendering.blockentities.SatelliteDishBlockEntityRenderer;
 import com.cbi.coollink.rendering.blockentities.ServerRackBlockEntityRenderer;
 import com.cbi.coollink.rendering.WireNodeRenderer;
+import com.cbi.coollink.rendering.blockentities.ConduitBlockEntityRender;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
@@ -18,7 +18,6 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.Objects;
@@ -29,6 +28,8 @@ public class ClientEntryPoint implements ClientModInitializer {
         //register client things here
         AppRegistry.registerApp(ExampleApp.ID,ExampleApp::new,null, Text.of("this is a test app\nlets try 2 lines"));
         AppRegistry.registerApp(SnakeGameApp.appID, SnakeGameApp::new, SnakeGameApp.ICON,Text.of("Snake Game!"));
+        AppRegistry.registerApp(TerminalPhoneApp.ID, TerminalPhoneApp::new, TerminalPhoneApp.ICON, Text.of("Terminal for your phone"));
+        AppRegistry.registerApp(ConduitHiderApp.ID, ConduitHiderApp::new, null,Text.of("Quick and dirty app to change the cover of a conduit"), ConduitHiderApp::openOnBlockEntity);
 
 
         BlockEntityRendererFactories.register(Main.SERVER_RACK_BLOCK_ENTITY, ServerRackBlockEntityRenderer::new);
@@ -45,21 +46,11 @@ public class ClientEntryPoint implements ClientModInitializer {
                 Main.LOGGER.error("Something has gon massively wrong client world does not match 💀");
                 return;
             }
-            BlockPos blockEntityPos = payload.block();
 
             ItemStack heldItem = payload.heldItem();
 
-            boolean noBLockEntity = payload.noBlockEntity();
-            BlockEntity usedBlockEntity;
-            if(!noBLockEntity)
-                usedBlockEntity = Objects.requireNonNull(world).getBlockEntity(blockEntityPos);
-            else {
-                usedBlockEntity = null;
-            }
-
-
             context.client().execute( () -> {
-                context.client().setScreen(new PhoneScreen(new PhoneGui(world, usedBlockEntity, heldItem,payload.playerPos())));
+                context.client().setScreen(new PhoneScreen(new PhoneGui(world, heldItem,payload.playerPos())));
             });
         });
 
@@ -97,6 +88,10 @@ public class ClientEntryPoint implements ClientModInitializer {
 
         BlockEntityRendererFactories.register(Main.AIO_BLOCK_ENTITY,WireNodeRenderer::new);
         BlockEntityRendererFactories.register(Main.SWITCH_SIMPLE_BLOCK_ENTITY,WireNodeRenderer::new);
+        BlockEntityRendererFactories.register(Main.SATELLITE_DISH_BLOCK_ENTITY, SatelliteDishBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(Main.LARGE_CONDUIT_BLOCK_ENTITY, ConduitBlockEntityRender::new);
+        BlockEntityRendererFactories.register(Main.SMALL_CONDUIT_BLOCK_ENTITY, ConduitBlockEntityRender::new);
+        BlockEntityRendererFactories.register(Main.MEDIUM_CONDUIT_BLOCK_ENTITY, ConduitBlockEntityRender::new);
 
 
     }
