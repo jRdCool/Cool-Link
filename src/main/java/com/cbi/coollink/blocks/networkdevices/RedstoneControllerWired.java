@@ -1,18 +1,13 @@
 package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.blocks.blockentities.RedstoneControllerWiredBE;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
@@ -29,13 +24,13 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
     }
 
 
-    private static final int REGULAR_POWER_DELAY = 8;
+    //private static final int REGULAR_POWER_DELAY = 8;
 
-    private static final int RECOVERABLE_POWER_DELAY = 20;
+    //private static final int RECOVERABLE_POWER_DELAY = 20;
 
     protected RedstoneControllerWired(AbstractBlock.Settings settings) {
         super(settings);
-        this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(POWER, 0));
+        this.setDefaultState((this.stateManager.getDefaultState()).with(POWER, 0));
     }//Constructor
 
     @Override
@@ -45,36 +40,34 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new RedstoneControllerWiredBE(pos,state);
-    }
+    public abstract BlockEntity createBlockEntity(BlockPos pos, BlockState state);
 
     private static void setPower(WorldAccess world, BlockState state, int power, BlockPos pos, int delay) {
-        world.setBlockState(pos, (BlockState)state.with(POWER, power), 3);
+        world.setBlockState(pos, state.with(POWER, power), 3);
         world.scheduleBlockTick(pos, state.getBlock(), delay);
     }
 
     protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if ((Integer)state.get(POWER) != 0) {
-            world.setBlockState(pos, (BlockState)state.with(POWER, 0), 3);
+        if (state.get(POWER) != 0) {
+            world.setBlockState(pos, state.with(POWER, 0), 3);
         }
 
     }
 
     protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-        return (Integer)state.get(POWER);
+        return state.get(POWER);
     }
 
     protected abstract boolean emitsRedstonePower(BlockState state);
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(new Property[]{POWER});
+        builder.add(POWER);
     }
 
     protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         if (!world.isClient() && !state.isOf(oldState.getBlock())) {
-            if ((Integer)state.get(POWER) > 0 && !world.getBlockTickScheduler().isQueued(pos, this)) {
-                world.setBlockState(pos, (BlockState)state.with(POWER, 0), 18);
+            if (state.get(POWER) > 0 && !world.getBlockTickScheduler().isQueued(pos, this)) {
+                world.setBlockState(pos, state.with(POWER, 0), 18);
             }
 
         }

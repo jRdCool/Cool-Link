@@ -1,6 +1,7 @@
 package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.blocks.blockentities.RedstoneControllerWiredBE;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -25,12 +26,12 @@ public class RSReceiverWired extends RedstoneControllerWired{
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return null;
+        return new RedstoneControllerWiredBE(pos,state,Main.RS_RECEIVER_WIRED_BLOCK_ENTITY);
     }
 
     @Override
-    protected boolean emitsRedstonePower(BlockState state) {
-        return false;
+    public boolean emitsRedstonePower(BlockState state) {
+        return true;
     }
 
 }

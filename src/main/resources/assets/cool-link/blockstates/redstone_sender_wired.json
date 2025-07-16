@@ -1,5 +1,5 @@
 {
   "variants": {
-    "": { "model": "cool-link:block/test_block" }
+    "": { "model": "cool-link:block/redstone_sender_wired"}
   }
 }

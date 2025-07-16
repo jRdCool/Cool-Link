@@ -64,7 +64,6 @@ public abstract class Conduit extends BlockWithEntity {
         );
     }
 
-    @SuppressWarnings({"deprecation","all"})
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
         //north = BooleanProperty.of("north");
         //east = BooleanProperty.of("east");
