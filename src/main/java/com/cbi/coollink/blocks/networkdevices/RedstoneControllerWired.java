@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class RedstoneControllerWired extends BlockWithEntity implements BlockEntityProvider {
 
-    private static final IntProperty POWER;
+    public static final IntProperty POWER;
     static {
         POWER = Properties.POWER;
     }
@@ -42,10 +42,11 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
     @Override
     public abstract BlockEntity createBlockEntity(BlockPos pos, BlockState state);
 
-    private static void setPower(WorldAccess world, BlockState state, int power, BlockPos pos, int delay) {
+    public void setPower(WorldAccess world, BlockState state, int power, BlockPos pos, int delay) {
         world.setBlockState(pos, state.with(POWER, power), 3);
         world.scheduleBlockTick(pos, state.getBlock(), delay);
     }
+
 
     protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         if (state.get(POWER) != 0) {
