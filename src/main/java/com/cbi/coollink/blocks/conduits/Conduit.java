@@ -31,6 +31,7 @@ public abstract class Conduit extends BlockWithEntity {
     public static final BooleanProperty east = BooleanProperty.of("east");
     public static final BooleanProperty south = BooleanProperty.of("south");
     public static final BooleanProperty west = BooleanProperty.of("west");
+    public static final BooleanProperty HIDDEN = BooleanProperty.of("hidden");
     public static final BooleanProperty junctionBox = BooleanProperty.of("junctionbox");
     public static final IntProperty cableShape = IntProperty.of("cableshape",0,7);
     public static final IntProperty cableLevel = IntProperty.of("cablelevel",1,3);
@@ -59,10 +60,10 @@ public abstract class Conduit extends BlockWithEntity {
                 .with(junctionBox,false)
                 .with(cableShape,0)
                 .with(neighborLarger,false)
+                .with(HIDDEN,false)
         );
     }
 
-    @SuppressWarnings({"deprecation","all"})
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
         //north = BooleanProperty.of("north");
         //east = BooleanProperty.of("east");
@@ -81,6 +82,7 @@ public abstract class Conduit extends BlockWithEntity {
         stateManager.add(cableShape);
         stateManager.add(cableLevel);
         stateManager.add(neighborLarger);
+        stateManager.add(HIDDEN);
     }
 
 
@@ -278,7 +280,12 @@ public abstract class Conduit extends BlockWithEntity {
     @Override
     public BlockRenderType getRenderType(BlockState state) {
         // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
-        return BlockRenderType.MODEL;
+        boolean hidden = state.get(HIDDEN,false);
+        if(!hidden) {
+            return BlockRenderType.MODEL;
+        }else{
+            return BlockRenderType.INVISIBLE;
+        }
     }
 
 

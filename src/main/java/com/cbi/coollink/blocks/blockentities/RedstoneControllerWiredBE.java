@@ -17,12 +17,17 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
 
     private static final int deviceID = 0x52;
 
-    public RedstoneControllerWiredBE(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(Main.AIO_BLOCK_ENTITY, pos, state);
-        //String currentThread = Thread.currentThread().getName();
-        //if(currentThread.equals("Server thread")) {
-            mac = new Mac(deviceID);
-        //}
+    public static RedstoneControllerWiredBE of( BlockPos pos, BlockState state,int type) {
+        return switch (type){
+            case 0 -> new RedstoneControllerWiredBE(pos, state, Main.RS_SENDER_WIRED_BLOCK_ENTITY);
+            case 1 -> new RedstoneControllerWiredBE(pos, state, Main.RS_RECEIVER_WIRED_BLOCK_ENTITY);
+            default -> null;
+        };
+
+    }
+
+    public RedstoneControllerWiredBE(BlockPos pos, BlockState state, BlockEntityType<?> type) {
+        super(type, pos, state);
         this.localNodes = new LocalNode[getNodeCount()];
     }
 
@@ -65,7 +70,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
 
     @Override
     public WireType getPortType(int index) {
-        return null;
+        return WireType.CAT6;
     }
 
     @Override
@@ -77,4 +82,6 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
     public void setIsNodeUsed(int index, boolean set) {
 
     }
+
+
 }

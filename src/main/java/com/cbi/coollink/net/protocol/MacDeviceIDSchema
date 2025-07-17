@@ -15,4 +15,4 @@
 
 0x5X = General Wired Devices
     0x51 = Desktop / Laptop NIC
-    0x52 = Redstone Controller (Wired)
+    0x52 = Redstone Controllers (Wired)

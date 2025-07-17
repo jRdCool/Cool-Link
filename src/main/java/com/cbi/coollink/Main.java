@@ -24,9 +24,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.ConduitBlockEntity;
 import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
@@ -63,14 +63,15 @@ public class Main implements ModInitializer {
 
     //Block Entity Registry
     public static final BlockEntityType<AIOBlockEntity> AIO_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "aio_block_entity"), AIOBlockEntity::new, AIO_Network.ENTRY);
-    public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "small_conduit_block_entity"), ConduitBlockEntity::new, SmallConduit.ENTRY);
-    public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "medium_conduit_block_entity"), ConduitBlockEntity::new, MediumConduit.ENTRY);
-    public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "large_conduit_block_entity"), ConduitBlockEntity::new, LargeConduit.ENTRY);
+    public static final BlockEntityType<ConduitBlockEntity> SMALL_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "small_conduit_block_entity"),  (pos, state) -> ConduitBlockEntity.of(pos,state,0), SmallConduit.ENTRY);
+    public static final BlockEntityType<ConduitBlockEntity> MEDIUM_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "medium_conduit_block_entity"), (pos, state) -> ConduitBlockEntity.of(pos,state,1), MediumConduit.ENTRY);
+    public static final BlockEntityType<ConduitBlockEntity> LARGE_CONDUIT_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "large_conduit_block_entity"), (pos, state) -> ConduitBlockEntity.of(pos,state,2), LargeConduit.ENTRY);
     public static final BlockEntityType<ServerRackBlockEntity> SERVER_RACK_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"server_rack_block_entity"), ServerRackBlockEntity::new,ServerRack.ENTRY);
     public static final BlockEntityType<SwitchSimpleBE> SWITCH_SIMPLE_BLOCK_ENTITY = registerBlockEntity(Identifier.of("cool-link", "switch_simple_be"), SwitchSimpleBE::new, SwitchSimple.ENTRY);
     public static final BlockEntityType<SatelliteDishBlockEntity> SATELLITE_DISH_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"satellite-dish-block-entity"),SatelliteDishBlockEntity::new,SatelliteDishBlock.ENTRY);
+    public static final BlockEntityType<RedstoneControllerWiredBE> RS_SENDER_WIRED_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"rs_sender_wired_block_entity"),(pos, state) -> RedstoneControllerWiredBE.of(pos,state,0),RSSenderWired.ENTRY);
+    public static final BlockEntityType<RedstoneControllerWiredBE> RS_RECEIVER_WIRED_BLOCK_ENTITY = registerBlockEntity(Identifier.of(namespace,"rs_receiver_wired_block_entity"),(pos, state) -> RedstoneControllerWiredBE.of(pos,state,1),RSReceiverWired.ENTRY);
     //public static final BlockEntityType<CoaxWallPortSingleBE> COAX_WALL_PORT_SINGLE_BLOCK_ENTITY =
-
 
 
     //Cable Registries
@@ -111,10 +112,13 @@ public class Main implements ModInitializer {
         //smartphone
         SmartPhone smartPhoneEntry = Registry.register(Registries.ITEM, SmartPhone.ITEM_KEY,new SmartPhone(new Item.Settings().registryKey(SmartPhone.ITEM_KEY)));
 
-        //redstone controller wired
-        Registry.register(Registries.BLOCK, RedstoneControllerWired.BLOCK_KEY, RedstoneControllerWired.ENTRY);
-        //BlockRenderLayerMap.putBlock(RedstoneControllerWired.ENTRY, BlockRenderLayer.CUTOUT);
-        Registry.register(Registries.ITEM, RedstoneControllerWired.ITEM_KEY,new BlockItem(RedstoneControllerWired.ENTRY, new Item.Settings().registryKey(RedstoneControllerWired.ITEM_KEY)));
+        //redstone controllers wired
+        Registry.register(Registries.BLOCK, RSReceiverWired.BLOCK_KEY, RSReceiverWired.ENTRY);
+        //BlockRenderLayerMap.putBlock(RSReceiverWired.ENTRY, BlockRenderLayer.CUTOUT);
+        Registry.register(Registries.ITEM, RSReceiverWired.ITEM_KEY,new BlockItem(RSReceiverWired.ENTRY, new Item.Settings().registryKey(RSReceiverWired.ITEM_KEY)));
+        Registry.register(Registries.BLOCK, RSSenderWired.BLOCK_KEY, RSSenderWired.ENTRY);
+        //BlockRenderLayerMap.putBlock(RSReceiverWired.ENTRY, BlockRenderLayer.CUTOUT);
+        Registry.register(Registries.ITEM, RSSenderWired.ITEM_KEY,new BlockItem(RSSenderWired.ENTRY, new Item.Settings().registryKey(RSSenderWired.ITEM_KEY)));
 
         //wire tester
         WireTester wireTesterEntry = Registry.register(Registries.ITEM, WireTester.ITEM_KEY,new WireTester(new Item.Settings().registryKey(WireTester.ITEM_KEY)));
@@ -174,6 +178,8 @@ public class Main implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(AIO_Network.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(SwitchSimple.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(ServerRack.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(RSSenderWired.ENTRY));
+        ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(RSReceiverWired.ENTRY));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(smartPhoneEntry));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(cat6CableEntry));
         ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP).register(entries -> entries.add(coaxialCableEntry));
@@ -201,6 +207,7 @@ public class Main implements ModInitializer {
         PayloadTypeRegistry.playS2C().register(AioSyncMacPacket.ID,AioSyncMacPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(OpenPortSelectGuiPacket.ID,OpenPortSelectGuiPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(WireInfoDataPacket.ID,WireInfoDataPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(UpdateConduitBlockCover.ID,UpdateConduitBlockCover.CODEC);
 
         //register a packet listener to listen for the aio-set-password packet
         ServerPlayNetworking.registerGlobalReceiver(AioSetAdminPasswordPacket.ID, (payload, context) -> {
@@ -320,6 +327,23 @@ public class Main implements ModInitializer {
                 }
             });
 
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(UpdateConduitBlockCover.ID, (payload, context) -> {
+            BlockPos pos = payload.position();
+            RegistryKey<World> wrk=payload.world();
+            BlockState ns = payload.state();
+            //execute code on the server thread
+            context.server().execute(() ->{
+                BlockEntity be = context.server().getWorld(wrk).getBlockEntity(pos);
+                if(be instanceof com.cbi.coollink.blocks.blockentities.ConduitBlockEntity conduitBlockEntity){
+                    if(ns.getRegistryEntry().getIdAsString().equals("minecraft:air")){
+                        conduitBlockEntity.setCoverBlock(null);
+                    }else{
+                        conduitBlockEntity.setCoverBlock(ns);
+                    }
+                }
+            });
         });
 
 
