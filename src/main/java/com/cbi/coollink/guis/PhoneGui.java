@@ -2,7 +2,10 @@ package com.cbi.coollink.guis;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.app.*;
+import com.cbi.coollink.net.ConnectToWifiNetworkRequestPacket;
+import com.cbi.coollink.net.RequestAccessPointPositionsPacket;
 import com.cbi.coollink.net.SavePhoneDataPacket;
+import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
@@ -47,6 +50,7 @@ public class PhoneGui extends LightweightGuiDescription {
 
 
     public NbtCompound appData;
+    private final ArrayList<WifiNetworkInfo> savedNetworks = new ArrayList<>();
     public int backgroundNumber=0;
 
     public  enum ClockTimeType{AMPM,HOUR24}
@@ -55,6 +59,11 @@ public class PhoneGui extends LightweightGuiDescription {
 
     public Vec3d playerPosition;
     ProgramNetworkInterface networkInterface;//TODO
+
+    private double distToAp = 100e300;
+    private BlockPos apBlockPos = new BlockPos(Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE);
+
+    private final Mac mac;
 
     public PhoneGui(World world, ItemStack phoneInstance, Vec3d playerPosition) {
         installedApps.add(new PhoneAppInfo(SettingsPhoneApp.ID, (world1, blockEntity, nbtCompound, networkInterface) -> new SettingsPhoneApp(world1,blockEntity,this), SettingsPhoneApp.ICON,true, (be) -> false));
@@ -115,11 +124,42 @@ public class PhoneGui extends LightweightGuiDescription {
                 this.clickedOnBLockEntity = null;
             }
 
+            //WIFI TIME!
+            NbtList savedWifiNetworks = nbt.getListOrEmpty("networks");
+            for(int i=0;i<savedWifiNetworks.size();i++){
+                NbtCompound networkDescription = savedWifiNetworks.getCompoundOrEmpty(i);
+                savedNetworks.add(new WifiNetworkInfo(networkDescription));
+            }
+
+            for (WifiNetworkInfo network : savedNetworks) {
+                //if this AP is not in this dimension, then skip it
+                if (!world.getRegistryKey().getValue().equals(network.dimension())) {
+                    continue;
+                }
+                BlockPos knownAp = new BlockPos(network.apX(), network.apY(), network.apZ());
+                if (playerPosition.distanceTo(knownAp.toCenterPos()) < 512) {//only check for aps that are less than 512 blocks away
+                    ClientPlayNetworking.send(new RequestAccessPointPositionsPacket(world.getRegistryKey(), knownAp));//request all ap locations on that network
+                }
+            }
+
+            NbtList macNbt = nbt.getListOrEmpty("mac");
+            if(macNbt.isEmpty()){
+                mac = new Mac(0x31);
+            }else{
+                int[] mc = new int[3];
+                mc[0] = macNbt.getInt(0,0);
+                mc[1] = macNbt.getInt(1,0);
+                mc[2] = macNbt.getInt(2,0);
+                mac = new Mac(mc);
+            }
+
+            //end of nbt is not empty
         }else{
             Main.LOGGER.info("no NBT data");
             appData=new NbtCompound();
             phoneName="UnNamed phone";
             this.clickedOnBLockEntity = null;
+            mac = new Mac(0x31);
         }
 
         root = new WPlainPanel();//.setBackgroundPainter(new BackgroundPainter());
@@ -193,7 +233,7 @@ public class PhoneGui extends LightweightGuiDescription {
                 }
             });
 
-            //pain the notch to the screen
+            //append the notch to the screen
             notchAndTimePanel.setBackgroundPainter((matrices, left, top, panel) -> ScreenDrawing.texturedRect(matrices,left,top+50,17, 100,Identifier.of("cool-link", "textures/gui/noch.png"),0,0,1,1,0xFF_FFFFFF));
         }
     }
@@ -289,6 +329,12 @@ public class PhoneGui extends LightweightGuiDescription {
         nbt.putInt("clock type",(clockTimeType==ClockTimeType.AMPM)? 0: 1);
         nbt.putString("Name",phoneName);
 
+        NbtList networks = new NbtList();
+        for(WifiNetworkInfo wifi: savedNetworks){
+            networks.add(wifi.toNbt());
+        }
+        nbt.put("networks",networks);
+
         //write the data
         phoneInstance.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
         ClientPlayNetworking.send(new SavePhoneDataPacket(nbt,phoneInstance));
@@ -316,7 +362,75 @@ public class PhoneGui extends LightweightGuiDescription {
         return installedApps.size();
     }
 
+    public void accessPointLocationResponse(BlockPos[] aps, String ssid){
+        //find the one closest to the player
+        double closeDist = 100e40;
+        BlockPos closePos = new BlockPos(Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE);
+        for(BlockPos p :aps){
+            double dist = playerPosition.distanceTo(p.toCenterPos());
+            if(closeDist > dist){
+                closePos = p;
+                closeDist = dist;
+            }
+        }
+        //check if this one is closer than any that is currently connected
+        if(closeDist < distToAp) {
+            distToAp = closeDist;
+            //get the password for this network
+            String pass = "";
+            for(WifiNetworkInfo net: savedNetworks){
+                if(net.ssid().equals(ssid)){
+                    pass = net.password();
+                    break;
+                }
+            }
+
+            //try to connect to that one
+            ClientPlayNetworking.send(new ConnectToWifiNetworkRequestPacket(world.getRegistryKey(),closePos,pass,mac));
+
+            //update the stored AP position
+            apBlockPos = closePos;
+
+            //if already connected to a network then disconnect
+        }
+    }
+
     protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){}
+    protected record WifiNetworkInfo(String ssid,String password,Identifier dimension, int apX,int apY,int apZ){
+        public NbtCompound toNbt(){
+            NbtCompound compound = new NbtCompound();
+            compound.putString("ssid",ssid);
+            compound.putString("password",password);
+            compound.putString("dim",dimension.toString());
+            compound.putInt("x",apX);
+            compound.putInt("y",apY);
+            compound.putInt("z",apZ);
+            return compound;
+        }
+
+        public WifiNetworkInfo(NbtCompound compound){
+            this(
+                compound.getString("ssid","Error network"),
+                compound.getString("password",""),
+                Identifier.of(compound.getString("dim","air")),
+                compound.getInt("x",Integer.MIN_VALUE),
+                compound.getInt("y",Integer.MIN_VALUE),
+                compound.getInt("z",Integer.MIN_VALUE)
+            );
+        }
+
+        @Override
+        public String toString() {
+            return "WifiNetworkInfo{" +
+                    "ssid='" + ssid + '\'' +
+                    ", password='" + password + '\'' +
+                    ", dimension=" + dimension +
+                    ", apX=" + apX +
+                    ", apY=" + apY +
+                    ", apZ=" + apZ +
+                    '}';
+        }
+    }
 
 
 

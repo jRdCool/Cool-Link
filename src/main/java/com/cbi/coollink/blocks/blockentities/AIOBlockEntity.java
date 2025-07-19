@@ -379,6 +379,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 */
 	@Override
 	public void getNetworkAccessPointLocations(ServerPlayerEntity player) {
-		ServerPlayNetworking.send(player,new AccessPointLocationPacket(new BlockPos[]{getPos()}));
+		ServerPlayNetworking.send(player,new AccessPointLocationPacket(new BlockPos[]{getPos()},ssid));
 	}
 }

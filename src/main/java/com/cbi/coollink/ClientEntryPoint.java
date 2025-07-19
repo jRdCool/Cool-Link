@@ -81,7 +81,11 @@ public class ClientEntryPoint implements ClientModInitializer {
         });
 
         ClientPlayNetworking.registerGlobalReceiver(AccessPointLocationPacket.ID, (accessPointLocationPacket, context) -> {
-            Main.LOGGER.error("Unimplemented client packet receiver!!! "+AccessPointLocationPacket.ID);
+            if(context.client().currentScreen instanceof PhoneScreen screen){
+                if(screen.getDescription() instanceof PhoneGui phone){
+                    phone.accessPointLocationResponse(accessPointLocationPacket.aps(), accessPointLocationPacket.ssid());
+                }
+            }
         });
 
         BlockEntityRendererFactories.register(Main.AIO_BLOCK_ENTITY,WireNodeRenderer::new);

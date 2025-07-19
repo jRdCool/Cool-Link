@@ -212,6 +212,7 @@ public class Main implements ModInitializer {
         PayloadTypeRegistry.playC2S().register(UpdateConduitBlockCover.ID,UpdateConduitBlockCover.CODEC);
         PayloadTypeRegistry.playC2S().register(WIFIClientIpPacket.ID,WIFIClientIpPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(AccessPointLocationPacket.ID,AccessPointLocationPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(RequestAccessPointPositionsPacket.ID,RequestAccessPointPositionsPacket.CODEC);
 
         //register a packet listener to listen for the aio-set-password packet
         ServerPlayNetworking.registerGlobalReceiver(AioSetAdminPasswordPacket.ID, (payload, context) -> {
@@ -365,6 +366,25 @@ public class Main implements ModInitializer {
                 }
             });
         });
+
+        ServerPlayNetworking.registerGlobalReceiver(RequestAccessPointPositionsPacket.ID,(wifiClientIpPacket, context) -> {
+            RegistryKey<World> wrk=wifiClientIpPacket.world();
+            BlockPos apLocation = wifiClientIpPacket.accessPointPosition();
+            World world = context.server().getWorld(wrk);
+            if(world == null){
+                LOGGER.error("Wold was null");
+                return;
+            }
+            context.server().execute(()->{
+                BlockEntity be = world.getBlockEntity(apLocation);
+                if(be instanceof AccessPoint ap){
+                    ap.getNetworkAccessPointLocations(context.player());
+                }
+            });
+        });
+
+
+
 
 
         //Register Cli program packages
