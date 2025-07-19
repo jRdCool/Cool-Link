@@ -65,26 +65,27 @@ public class RSSenderWired extends RedstoneControllerWired{
         world.updateNeighbor(blockPos, this, wireOrientation);
         world.updateNeighborsExcept(blockPos, this, direction, wireOrientation);
     }
-/*
+
+    /*
     protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
         if (state.get(FACING) == direction && !(Boolean)state.get(POWERED)) {
             this.scheduleTick(world, tickView, pos);
         }
 
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
-    }
+    }*/
 
     protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         if (state.get(POWERED)) {
             world.setBlockState(pos, state.with(POWERED, false), 2);
         } else {
             world.setBlockState(pos, state.with(POWERED, true), 2);
-            world.scheduleBlockTick(pos, this, 2);
+            //world.scheduleBlockTick(pos, this, 2);
         }
 
         this.updateNeighbors(world, pos, state);
     }
-
+/*
     private void scheduleTick(WorldView world, ScheduledTickView tickView, BlockPos pos) {
         if (!world.isClient() && !tickView.getBlockTickScheduler().isQueued(pos, this)) {
             tickView.scheduleBlockTick(pos, this, 2);

@@ -31,7 +31,7 @@ public class AIOWallPort extends Block {
 
     public AIOWallPort(Settings settings){
         super(settings);
-        Main.LOGGER.info("AIOWallPort loaded");
+        //Main.LOGGER.info("AIOWallPort loaded");
     }
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {

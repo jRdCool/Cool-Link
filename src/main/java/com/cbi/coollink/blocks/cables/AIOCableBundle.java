@@ -52,7 +52,7 @@ public class AIOCableBundle extends Block {
                 .with(up,false)
                 .with(down,false)
         );
-        Main.LOGGER.info("AIOCableBundle loaded");
+        //Main.LOGGER.info("AIOCableBundle loaded");
     }
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
