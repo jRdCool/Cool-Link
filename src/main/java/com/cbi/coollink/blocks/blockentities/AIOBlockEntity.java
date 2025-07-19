@@ -165,7 +165,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		return createNbt(registryLookup);
 	}//Rendering Crucial
 
-	@SuppressWarnings("unused")
+
 	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//Main.LOGGER.info(be.password);
 		be.createConnectedDevices();
