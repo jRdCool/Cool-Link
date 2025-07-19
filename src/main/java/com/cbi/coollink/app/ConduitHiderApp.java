@@ -4,6 +4,7 @@ import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
 import com.cbi.coollink.net.UpdateConduitBlockCover;
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WButton;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
@@ -22,7 +23,7 @@ public class ConduitHiderApp extends AbstractPhoneApp{
 
     public static final Identifier ID = Identifier.of(Main.namespace,"hide_those_conduits");
 
-    public ConduitHiderApp(World world, BlockEntity blockEntity, NbtCompound appData) {
+    public ConduitHiderApp(World world, BlockEntity blockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface) {
         super(ID);
         root = new WPlainPanel();
         root.setSize(phoneWidth,phoneHeight);

@@ -1,5 +1,6 @@
 package com.cbi.coollink.app;
 
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import net.minecraft.block.entity.BlockEntity;
@@ -10,7 +11,7 @@ import net.minecraft.world.World;
 public class ExampleApp extends AbstractPhoneApp{
     public static Identifier ID = Identifier.of("cool-link","example-app");
 
-    public ExampleApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData){
+    public ExampleApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface){
         super(ID);//the id of the app
         root=new WPlainPanel();//create the panel witch all widget will sit on
         timeColor=TIME_COLOR_BLACK;//set the color of the clock if necessary

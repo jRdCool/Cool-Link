@@ -1,6 +1,7 @@
 package com.cbi.coollink.app;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import com.cbi.coollink.terminal.PhoneCommandLineContext;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WButton;
@@ -23,7 +24,8 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
     WButton executeButton, terminateButton;
     PhoneCommandLineContext commandLineContext;
     WLabel title;
-    public TerminalPhoneApp(World ignoredWorld, BlockEntity ignoredClickedOnBlockEntity, NbtCompound appData) {
+    ProgramNetworkInterface networkInterface;
+    public TerminalPhoneApp(World ignoredWorld, BlockEntity ignoredClickedOnBlockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface) {
         super(ID);
         PhoneCommandLineContext commandRunner = new PhoneCommandLineContext(appData);
         root=new WPlainPanel();//create the panel witch all widget will sit on
@@ -45,6 +47,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         terminateButton = new WButton(Text.of("Terminate"));
         panel.add(terminateButton,70,180,80,20);
         terminateButton.setOnClick(() -> commandLineContext.terminateRunningProgram());
+        this.networkInterface = networkInterface;
 
     }
 
@@ -79,7 +82,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
     void executeCommand(){
         String command = inputBox.getText().trim();
         if(!commandLineContext.commandExecuting() && !command.isEmpty()) {
-            commandLineContext.executeCommand(command);
+            commandLineContext.executeCommand(command,networkInterface);
             inputBox.setText("");
         }
         inputBox.requestFocus();

@@ -2,6 +2,7 @@ package com.cbi.coollink.cli;
 
 import com.cbi.coollink.cli.repo.CliCommandPackage;
 import com.cbi.coollink.cli.repo.CliPackageRepository;
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import com.cbi.coollink.terminal.CommandLineContext;
 import com.cbi.coollink.terminal.CommandTextOutputArea;
 import net.minecraft.util.Identifier;
@@ -14,7 +15,7 @@ public class PackageManager implements CliProgram{
     private final String programEnv;
     private final CommandLineContext cli;
 
-    public PackageManager(String[] args, HashMap<String,String> env, CommandTextOutputArea stdOut, CommandLineContext cli){
+    public PackageManager(String[] args, HashMap<String,String> env, CommandTextOutputArea stdOut, CommandLineContext cli, ProgramNetworkInterface networkInterface){
         programEnv = env.get("PLATFORM");
         this.cli=cli;
         if(args.length<1){
