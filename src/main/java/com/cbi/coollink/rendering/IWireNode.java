@@ -1,6 +1,8 @@
 package com.cbi.coollink.rendering;
 
+import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import com.cbi.coollink.net.protocol.WireDataPacket;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -206,5 +208,52 @@ public interface IWireNode {
 
     boolean isNodeInUse(int index);
     void setIsNodeUsed(int index,boolean set);
+
+    /**Get the node of the destination device at the other end of the wire (not the next place the wire connects).
+     * NOTE FOR IMPLEMENTATION: first: validate that the specified node has a connection/exsists then call IWireNode.traverseWire()
+     * @param connectionIndex The index of the start of the connection on this device
+     * @return The {@link LocalNode} representing the other end of the wire, where index is the index of the node connection this wire terminates in on the receiving device
+     */
+    LocalNode getDestinationNode(int connectionIndex);
+
+    /**Send a packet of data to this device.
+     * NOTE FOR IMPLEMENTATION: this method is your class receiving this data from another class, this is called from another class.
+     * Mid wire blocks(wall ports, conduits, ect..) should throw a warning upon calling this method.
+     * All other blocks should first check that the data packet is of the correct type (coax, ethernet, fiber ect..) then process the packet accordingly
+     * @param connectionIndex The index of the connection node on the destination device that is reviving the data
+     * @param data The data to send to the other device
+     */
+    void transmitData(int connectionIndex, WireDataPacket data);
+
+    /**Travel down a wire to the device at the other side
+     * @param start The instance of the node on this send to start at
+     * @return The local node on the ending side of the node
+     */
+    static LocalNode traverseWire(LocalNode start){
+        WireType wireType = start.getType();
+        LocalNode endLocation = null;
+        World blockWorld = start.getBlockEntity().getWorld();
+        if(blockWorld == null){
+            return null;
+        }
+        BlockPos nextBlockPos = start.getTargetPos();
+        int nextBlockConnectionIndex = start.getOtherIndex();
+        for(int i=0;i< wireType.getTransmissionDistance();i++){//loop a maximum number of times for the distance a transition can go
+            BlockEntity otherEntity = blockWorld.getBlockEntity(nextBlockPos);
+            if(otherEntity instanceof IWireNode wireNode){
+                if(wireNode instanceof ConduitBlockEntity){
+                    //mid-wire case
+                    //special conduit/wall port transfer case
+                    //nextBlockPos = something
+                }else{
+                    //end of wire case
+                    endLocation = wireNode.getLocalNode(nextBlockConnectionIndex);
+                }
+            }else{
+                break;
+            }
+        }
+        return endLocation;
+    }
 
 }
