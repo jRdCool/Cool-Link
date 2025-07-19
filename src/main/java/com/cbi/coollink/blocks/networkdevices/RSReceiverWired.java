@@ -8,14 +8,21 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
+
+import static net.minecraft.state.property.Properties.FACING;
 
 public class RSReceiverWired extends RedstoneControllerWired{
     public RSReceiverWired(Settings settings) {
         super(settings);
     }
+
+    private static final BooleanProperty POWERED = Properties.POWERED;
 
     public static final Identifier ID = Identifier.of(Main.namespace,"redstone_receiver_wired");
     public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
@@ -30,8 +37,11 @@ public class RSReceiverWired extends RedstoneControllerWired{
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState state) {
-        return true;
-    }
+    public boolean emitsRedstonePower(BlockState state) {return true;}
 
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING)
+                .add(POWERED);
+        super.appendProperties(builder);
+    }
 }

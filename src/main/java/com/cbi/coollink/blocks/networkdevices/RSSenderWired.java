@@ -28,7 +28,7 @@ import static net.minecraft.state.property.Properties.FACING;
 public class RSSenderWired extends RedstoneControllerWired{
     public RSSenderWired(Settings settings) {
         super(settings);
-        this.setDefaultState(((this.stateManager.getDefaultState()).with(FACING, Direction.SOUTH)).with(POWERED, false));
+
     }
 
     @Override
@@ -65,7 +65,7 @@ public class RSSenderWired extends RedstoneControllerWired{
         world.updateNeighbor(blockPos, this, wireOrientation);
         world.updateNeighborsExcept(blockPos, this, direction, wireOrientation);
     }
-
+/*
     protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
         if (state.get(FACING) == direction && !(Boolean)state.get(POWERED)) {
             this.scheduleTick(world, tickView, pos);
@@ -90,7 +90,7 @@ public class RSSenderWired extends RedstoneControllerWired{
             tickView.scheduleBlockTick(pos, this, 2);
         }
 
-    }
+    }*/
 
 
 }

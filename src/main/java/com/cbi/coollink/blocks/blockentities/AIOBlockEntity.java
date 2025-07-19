@@ -269,6 +269,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 		markDirty();
         assert world != null;
         world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+		this.setIsNodeUsed(index,false);
 	}//Breaks the wire
 
 	@Override

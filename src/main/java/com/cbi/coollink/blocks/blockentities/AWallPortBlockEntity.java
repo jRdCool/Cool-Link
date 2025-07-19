@@ -125,6 +125,7 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
         markDirty();
         assert world != null;
         world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        this.setIsNodeUsed(index,false);
     }
 
     @Override

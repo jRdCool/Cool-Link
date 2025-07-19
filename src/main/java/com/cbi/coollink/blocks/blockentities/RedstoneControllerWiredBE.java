@@ -74,7 +74,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
                 new Vec3d(nodeZN,nodeY,1-nodeXN) // - -  WEST
         };
         int dir = 0;
-        switch (getCachedState().get(Properties.HORIZONTAL_FACING)){
+        switch (getCachedState().get(Properties.FACING)){
             case EAST -> dir=1;
             case SOUTH -> dir=2;
             case WEST -> dir=3;
@@ -91,7 +91,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
 
     @Override
     public IWireNode getWireNode(int index) {
-        return null;
+        return this;
     }
 
     @Override
@@ -115,11 +115,12 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
 
     @Override
     public void removeNode(int index, boolean dropWire) {
-//LocalNode old = this.localNodes[index];
+        //LocalNode old = this.localNodes[index];
         this.localNodes[index] = null;
         markDirty();
         assert world != null;
         world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        this.setIsNodeUsed(index,false);
     }//Breaks the wire
 
     @Override
