@@ -2,10 +2,17 @@ package com.cbi.coollink.blocks.blockentities;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import com.cbi.coollink.blocks.networkdevices.AccessPoint;
+import com.cbi.coollink.blocks.networkdevices.Modem;
+import com.cbi.coollink.blocks.networkdevices.Router;
+import com.cbi.coollink.blocks.networkdevices.Switch;
+import com.cbi.coollink.net.AccessPointLocationPacket;
+import com.cbi.coollink.net.WIFIClientIpPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -14,6 +21,7 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.Properties;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
@@ -27,7 +35,7 @@ import java.util.*;
 // Made with Blockbench 4.5.2
 // Exported for Minecraft version 1.17+ for Yarn
 // Paste this class into your mod and generate all required imports
-public class AIOBlockEntity extends BlockEntity implements IWireNode {
+public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoint, Router, Switch, Modem {
 	public AIOBlockEntity(BlockPos pos, BlockState state) {
 		super(Main.AIO_BLOCK_ENTITY, pos, state);
 		//String currentThread = Thread.currentThread().getName();
@@ -351,5 +359,26 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode {
 				", deviceIP=" + deviceIP +
 				", localNodes=" + Arrays.toString(localNodes) +
 				'}';
+	}
+
+	/**
+	 * Take an ip packet from the wifi and transmits it over the network
+	 *
+	 * @param packet The ip packet transmitted over the wifi
+	 * @param player The player that transmitted it
+	 */
+	@Override
+	public void processIncomingWifiPacket(WIFIClientIpPacket packet, ServerPlayerEntity player) {
+
+	}
+
+	/**
+	 * Send the requesting player an array if block positions repressing all the wireless access points connected to this network
+	 *
+	 * @param player The player sending the request
+	 */
+	@Override
+	public void getNetworkAccessPointLocations(ServerPlayerEntity player) {
+		ServerPlayNetworking.send(player,new AccessPointLocationPacket(new BlockPos[]{getPos()}));
 	}
 }

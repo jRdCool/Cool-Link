@@ -16,6 +16,7 @@ import com.cbi.coollink.items.*;
 import com.cbi.coollink.net.*;
 import com.cbi.coollink.rendering.IWireNode;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -46,6 +47,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,6 +210,8 @@ public class Main implements ModInitializer {
         PayloadTypeRegistry.playS2C().register(OpenPortSelectGuiPacket.ID,OpenPortSelectGuiPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(WireInfoDataPacket.ID,WireInfoDataPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(UpdateConduitBlockCover.ID,UpdateConduitBlockCover.CODEC);
+        PayloadTypeRegistry.playC2S().register(WIFIClientIpPacket.ID,WIFIClientIpPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(AccessPointLocationPacket.ID,AccessPointLocationPacket.CODEC);
 
         //register a packet listener to listen for the aio-set-password packet
         ServerPlayNetworking.registerGlobalReceiver(AioSetAdminPasswordPacket.ID, (payload, context) -> {
@@ -342,6 +346,22 @@ public class Main implements ModInitializer {
                     }else{
                         conduitBlockEntity.setCoverBlock(ns);
                     }
+                }
+            });
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(WIFIClientIpPacket.ID,(wifiClientIpPacket, context) -> {
+            RegistryKey<World> wrk=wifiClientIpPacket.world();
+            BlockPos apLocation = wifiClientIpPacket.accessPointPosition();
+            World world = context.server().getWorld(wrk);
+            if(world == null){
+                LOGGER.error("Wold was null");
+                return;
+            }
+            context.server().execute(()->{
+                BlockEntity be = world.getBlockEntity(apLocation);
+                if(be instanceof AccessPoint ap){
+                    ap.processIncomingWifiPacket(wifiClientIpPacket,context.player());
                 }
             });
         });

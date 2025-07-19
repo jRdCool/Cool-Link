@@ -3,10 +3,7 @@ package com.cbi.coollink;
 import com.cbi.coollink.app.*;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.guis.*;
-import com.cbi.coollink.net.AioSyncMacPacket;
-import com.cbi.coollink.net.OpenConduitGuiPacket;
-import com.cbi.coollink.net.OpenPhoneGuiPacket;
-import com.cbi.coollink.net.OpenPortSelectGuiPacket;
+import com.cbi.coollink.net.*;
 import com.cbi.coollink.rendering.blockentities.SatelliteDishBlockEntityRenderer;
 import com.cbi.coollink.rendering.blockentities.ServerRackBlockEntityRenderer;
 import com.cbi.coollink.rendering.WireNodeRenderer;
@@ -19,8 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
-
-import java.util.Objects;
 
 public class ClientEntryPoint implements ClientModInitializer {
     @Override
@@ -49,26 +44,25 @@ public class ClientEntryPoint implements ClientModInitializer {
 
             ItemStack heldItem = payload.heldItem();
 
-            context.client().execute( () -> {
-                context.client().setScreen(new PhoneScreen(new PhoneGui(world, heldItem,payload.playerPos())));
-            });
+            context.client().execute( () -> context.client().setScreen(new PhoneScreen(new PhoneGui(world, heldItem,payload.playerPos()))));
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(OpenConduitGuiPacket.ID,(payload, context) -> {
-            context.client().execute( ()->{
-                context.client().setScreen(new BasicScreen(new ConduitGUI()));
-            });
-        });
+        ClientPlayNetworking.registerGlobalReceiver(OpenConduitGuiPacket.ID,(payload, context) -> context.client().execute( ()-> context.client().setScreen(new BasicScreen(new ConduitGUI()))));
 
         ClientPlayNetworking.registerGlobalReceiver(AioSyncMacPacket.ID,(payload, context) -> {
             context.client().execute(()->{
-                if(context.client().world.getRegistryKey().equals(payload.world())){
+                World clientWorld=context.client().world;
+                if(clientWorld == null){
+                    Main.LOGGER.error("WORLD IS NULL!");
+                    return;
+                }
+                if(clientWorld.getRegistryKey().equals(payload.world())){
                     try {
-                        BlockEntity be = context.client().world.getBlockEntity(payload.pos());
+                        BlockEntity be = clientWorld.getBlockEntity(payload.pos());
                         if(be instanceof AIOBlockEntity aio){
                             aio.setMacAddresses(payload.mac1(),payload.mac2());
                         }
-                    }catch(Exception e){}
+                    }catch(Exception ignored){}
                 }
             });
         });
@@ -84,6 +78,10 @@ public class ClientEntryPoint implements ClientModInitializer {
                     context.client().setScreen(new BasicScreen(new PortSelectGUI(payload.ofType(),payload.type(),clickedOnBlockEntity,payload.heldItem())));
                 }
             });
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(AccessPointLocationPacket.ID, (accessPointLocationPacket, context) -> {
+            Main.LOGGER.error("Unimplemented client packet receiver!!! "+AccessPointLocationPacket.ID);
         });
 
         BlockEntityRendererFactories.register(Main.AIO_BLOCK_ENTITY,WireNodeRenderer::new);
