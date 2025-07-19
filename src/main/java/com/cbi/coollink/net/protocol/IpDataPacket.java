@@ -1,8 +1,77 @@
 package com.cbi.coollink.net.protocol;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.util.math.BlockPos;
+
+import java.nio.charset.Charset;
 
 public class IpDataPacket {
+
+    public static final PacketCodec<ByteBuf, IpDataPacket> PACKET_CODEC = new PacketCodec<ByteBuf, IpDataPacket>() {
+        public IpDataPacket decode(ByteBuf byteBuf) {
+            boolean hasDestMac;
+            Mac mac1 = null;
+            Mac mac2;
+
+            String sourceIp;
+            String destIp;
+
+            NbtCompound data;
+            hasDestMac = byteBuf.readBoolean();
+            if(hasDestMac){
+                int[] m1i = {0,0,0};
+                m1i[0] = byteBuf.readInt();
+                m1i[1] = byteBuf.readInt();
+                m1i[2] = byteBuf.readInt();
+                mac1 = new Mac(m1i);
+            }
+            int[] m2i = {0,0,0};
+            m2i[0] = byteBuf.readInt();
+            m2i[1] = byteBuf.readInt();
+            m2i[2] = byteBuf.readInt();
+            mac2 = new Mac(m2i);
+
+            int strLength = byteBuf.readInt();
+            destIp = byteBuf.readCharSequence(strLength,Charset.defaultCharset()).toString();
+            strLength = byteBuf.readInt();
+            sourceIp = byteBuf.readCharSequence(strLength,Charset.defaultCharset()).toString();
+
+            data = PacketCodecs.NBT_COMPOUND.decode(byteBuf);
+            if(hasDestMac){
+                return new IpDataPacket(destIp,sourceIp,mac2,mac1,data);
+            }else{
+                return new IpDataPacket(destIp,sourceIp,mac2,data);
+            }
+        }
+
+        public void encode(ByteBuf byteBuf, IpDataPacket data) {
+            byteBuf.writeBoolean(data.hasDestinationMac());
+            if(data.hasDestinationMac()){
+                int[] mac1Arr = data.destinationMacAddress.getMac();
+                byteBuf.writeInt(mac1Arr[0]);
+                byteBuf.writeInt(mac1Arr[1]);
+                byteBuf.writeInt(mac1Arr[2]);
+            }
+            int[] mac2Arr = data.getSourceMacAddress().getMac();
+            byteBuf.writeInt(mac2Arr[0]);
+            byteBuf.writeInt(mac2Arr[1]);
+            byteBuf.writeInt(mac2Arr[2]);
+
+            int byteLength = data.destinationIpAddress.getBytes(Charset.defaultCharset()).length;
+            byteBuf.writeInt(byteLength);
+            byteBuf.writeCharSequence(data.destinationIpAddress, Charset.defaultCharset());
+            byteLength = data.sourceIpAddress.getBytes(Charset.defaultCharset()).length;
+            byteBuf.writeInt(byteLength);
+            byteBuf.writeCharSequence(data.sourceIpAddress, Charset.defaultCharset());
+
+            PacketCodecs.NBT_COMPOUND.encode(byteBuf,data.ipData);
+
+        }
+    };;
 
     private Mac destinationMacAddress;
     private final Mac sourceMacAddress;
