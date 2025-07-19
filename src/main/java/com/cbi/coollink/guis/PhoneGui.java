@@ -2,10 +2,12 @@ package com.cbi.coollink.guis;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.app.*;
+import com.cbi.coollink.net.ClientWifiConnectionResultPacket;
 import com.cbi.coollink.net.ConnectToWifiNetworkRequestPacket;
 import com.cbi.coollink.net.RequestAccessPointPositionsPacket;
 import com.cbi.coollink.net.SavePhoneDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
+import com.cbi.coollink.net.protocol.PhoneNetworkInterface;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
@@ -58,12 +60,18 @@ public class PhoneGui extends LightweightGuiDescription {
     public String phoneName;
 
     public Vec3d playerPosition;
-    ProgramNetworkInterface networkInterface;//TODO
+    ProgramNetworkInterface networkInterface;
 
     private double distToAp = 100e300;
     private BlockPos apBlockPos = new BlockPos(Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE);
 
     private final Mac mac;
+
+    private boolean connectedToWifi = false;
+    private String deviceIp = "";
+    private String wifiSsid = "";
+
+    private boolean deviceOnline = false;
 
     public PhoneGui(World world, ItemStack phoneInstance, Vec3d playerPosition) {
         installedApps.add(new PhoneAppInfo(SettingsPhoneApp.ID, (world1, blockEntity, nbtCompound, networkInterface) -> new SettingsPhoneApp(world1,blockEntity,this), SettingsPhoneApp.ICON,true, (be) -> false));
@@ -161,6 +169,8 @@ public class PhoneGui extends LightweightGuiDescription {
             this.clickedOnBLockEntity = null;
             mac = new Mac(0x31);
         }
+
+        networkInterface = new PhoneNetworkInterface(mac);
 
         root = new WPlainPanel();//.setBackgroundPainter(new BackgroundPainter());
         setRootPanel(root);
@@ -386,12 +396,30 @@ public class PhoneGui extends LightweightGuiDescription {
             }
 
             //try to connect to that one
-            ClientPlayNetworking.send(new ConnectToWifiNetworkRequestPacket(world.getRegistryKey(),closePos,pass,mac));
+            ClientPlayNetworking.send(new ConnectToWifiNetworkRequestPacket(world.getRegistryKey(),closePos,pass,mac,phoneName));
 
             //update the stored AP position
             apBlockPos = closePos;
 
             //if already connected to a network then disconnect
+        }
+    }
+
+    public void handleWifiConnectionResponse(ClientWifiConnectionResultPacket response){
+        if(response.incorrectPassword() || response.networkFull()){
+            //show error condition
+        }else{
+            for(WifiNetworkInfo net: savedNetworks){
+                if(net.ssid.equals(response.ssid())){
+                    connectedToWifi = true;
+                    deviceIp = response.deviceIp();
+                    wifiSsid = response.ssid();
+                    deviceOnline = response.connectedToTheInternet();
+                    networkInterface = new PhoneNetworkInterface(mac,deviceIp,world,apBlockPos,deviceOnline);
+                }else{
+                    //send disconnect packet
+                }
+            }
         }
     }
 

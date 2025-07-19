@@ -213,6 +213,8 @@ public class Main implements ModInitializer {
         PayloadTypeRegistry.playC2S().register(WIFIClientIpPacket.ID,WIFIClientIpPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(AccessPointLocationPacket.ID,AccessPointLocationPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(RequestAccessPointPositionsPacket.ID,RequestAccessPointPositionsPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(ConnectToWifiNetworkRequestPacket.ID,ConnectToWifiNetworkRequestPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(ClientWifiConnectionResultPacket.ID,ClientWifiConnectionResultPacket.CODEC);
 
         //register a packet listener to listen for the aio-set-password packet
         ServerPlayNetworking.registerGlobalReceiver(AioSetAdminPasswordPacket.ID, (payload, context) -> {
@@ -379,6 +381,22 @@ public class Main implements ModInitializer {
                 BlockEntity be = world.getBlockEntity(apLocation);
                 if(be instanceof AccessPoint ap){
                     ap.getNetworkAccessPointLocations(context.player());
+                }
+            });
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(ConnectToWifiNetworkRequestPacket.ID, (connectToWifiNetworkRequestPacket, context) -> {
+            RegistryKey<World> wrk=connectToWifiNetworkRequestPacket.world();
+            BlockPos apLocation = connectToWifiNetworkRequestPacket.accessPointPosition();
+            World world = context.server().getWorld(wrk);
+            if(world == null){
+                LOGGER.error("Wold was null");
+                return;
+            }
+            context.server().execute(()->{
+                BlockEntity be = world.getBlockEntity(apLocation);
+                if(be instanceof AccessPoint ap){
+                    ap.handleClientWifiConnectionRequest(connectToWifiNetworkRequestPacket.password(),connectToWifiNetworkRequestPacket.deviceMacAddress(),context.player(),connectToWifiNetworkRequestPacket.deviceName());
                 }
             });
         });

@@ -8,7 +8,8 @@ import net.minecraft.world.World;
 
 public class PhoneNetworkInterface extends ProgramNetworkInterface{
 
-    private boolean onLine = false;
+    private boolean connectedToNetwork = false;
+    private boolean deviceOnline = false;
     private World playerWorld = null;
     private BlockPos accessPointPos = null;
 
@@ -16,18 +17,19 @@ public class PhoneNetworkInterface extends ProgramNetworkInterface{
         super(deviceMacAddress, "127.0.0.1");
     }
 
-    public PhoneNetworkInterface(Mac deviceMacAddress, String deviceIpAddress, World playerWorld, BlockPos accessPointPos) {
+    public PhoneNetworkInterface(Mac deviceMacAddress, String deviceIpAddress, World playerWorld, BlockPos accessPointPos, boolean deviceOnline) {
         super(deviceMacAddress, deviceIpAddress);
-        onLine = true;
+        connectedToNetwork = true;
         this.playerWorld = playerWorld;
         this.accessPointPos = accessPointPos;
+        this.deviceOnline = deviceOnline;
     }
 
 
 
     @Override
     public void sendIpPacketOverNetwork(IpDataPacket data) {
-        if(!onLine){
+        if(!connectedToNetwork){
             Main.LOGGER.error("App tried to send data packet but device is offline");
             return;
         }
@@ -36,7 +38,11 @@ public class PhoneNetworkInterface extends ProgramNetworkInterface{
 
     }
 
-    public boolean isOnLine(){
-        return onLine;
+    public boolean isConnectedToNetwork(){
+        return connectedToNetwork;
+    }
+
+    public boolean isDeviceOnline(){
+        return deviceOnline;
     }
 }

@@ -88,6 +88,14 @@ public class ClientEntryPoint implements ClientModInitializer {
             }
         });
 
+        ClientPlayNetworking.registerGlobalReceiver(ClientWifiConnectionResultPacket.ID, (clientWifiConnectionResultPacket, context) -> {
+            if(context.client().currentScreen instanceof PhoneScreen screen){
+                if(screen.getDescription() instanceof PhoneGui phone){
+                    phone.handleWifiConnectionResponse(clientWifiConnectionResultPacket);
+                }
+            }
+        });
+
         BlockEntityRendererFactories.register(Main.AIO_BLOCK_ENTITY,WireNodeRenderer::new);
         BlockEntityRendererFactories.register(Main.SWITCH_SIMPLE_BLOCK_ENTITY,WireNodeRenderer::new);
         BlockEntityRendererFactories.register(Main.SATELLITE_DISH_BLOCK_ENTITY, SatelliteDishBlockEntityRenderer::new);

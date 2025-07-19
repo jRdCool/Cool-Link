@@ -7,6 +7,7 @@ import com.cbi.coollink.blocks.networkdevices.Modem;
 import com.cbi.coollink.blocks.networkdevices.Router;
 import com.cbi.coollink.blocks.networkdevices.Switch;
 import com.cbi.coollink.net.AccessPointLocationPacket;
+import com.cbi.coollink.net.ClientWifiConnectionResultPacket;
 import com.cbi.coollink.net.WIFIClientIpPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.WireDataPacket;
@@ -16,6 +17,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.ai.brain.task.BreedTask;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -57,10 +59,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	private final LocalNode[] localNodes;
 	private static final int deviceID = 0x11;
 	public Mac mac1,mac2;
-	public ArrayList<String> connectedDevices=new ArrayList<>();
-	public ArrayList<String> deviceName=new ArrayList<>();
-	public ArrayList<String> deviceIP=new ArrayList<>();
 
+	public static String IPADDRESS_BASE = "192.168.1.";
+
+	public static final int MAX_CONNECTED_DEVICES = 15;
+	public ArrayList<ConnectedDevice> connectedDevices=new ArrayList<>();
 
 
 	// Serialize the BlockEntity
@@ -87,30 +90,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		//view.put("connections",,nodeIDS);
 	}//Writing data
 
-//	@Override
-//	public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-//		// Save the current value of the number to the nbt
-//		nbt.putInt("number", 89);
-//		nbt.putString("password", Objects.requireNonNullElse(password, "password123546"));
-////		nbt.putString("ssid", Objects.requireNonNullElse(ssid, "Un-configured Network"));
-//		nbt.putString("Wireless_Password", Objects.requireNonNullElse(netPass, ""));
-//		nbt.putByteArray("MAC1",mac1.getBytes());
-//		nbt.putByteArray("MAC2",mac2.getBytes());
-//		NbtList nodeIDS = new NbtList();
-//		for(int i=0;i<nodeCount;i++){
-//			NbtCompound compound = new NbtCompound();
-//			if(localNodes[i]==null){
-//				nodeIDS.add(compound);
-//				continue;
-//			}
-//
-//			localNodes[i].write(compound);
-//			nodeIDS.add(compound);
-//		}
-//		nbt.put("connections",nodeIDS);
-//
-//		super.writeNbt(nbt,registryLookup);
-//	}
 
 
 	@Override
@@ -142,27 +121,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}//reading data
 
 	// Deserialize the BlockEntity
-//	@Override
-//	public void readNbt(NbtCompound nbt,RegistryWrapper.WrapperLookup registryLookup) {
-//		super.readNbt(nbt,registryLookup);
-//		password=nbt.getString("password");
-//		ssid = nbt.getString("ssid");
-//		netPass = nbt.getString("Wireless_Password");
-//		byte[] mac1Bytes = nbt.getByteArray("MAC1");
-//		byte[] mac2Bytes = nbt.getByteArray("MAC2");
-//		setMacAddresses(mac1Bytes,mac2Bytes);
-//		NbtList nodeIDS = nbt.getList("connections",NbtCompound.COMPOUND_TYPE);
-//		for (int i=0;i<nodeCount;i++){
-//			NbtCompound compound = nodeIDS.getCompound(i);
-//			if(compound==null || compound.isEmpty()){
-//				isNodeUsed[i] = false;
-//				continue;
-//			}
-//			localNodes[i]=new LocalNode(this , compound);
-//			isNodeUsed[i] = true;
-//		}
-//	}
-
 	@Nullable
 	@Override
 	public Packet<ClientPlayPacketListener> toUpdatePacket() {
@@ -176,40 +134,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 
 	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
-		//Main.LOGGER.info(be.password);
-		be.createConnectedDevices();
+		//called from the AIONetwork block class
 	}//run on tick
 	public void updateStates(){
 		if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
 	}//notifies the world of updates to the block state
-
-	void createConnectedDevices() {
-		if(deviceName.isEmpty() && deviceIP.isEmpty()) {
-			if(!connectedDevices.isEmpty())
-			{connectedDevices.clear();}
-			connectedDevices.add("No connected devices");
-
-		}
-		else if(deviceName.size() != deviceIP.size())
-		{
-			if(deviceName.size() < deviceIP.size())
-			{
-				//TODO: Call a function that assigns ip addresses to devices that don't have them (DHCP Server)
-				//return;
-			}
-			else {
-				Main.LOGGER.info("!!!!! !!!ERROR!!! MORE DEVICES THAN IPs !!!!!");
-			}
-		}
-		else {
-			for (int i=0;i<deviceName.size();i++)
-			{
-                connectedDevices.set(i, deviceName.get(i) + "  " + " ".repeat(Math.max(0, 16 - deviceName.get(i).length())) + deviceIP.get(i));
-				String sb = "  " + " ".repeat(Math.max(0, 16 - deviceName.get(i).length()));
-				connectedDevices.set(i,deviceName.get(i)+ sb +deviceIP.get(i));
-			}
-		}
-	}//WIFI
 
 	public void setMacAddresses(int[] mac1,int[] mac2){
 		this.mac1 = new Mac(mac1);
@@ -355,8 +284,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 				", mac1=" + mac1 +
 				", mac2=" + mac2 +
 				", connectedDevices=" + connectedDevices +
-				", deviceName=" + deviceName +
-				", deviceIP=" + deviceIP +
 				", localNodes=" + Arrays.toString(localNodes) +
 				'}';
 	}
@@ -380,5 +307,65 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	@Override
 	public void getNetworkAccessPointLocations(ServerPlayerEntity player) {
 		ServerPlayNetworking.send(player,new AccessPointLocationPacket(new BlockPos[]{getPos()},ssid));
+	}
+
+	@Override
+	public void handleClientWifiConnectionRequest(String password, Mac deviceMacAddress, ServerPlayerEntity player, String deviceName) {
+		//in this situation we are already at the rougher swo we can just process this immediately, but if wer were not at the rougher then we would have to send a packet to the rougher with the info
+
+		//check if this is device is already connected
+		for(ConnectedDevice device: connectedDevices){
+			if(device.deviceMac().equals(deviceMacAddress)){
+				//this device is already connected
+				ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(false,false,device.ipAddress(),ssid,false));
+				return;
+			}
+		}
+
+		if(connectedDevices.size() >= MAX_CONNECTED_DEVICES){
+			//fail, too many connected devices
+			ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(false,true,"",ssid,false));
+			return;
+		}
+
+		if(netPass.isEmpty() || password.equals(netPass)){//correct password
+			String deviceIp = generateNewIp();
+			connectedDevices.add(new ConnectedDevice(deviceIp,deviceMacAddress,deviceName));
+			ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(false,false,deviceIp,ssid,false));
+		}else{
+			//incorrect password
+			ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(true,false,"",ssid,false));
+		}
+	}
+
+	private String generateNewIp(){
+		String ip = "";
+		boolean ipExsists = false;
+
+		do{
+			ipExsists = false;
+			int num = (int)(Math.random()*252)+2;
+			ip = IPADDRESS_BASE+num;
+			//check if the address exsists
+			for(ConnectedDevice device: connectedDevices){
+				if(device.ipAddress().equals(ip)){
+					ipExsists = true;
+					break;
+				}
+			}
+		}while (ipExsists);
+
+		return ip;
+	}
+
+	public record ConnectedDevice(String ipAddress, Mac deviceMac, String deviceName){
+		@Override
+		public String toString() {
+			return "ConnectedDevice{" +
+					"ipAddress='" + ipAddress + '\'' +
+					", deviceMac=" + deviceMac +
+					", deviceName='" + deviceName + '\'' +
+					'}';
+		}
 	}
 }

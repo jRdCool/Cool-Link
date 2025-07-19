@@ -11,7 +11,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public record ConnectToWifiNetworkRequestPacket(RegistryKey<World> world, BlockPos accessPointPosition, String password, Mac deviceMacAddress) implements CustomPayload {
+public record ConnectToWifiNetworkRequestPacket(RegistryKey<World> world, BlockPos accessPointPosition, String password, Mac deviceMacAddress, String deviceName) implements CustomPayload {
     public static final Id<ConnectToWifiNetworkRequestPacket> ID = new Id<>(Identifier.of(Main.namespace,"client-connect-to-wifi-packet"));
 
     public static final PacketCodec<RegistryByteBuf, ConnectToWifiNetworkRequestPacket> CODEC = PacketCodec.tuple(
@@ -19,6 +19,7 @@ public record ConnectToWifiNetworkRequestPacket(RegistryKey<World> world, BlockP
             BlockPos.PACKET_CODEC, ConnectToWifiNetworkRequestPacket::accessPointPosition,
             PacketCodecs.STRING, ConnectToWifiNetworkRequestPacket::password,
             Mac.PACKET_CODEC, ConnectToWifiNetworkRequestPacket::deviceMacAddress,
+            PacketCodecs.STRING, ConnectToWifiNetworkRequestPacket::deviceName,
             ConnectToWifiNetworkRequestPacket::new
     );
 

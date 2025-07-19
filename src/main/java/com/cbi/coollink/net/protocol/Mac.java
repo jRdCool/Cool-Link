@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 
 import java.beans.ConstructorProperties;
+import java.util.Arrays;
 
 public class Mac {
 
@@ -112,5 +113,18 @@ public class Mac {
         if(cd.length()==1){cd="0"+cd;}//adds on a leading 0 if the number is 1 character long
         if(ef.length()==1){ef="0"+ef;}//adds on a leading 0 if the number is 1 character long
         return ab+":"+cd+":"+ef;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Mac mac1 = (Mac) o;
+        return Arrays.equals(mac, mac1.mac);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(mac);
     }
 }

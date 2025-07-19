@@ -148,8 +148,8 @@ public class AIOSettingApp extends AbstractPhoneApp{
 
     private void aioSettingsScreen(AIOBlockEntity blockA)
     {
-        BiConsumer<String, AIODeviceList> configurator = (String name, AIODeviceList destination) -> {
-            destination.device.setLabel(Text.literal(name));
+        BiConsumer<AIOBlockEntity.ConnectedDevice, AIODeviceList> configurator = (device, destination) -> {
+            destination.device.setLabel(Text.literal(device.deviceName()));
             //destination.sprite.setImage(new Identifier("libgui-test:portal1.png"));
         };
         settingsScreen=true;
@@ -216,7 +216,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
 
         //connected devices panel
         aioSettingsPanel.add(connectedDevices,265,30);
-        WListPanel<String,AIODeviceList> connectedDevicesPanel=new WListPanel<>(blockA.connectedDevices, AIODeviceList::new, configurator);
+        WListPanel<AIOBlockEntity.ConnectedDevice,AIODeviceList> connectedDevicesPanel=new WListPanel<>(blockA.connectedDevices, AIODeviceList::new, configurator);
         connectedDevicesPanel.setListItemHeight(2*18);
         aioSettingsPanel.add(connectedDevicesPanel,220,40,190,155);
 
