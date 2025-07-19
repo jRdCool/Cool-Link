@@ -1,5 +1,6 @@
 package com.cbi.coollink.rendering;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.BlockState;
@@ -37,18 +38,22 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 		for (int i = 0; i < te.getNodeCount(); i++) {
 
 
-			if (!te.hasConnection(i)) continue;
-			if (world.getBlockEntity(te.getLocalNode(i).getTargetPos())instanceof IWireNode){
+			if (!te.hasConnection(i)) continue;//check that this node is connected
+			if (world.getBlockEntity(te.getLocalNode(i).getTargetPos())instanceof IWireNode){//check the target has wire nodes
 				otherBlock =(IWireNode) world.getBlockEntity(te.getLocalNode(i).getTargetPos());
-				if(otherBlock==null)continue;
+				if(otherBlock==null)continue;//????? what why is this necessary, would instance of not take care of this?
 			}else{continue;}
 			Vec3d d1 = te.getNodeOffset(i);
 			float ox1 = ((float) d1.x);
 			float oy1 = ((float) d1.y);
 			float oz1 = ((float) d1.z);
 
-			IWireNode wn = otherBlock.getWireNode(i);
-			if (wn == null) continue;
+			IWireNode wn = otherBlock.getWireNode(i); //get the wire node of a given node index
+			if (wn == null) {//if that returned null then stop rendering further
+				//TODO make this logging toggleable
+				Main.LOGGER.warn("getWireNode("+i+") returned null when attempting to render wire for "+otherBlock.getPos());
+				continue;
+			}
 
 			Vec3d d2 = wn.getNodeOffset(te.getOtherNodeIndex(i)); // get other
 			float ox2 = ((float) d2.x);
