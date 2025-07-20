@@ -5,19 +5,20 @@ import com.cbi.coollink.rendering.IWireNode;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.enums.WireConnection;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.*;
 import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
@@ -30,6 +31,7 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
     static {
         POWER = Properties.POWER;
     }
+    private boolean wiresGivePower = true;
 
 
     //private static final int REGULAR_POWER_DELAY = 8;
@@ -58,7 +60,8 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
 
     protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         if (state.get(POWER) != 0) {
-            world.setBlockState(pos, state.with(POWER, 0), 3);
+            //world.setBlockState(pos, state.with(POWER, 0), 3);
+            state.with(POWER,world.getReceivedRedstonePower(pos));
         }
 
     }
@@ -113,5 +116,22 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
         super.onExploded(state, world, pos, explosion, stackMerger);
     }
 
+    public int getStrongPower(World world, BlockPos pos) {
+        this.wiresGivePower = false;
+        int i = world.getReceivedRedstonePower(pos);
+        this.wiresGivePower = true;
+        return i;
+    }
+
+    /*protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        if (direction == Direction.DOWN) {
+            return !this.canRunOnTop(world, neighborPos, neighborState) ? Blocks.AIR.getDefaultState() : state;
+        } else if (direction == Direction.UP) {
+            return this.getPlacementState(world, state, pos);
+        } else {
+            WireConnection wireConnection = this.getRenderConnectionType(world, pos, direction);
+            return wireConnection.isConnected() == ((WireConnection)state.get((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction))).isConnected() && !isFullyConnected(state) ? (BlockState)state.with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction), wireConnection) : this.getPlacementState(world, (BlockState)((BlockState)this.dotState.with(POWER, (Integer)state.get(POWER))).with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction), wireConnection), pos);
+        }
+    }*/
 
 }

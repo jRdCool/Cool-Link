@@ -44,4 +44,5 @@ public class RSReceiverWired extends RedstoneControllerWired{
                 .add(POWERED);
         super.appendProperties(builder);
     }
+
 }
