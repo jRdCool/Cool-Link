@@ -11,8 +11,6 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -36,7 +34,7 @@ public class RSSenderWired extends RedstoneControllerWired{
         return new RedstoneControllerWiredBE(pos,state,Main.RS_SENDER_WIRED_BLOCK_ENTITY);
     }
 
-    private static final BooleanProperty POWERED = Properties.POWERED;
+    //private static final BooleanProperty POWERED = Properties.POWERED;
 
     public static final Identifier ID = Identifier.of(Main.namespace,"redstone_sender_wired");
     public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
@@ -50,8 +48,7 @@ public class RSSenderWired extends RedstoneControllerWired{
     }
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING)
-                .add(POWERED);
+        builder.add(FACING);
         super.appendProperties(builder);
     }
     public boolean emitsRedstonePower(BlockState state) {

@@ -20,9 +20,9 @@ import static net.minecraft.state.property.Properties.FACING;
 public class RSReceiverWired extends RedstoneControllerWired{
     public RSReceiverWired(Settings settings) {
         super(settings);
+
     }
 
-    private static final BooleanProperty POWERED = Properties.POWERED;
 
     public static final Identifier ID = Identifier.of(Main.namespace,"redstone_receiver_wired");
     public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
@@ -40,8 +40,7 @@ public class RSReceiverWired extends RedstoneControllerWired{
     public boolean emitsRedstonePower(BlockState state) {return true;}
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING)
-                .add(POWERED);
+        builder.add(FACING);
         super.appendProperties(builder);
     }
 

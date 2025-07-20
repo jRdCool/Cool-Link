@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiConsumer;
 
 import static net.minecraft.state.property.Properties.FACING;
+import static net.minecraft.state.property.Properties.POWERED;
 
 public abstract class RedstoneControllerWired extends BlockWithEntity implements BlockEntityProvider {
 
@@ -32,6 +34,7 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
         POWER = Properties.POWER;
     }
     private boolean wiresGivePower = true;
+    protected static final BooleanProperty POWERED = Properties.POWERED;
 
 
     //private static final int REGULAR_POWER_DELAY = 8;
@@ -40,7 +43,10 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
 
     protected RedstoneControllerWired(AbstractBlock.Settings settings) {
         super(settings);
-        this.setDefaultState((this.stateManager.getDefaultState()).with(POWER, 0).with(FACING, Direction.SOUTH));
+        this.setDefaultState((this.stateManager.getDefaultState())
+                .with(POWER, 0)
+                .with(FACING, Direction.SOUTH)
+                .with(POWERED,false));
     }//Constructor
 
     @Override
@@ -63,7 +69,7 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
             //world.setBlockState(pos, state.with(POWER, 0), 3);
             state.with(POWER,world.getReceivedRedstonePower(pos));
         }
-
+        shouldExtend(world,pos,state.get(FACING));
     }
 
     protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
@@ -73,7 +79,8 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
     protected abstract boolean emitsRedstonePower(BlockState state);
 
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(POWER);
+        builder.add(POWER)
+                .add(POWERED);
     }
 
     protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
@@ -133,5 +140,37 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
             return wireConnection.isConnected() == ((WireConnection)state.get((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction))).isConnected() && !isFullyConnected(state) ? (BlockState)state.with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction), wireConnection) : this.getPlacementState(world, (BlockState)((BlockState)this.dotState.with(POWER, (Integer)state.get(POWER))).with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction), wireConnection), pos);
         }
     }*/
+
+    private void shouldExtend(RedstoneView world, BlockPos pos, Direction facing) {
+        Direction[] var4 = Direction.values();
+        int var5 = var4.length;
+
+        int var6;
+        for(var6 = 0; var6 < var5; ++var6) {
+            Direction direction = var4[var6];
+            if (direction != facing && world.isEmittingRedstonePower(pos.offset(direction), direction)) {
+                world.getBlockState(pos).with(POWERED,true);
+                return;
+            }
+        }
+
+        if (world.isEmittingRedstonePower(pos, Direction.DOWN)) {
+            world.getBlockState(pos).with(POWERED,true);
+            return;
+        } else {
+            BlockPos blockPos = pos.up();
+            Direction[] var10 = Direction.values();
+            var6 = var10.length;
+
+            for(int var11 = 0; var11 < var6; ++var11) {
+                Direction direction2 = var10[var11];
+                if (direction2 != Direction.DOWN && world.isEmittingRedstonePower(blockPos.offset(direction2), direction2)) {
+                    world.getBlockState(pos).with(POWERED,true);
+                    return;
+                }
+            }
+            world.getBlockState(pos).with(POWERED,false);
+        }
+    }
 
 }
