@@ -69,11 +69,14 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
             //world.setBlockState(pos, state.with(POWER, 0), 3);
             state.with(POWER,world.getReceivedRedstonePower(pos));
         }
-        shouldExtend(world,pos,state.get(FACING));
     }
 
     protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
         return state.get(POWER);
+    }
+
+    protected int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return !this.wiresGivePower ? 0 : state.getWeakRedstonePower(world, pos, direction);
     }
 
     protected abstract boolean emitsRedstonePower(BlockState state);
@@ -130,16 +133,20 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
         return i;
     }
 
-    /*protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-        if (direction == Direction.DOWN) {
+
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+       //TODO : input power logic here
+
+        /*if (direction == Direction.DOWN) {
             return !this.canRunOnTop(world, neighborPos, neighborState) ? Blocks.AIR.getDefaultState() : state;
         } else if (direction == Direction.UP) {
             return this.getPlacementState(world, state, pos);
         } else {
             WireConnection wireConnection = this.getRenderConnectionType(world, pos, direction);
             return wireConnection.isConnected() == ((WireConnection)state.get((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction))).isConnected() && !isFullyConnected(state) ? (BlockState)state.with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction), wireConnection) : this.getPlacementState(world, (BlockState)((BlockState)this.dotState.with(POWER, (Integer)state.get(POWER))).with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction), wireConnection), pos);
-        }
-    }*/
+        }*/
+        return state.with(POWER,6);
+    }
 
     private void shouldExtend(RedstoneView world, BlockPos pos, Direction facing) {
         Direction[] var4 = Direction.values();
@@ -153,7 +160,7 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
                 return;
             }
         }
-
+        //world.
         if (world.isEmittingRedstonePower(pos, Direction.DOWN)) {
             world.getBlockState(pos).with(POWERED,true);
             return;
@@ -172,5 +179,6 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
             world.getBlockState(pos).with(POWERED,false);
         }
     }
+
 
 }
