@@ -4,19 +4,23 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.ArrayList;
+import java.util.function.IntFunction;
+
 public class Util {
 
-    public static <T> PacketCodec<ByteBuf, T[]> arrayPacketCodec(PacketCodec<ByteBuf,T> codec){
+    public static <T> PacketCodec<ByteBuf, T[]> arrayPacketCodec(PacketCodec<ByteBuf,T> codec, IntFunction<T[]> arrayFactory){
         return new PacketCodec<ByteBuf, T[]>() {
             @Override
             public T[] decode(ByteBuf buf) {
                 int arrSize = buf.readInt();
-                @SuppressWarnings("unchecked")
-                T[] arr = (T[])new Object[arrSize];
-                for(int i=0;i<arr.length;i++){
-                    arr[i] = codec.decode(buf);
+                ArrayList<T> list = new ArrayList<>(arrSize);
+//                @SuppressWarnings("unchecked")
+//                T[] arr = (T[])new Object[arrSize];
+                for(int i=0;i<arrSize;i++){
+                    list.add(codec.decode(buf));
                 }
-                return arr;
+                return list.toArray(arrayFactory);
             }
 
             @Override

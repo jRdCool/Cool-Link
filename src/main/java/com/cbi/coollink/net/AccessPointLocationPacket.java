@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 public record AccessPointLocationPacket(BlockPos[] aps, String ssid) implements CustomPayload {
     public static final Id<AccessPointLocationPacket> ID =new Id<>(Identifier.of(Main.namespace,"access-point-location-packet"));
     public static final PacketCodec<RegistryByteBuf, AccessPointLocationPacket> CODEC = PacketCodec.tuple(
-            Util.arrayPacketCodec(BlockPos.PACKET_CODEC), AccessPointLocationPacket::aps,
+            Util.arrayPacketCodec(BlockPos.PACKET_CODEC, BlockPos[]::new), AccessPointLocationPacket::aps,
             PacketCodecs.STRING, AccessPointLocationPacket::ssid,
             AccessPointLocationPacket::new
     );
