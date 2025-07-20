@@ -200,6 +200,7 @@ public class PhoneGui extends LightweightGuiDescription {
 
         time = new WLabel(MutableText.of(new Literal(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
         notchAndTimePanel.add(time, (int) (400 * 0.89), (int) (250 * 0.02));
+        //TODO add wifi icon to notchAndTimePanel
         root.add(notchAndTimePanel,0,0,1,1);
 
         //open a specific app based on the block that was clicked on
@@ -421,6 +422,14 @@ public class PhoneGui extends LightweightGuiDescription {
                 }
             }
         }
+    }
+
+    public Mac getMac(){
+        return mac;
+    }
+
+    public String getWifiSsid(){
+        return wifiSsid;
     }
 
     protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){}

@@ -2,6 +2,7 @@ package com.cbi.coollink;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.util.math.BlockPos;
 
 public class Util {
 
@@ -26,5 +27,48 @@ public class Util {
                 }
             }
         };
+    }
+
+    private static int countShell(int r) {
+        if (r == 0) return 1;
+        int outer = (2 * r + 1) * (2 * r + 1) * (2 * r + 1);
+        int inner = (2 * (r - 1) + 1);
+        inner = inner * inner * inner;
+        return outer - inner;
+    }
+
+    public static BlockPos getCubePos(int index,BlockPos center){
+        //vibe coding, i am so ashamed
+        if (index < 0) throw new IllegalArgumentException("Index must be non-negative.");
+
+        int shell = 0;
+        int total = 0;
+
+        // Step 1: Find which shell the index belongs to
+        while (true) {
+            int shellCount = countShell(shell);
+            if (index < total + shellCount) break;
+            total += shellCount;
+            shell++;
+        }
+
+        int offset = index - total;
+
+        // Step 2: Iterate over positions in the shell and return the one at offset
+        int count = 0;
+        for (int x = -shell; x <= shell; x++) {
+            for (int y = -shell; y <= shell; y++) {
+                for (int z = -shell; z <= shell; z++) {
+                    if (Math.max(Math.abs(x), Math.max(Math.abs(y), Math.abs(z))) != shell) continue;
+
+                    if (count == offset) {
+                        return new BlockPos(x +center.getX(), y+center.getY(), z+center.getZ());
+                    }
+                    count++;
+                }
+            }
+        }
+
+        throw new IllegalStateException("Index out of bounds after shell computation");
     }
 }

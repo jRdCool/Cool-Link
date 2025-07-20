@@ -158,6 +158,14 @@ public class IpDataPacket {
         return destinationIpAddress;
     }
 
+    /**Create a new ip data packet to respond to a received request. Basically just creates a bew packet with eh source and dest values swapped
+     * @param responseData The data to respond with
+     * @return A new data packet that can be sent back to whoever sent it
+     */
+    public IpDataPacket createResponsePacket(NbtCompound responseData){
+        return new IpDataPacket(sourceIpAddress,destinationIpAddress,destinationMacAddress,sourceMacAddress,responseData);
+    }
+
     @Override
     public String toString() {
         return "IpDataPacket{" +

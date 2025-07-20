@@ -94,16 +94,13 @@ public class AIOSettingApp extends AbstractPhoneApp{
 
     }
 
-    public static AIOSettingApp getDummyInstance(){
-        return new AIOSettingApp();
-    }
-
     public static boolean openOnBlockEntity(BlockEntity blockEntity){
         return blockEntity instanceof AIOBlockEntity;
     }
 
-    private void logInScreen(AIOBlockEntity blockA,Boolean changePass)
+    private void logInScreen(AIOBlockEntity blockA,boolean changePass)
     {
+        Main.LOGGER.info("LOGIN SCREEEN: "+blockA+" change pass: "+changePass);
         ((WPlainPanel)root).add(logInPanel,0,0);
         adminPasswordField = new WPasswordField(MutableText.of(new Literal("admins may be able to see text entered here")));
         adminPasswordField.setMaxLength(96);
@@ -122,24 +119,20 @@ public class AIOSettingApp extends AbstractPhoneApp{
         //Main.LOGGER.info(blockA.password);
         checkPassB.setOnClick(() -> {
 //
-            if(blockA.password.equals(adminPasswordField.getText()))
-            {
+            if(blockA.password.equals(adminPasswordField.getText())) {
                 passAccepted=true;
                 root.remove(logInPanel);
 
-                if(changePass){adminPassChangeScreen(blockA);}
-                else{aioSettingsScreen(blockA);}
-            }
-            else
-            {
+                if(changePass){
+                    adminPassChangeScreen(blockA);
+                }else{
+                    aioSettingsScreen(blockA);
+                }
+            } else {
                 errorMsg.setText(Text.of("Invalid password"));
             }
-            //Main.LOGGER.info("setting password to: "+aio.password);
-                /*PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeBlockPos(aio.getPos());
-                buf.writeString(networkPasswordField.getText());
-                buf.writeRegistryKey(world.getRegistryKey());*/
-                ClientPlayNetworking.send(new AioSetAdminPasswordPacket(blockA.getPos(),adminPasswordField.getText(),world.getRegistryKey()));
+            //how about we do not do this here
+            //ClientPlayNetworking.send(new AioSetAdminPasswordPacket(blockA.getPos(),adminPasswordField.getText(),world.getRegistryKey()));
 //
         });
         errorMsg.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.CENTER);
@@ -246,12 +239,11 @@ public class AIOSettingApp extends AbstractPhoneApp{
             netPassL=netPassField.getText();
             blockA.netPass=netPassField.getText();
             Main.LOGGER.info("setting netPass to:"+blockA.netPass);
-            //PacketByteBuf buf = PacketByteBufs.create();
-            //buf.writeBlockPos(blockA.getPos());
-            //buf.writeString(netPassField.getText());
-            //buf.writeRegistryKey(world.getRegistryKey());
-            //Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
-            ClientPlayNetworking.send(new AioSetNetPasswordPacket(blockA.getPos(),netPassField.getText(),world.getRegistryKey()));
+            if(netPassL == null){
+                return;
+            }
+            Main.LOGGER.info("Setting AIO password to: "+netPassL);
+            ClientPlayNetworking.send(new AioSetNetPasswordPacket(blockA.getPos(),netPassL,world.getRegistryKey()));
         });
 
         changeAdminPass.setOnClick(() -> {
@@ -291,11 +283,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
             if(adminPasswordField.getText()!=null) {
                 blockA.password = adminPasswordField.getText();
                 Main.LOGGER.info("setting password to: " + blockA.password);
-                //PacketByteBuf buf = PacketByteBufs.create();
-                //buf.writeBlockPos(blockA.getPos());
-                //buf.writeString(adminPasswordField.getText());
-                //buf.writeRegistryKey(world.getRegistryKey());
-                //Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
+
                 ClientPlayNetworking.send(new AioSetAdminPasswordPacket(blockA.getPos(),adminPasswordField.getText(),world.getRegistryKey()));
 
                 root.remove(changeAdminPassPanel);

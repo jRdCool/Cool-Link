@@ -23,4 +23,9 @@ public interface AccessPoint {
      * @param deviceName The name of the device connecting to the network
      */
     void handleClientWifiConnectionRequest(String password, Mac deviceMacAddress, ServerPlayerEntity player, String deviceName);
+
+    /**Get the ssid of the network this ap is attached to
+     * @return The ssid of this network
+     */
+    String getSsid();
 }

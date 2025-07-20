@@ -17,7 +17,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.ai.brain.task.BreedTask;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -336,6 +335,16 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			//incorrect password
 			ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(true,false,"",ssid,false));
 		}
+	}
+
+	/**
+	 * Get the ssid of the network this ap is attached to
+	 *
+	 * @return The ssid of this network
+	 */
+	@Override
+	public String getSsid() {
+		return ssid;
 	}
 
 	private String generateNewIp(){

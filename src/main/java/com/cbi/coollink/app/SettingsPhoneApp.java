@@ -1,13 +1,15 @@
 package com.cbi.coollink.app;
 
+import com.cbi.coollink.Main;
+import com.cbi.coollink.Util;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
+import com.cbi.coollink.blocks.networkdevices.AccessPoint;
 import com.cbi.coollink.guis.PhoneGui;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -25,18 +27,20 @@ public class SettingsPhoneApp extends AbstractRootApp{
     WLabel currentBackground,backgroundLabel,clockSetting=new WLabel(Text.of("Clock")),phoneName,mac;
     WTextField phoneNameField;
     WLabel networks= new WLabel(Text.of("Networks"));
+
+    WListPanel<DiscoveredNetwork,AIODeviceList> accessPoints;
+
+    World world;
+
+    ArrayList<DiscoveredNetwork> discoveredNetworks = new ArrayList<>();
     boolean settingPhoneName=false;
+
+    boolean searchingForWifi = false;
+    int wifiSearchProgress = 0;
 
     public static final Identifier ID = Identifier.of("cool-link","settings");
     public static final Identifier ICON = Identifier.of("cool-link","textures/gui/setting_app_icon.png");
 
-    /**do not use this constructor to initialize the app
-     * only use to get an instance of this app
-     */
-    private SettingsPhoneApp(){
-        super(ID);
-        icon = ICON;
-    }
     public SettingsPhoneApp(World world, BlockEntity clickedOnBlockEntity,PhoneGui phone){
         super(Identifier.of("cool-link","settings"));
         icon=Identifier.of("cool-link","textures/gui/setting_app_icon.png");
@@ -117,49 +121,81 @@ public class SettingsPhoneApp extends AbstractRootApp{
 
            }
         });
-        mac=new WLabel(Text.of("Mac:"));
+        mac=new WLabel(Text.of("Mac:   "+phone.getMac()));
         aPSearch=new WButton(Text.of("Search For Networks"));
         panel.add(mac,29, 111);
         panel.add(aPSearch,80,126,150,20);
-        ArrayList<String> availNets=new ArrayList<>();
 
-        aPSearch.setOnClick(()->{
-            for (int i=-30;i<=30;i++){
-                for (int j=-10;j<=10;j++){
-                    for (int k=-30;k<=30;k++){
-                        BlockEntity target = world.getBlockEntity(new BlockPos((int)Math.floor(phone.playerPosition.x)+i,(int)Math.floor(phone.playerPosition.y)+j,(int)Math.floor(phone.playerPosition.z)+k));
-                        if(target instanceof AIOBlockEntity){
-                            String lSSID=((AIOBlockEntity) target).ssid;
-                            if(availNets.isEmpty()|| !(availNets.contains(lSSID))){
-                                availNets.add(lSSID);
-                            }
-                        }
-                    }
-                }
+
+
+        BiConsumer<DiscoveredNetwork, AIODeviceList> configurator = (DiscoveredNetwork network, AIODeviceList destination) -> {
+            if(network.ssid.equals(phone.getWifiSsid())){//the currently connected network is displayed as green
+                destination.device.setLabel(Text.literal("§a"+network.ssid));
+            }else {
+                destination.device.setLabel(Text.literal(network.ssid));
             }
-        });
-
-        BiConsumer<String, AIODeviceList> configurator = (String name, AIODeviceList destination) -> {
-            destination.device.setLabel(Text.literal(name));
-            //destination.sprite.setImage(new Identifier("libgui-test:portal1.png"));
+            destination.device.setOnClick(() -> {
+               //TODO enter the password and then the connect button here
+            });
         };
 
         panel.add(networks,265,30);
-        WListPanel<String,AIODeviceList> accessPoints=new WListPanel<>(availNets, AIODeviceList::new,configurator);
-        accessPoints.setListItemHeight(2*18);
-        panel.add(accessPoints,220,40,190,155);
+        accessPoints = new WListPanel<>(discoveredNetworks, AIODeviceList::new, configurator);
+        accessPoints.setListItemHeight(18);
+        panel.add(accessPoints,230,40,170,155);
 
+        aPSearch.setOnClick(()->{
+            if(!searchingForWifi){
+                searchingForWifi = true;
+                discoveredNetworks.clear();
+                aPSearch.setEnabled(false);
+            }
+        });
 
+        this.world = world;
     }
 
 
     @Override
     public void tick() {
-
+        if(searchingForWifi){
+            final int maxSearchDiameter = 31;
+            final int searchPerTick = 200;
+            for(int startIndex = wifiSearchProgress; wifiSearchProgress < startIndex + searchPerTick && wifiSearchProgress < maxSearchDiameter*maxSearchDiameter*maxSearchDiameter;wifiSearchProgress++){
+                BlockPos searchBlock = Util.getCubePos(wifiSearchProgress, new BlockPos((int)phoneInstance.playerPosition.x,(int)phoneInstance.playerPosition.y,(int)phoneInstance.playerPosition.z));
+                BlockEntity worldEntity = world.getBlockEntity(searchBlock);
+                if(worldEntity instanceof AccessPoint ap){
+                    String networkName = ap.getSsid();
+                    if(networkName == null){
+                        continue;
+                    }
+                    boolean alreadyFound = false;
+                    for(DiscoveredNetwork net: discoveredNetworks){
+                        if(net.ssid.equals(networkName)){
+                            alreadyFound = true;
+                            break;
+                        }
+                    }
+                    if(alreadyFound){
+                        continue;
+                    }
+                    //TODO also calculate distance to player
+                    discoveredNetworks.add(new DiscoveredNetwork(networkName,searchBlock));
+                }
+            }
+            if(wifiSearchProgress >= maxSearchDiameter*maxSearchDiameter*maxSearchDiameter){
+                searchingForWifi = false;
+                wifiSearchProgress = 0;
+                aPSearch.setEnabled(true);
+            }
+            accessPoints.layout();
+        }
     }
 
     @Override
     public void addPainters() {
         root.setBackgroundPainter((matrices, left, top, panel) -> ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_FFFFFF));
     }
+
+    private record DiscoveredNetwork(String ssid, BlockPos accessPoint){}
 }
