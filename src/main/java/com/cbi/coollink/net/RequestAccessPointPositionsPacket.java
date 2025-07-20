@@ -21,6 +21,6 @@ public record RequestAccessPointPositionsPacket(RegistryKey<World> world, BlockP
 
     @Override
     public Id<? extends CustomPayload> getId() {
-        return null;
+        return ID;
     }
 }

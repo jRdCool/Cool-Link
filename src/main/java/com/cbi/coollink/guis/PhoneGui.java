@@ -161,6 +161,7 @@ public class PhoneGui extends LightweightGuiDescription {
                 }
                 BlockPos knownAp = new BlockPos(network.apX(), network.apY(), network.apZ());
                 if (playerPosition.distanceTo(knownAp.toCenterPos()) < 512) {//only check for aps that are less than 512 blocks away
+                    Main.LOGGER.info("sending: "+new RequestAccessPointPositionsPacket(world.getRegistryKey(), knownAp));
                     ClientPlayNetworking.send(new RequestAccessPointPositionsPacket(world.getRegistryKey(), knownAp));//request all ap locations on that network
                 }
             }
@@ -412,6 +413,7 @@ public class PhoneGui extends LightweightGuiDescription {
             }
 
             //try to connect to that one
+            Main.LOGGER.info("sending: "+new ConnectToWifiNetworkRequestPacket(world.getRegistryKey(),closePos,pass,mac,phoneName));
             ClientPlayNetworking.send(new ConnectToWifiNetworkRequestPacket(world.getRegistryKey(),closePos,pass,mac,phoneName));
 
             //update the stored AP position
