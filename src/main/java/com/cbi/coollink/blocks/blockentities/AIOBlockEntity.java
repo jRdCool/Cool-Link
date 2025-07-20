@@ -70,7 +70,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	protected void writeData(WriteView view) {
 		super.writeData(view);
 		view.putInt("number", 89);
-		view.putString("password", Objects.requireNonNullElse(password, "password123546"));
+		view.putString("password", Objects.requireNonNullElse(password, "password123456"));
 		view.putString("ssid", Objects.requireNonNullElse(ssid, "Unconfigured Network"));
 		view.putString("Wireless_Password", Objects.requireNonNullElse(netPass, ""));
 		view.putIntArray("MAC1",mac1.getMac());

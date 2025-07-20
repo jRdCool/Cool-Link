@@ -223,6 +223,7 @@ public class SettingsPhoneApp extends AbstractRootApp{
                     //success, go back to the main settings page
                     root.remove(connectingPanel);
                     ((WPlainPanel)root).add(primaryPanel,0,0);
+                    primaryPanel.layout();
                 }
             }
         }
@@ -263,6 +264,7 @@ public class SettingsPhoneApp extends AbstractRootApp{
            if(passwordField.getText() != null){
                //store the network info assuming the password is correct
                 phoneInstance.updateSavedNetwork(new PhoneGui.WifiNetworkInfo(network.ssid(), passwordField.getText(),world.getRegistryKey().getValue(),network.accessPoint().getX(),network.accessPoint().getY(),network.accessPoint().getZ()));
+                phoneInstance.apBlockPos = network.accessPoint();
 
                //send the request to try and connect to the network
                ClientPlayNetworking.send(new ConnectToWifiNetworkRequestPacket(world.getRegistryKey(),network.accessPoint(),passwordField.getText(),phoneInstance.getMac(),phoneInstance.phoneName));

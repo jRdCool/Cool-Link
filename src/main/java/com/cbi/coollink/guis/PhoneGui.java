@@ -27,6 +27,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -75,7 +76,7 @@ public class PhoneGui extends LightweightGuiDescription {
     ProgramNetworkInterface networkInterface;
 
     private double distToAp = 100e300;
-    private BlockPos apBlockPos = new BlockPos(Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE);
+    public BlockPos apBlockPos = new BlockPos(Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE);
 
     private final Mac mac;
 
@@ -87,6 +88,8 @@ public class PhoneGui extends LightweightGuiDescription {
 
     private boolean wifiConnectFinished = false;
     private int wifiConnectError = 0;
+
+    private final WSprite wifiIcon, noInternetIcon;
 
     public PhoneGui(World world, ItemStack phoneInstance, Vec3d playerPosition) {
         installedApps.add(new PhoneAppInfo(SettingsPhoneApp.ID, (world1, blockEntity, nbtCompound, networkInterface) -> new SettingsPhoneApp(world1,blockEntity,this), SettingsPhoneApp.ICON,true, (be) -> false));
@@ -111,12 +114,12 @@ public class PhoneGui extends LightweightGuiDescription {
         }
 
         if(!nbt.isEmpty()){
-            Main.LOGGER.info("NBT data found\n"+nbt);
+            //Main.LOGGER.info("NBT data found\n"+nbt);
             NbtList nbtApps = (NbtList) nbt.get("apps");
             if(nbtApps != null && !nbtApps.isEmpty()){
                 for(int i=0; i < nbtApps.size(); i++){
                     Identifier tmpName = Identifier.of(nbtApps.getString(i,null));
-                    Main.LOGGER.info("Found APP: "+tmpName);
+                    //Main.LOGGER.info("Found APP: "+tmpName);
                     //if(AppRegistry.get(tmpName)==null)
                     //    continue;
                     installedApps.add(new PhoneAppInfo(tmpName, AppRegistry.getLauncher(tmpName), AppRegistry.getIcon(tmpName),false, AppRegistry.getOpensOnBlockEntity(tmpName)));
@@ -161,7 +164,7 @@ public class PhoneGui extends LightweightGuiDescription {
                 }
                 BlockPos knownAp = new BlockPos(network.apX(), network.apY(), network.apZ());
                 if (playerPosition.distanceTo(knownAp.toCenterPos()) < 512) {//only check for aps that are less than 512 blocks away
-                    Main.LOGGER.info("sending: "+new RequestAccessPointPositionsPacket(world.getRegistryKey(), knownAp));
+
                     ClientPlayNetworking.send(new RequestAccessPointPositionsPacket(world.getRegistryKey(), knownAp));//request all ap locations on that network
                 }
             }
@@ -179,7 +182,7 @@ public class PhoneGui extends LightweightGuiDescription {
 
             //end of nbt is not empty
         }else{
-            Main.LOGGER.info("no NBT data");
+            //Main.LOGGER.info("no NBT data");
             appData=new NbtCompound();
             phoneName="UnNamed phone";
             this.clickedOnBLockEntity = null;
@@ -213,10 +216,13 @@ public class PhoneGui extends LightweightGuiDescription {
         });
         homeButtonPanel.setHost(this);
 
+        wifiIcon = new WSprite(Identifier.of(Main.namespace,"textures/icon/wifi_0.png"));
+        noInternetIcon = new WSprite(Identifier.of(Main.namespace,"textures/icon/wifi_no_network.png"));
 
         time = new WLabel(MutableText.of(new Literal(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
         notchAndTimePanel.add(time, (int) (400 * 0.89), (int) (250 * 0.02));
-        //TODO add wifi icon to notchAndTimePanel
+        notchAndTimePanel.add(wifiIcon,(int) (400 * 0.85),4,10,10);
+        notchAndTimePanel.add(noInternetIcon,(int) (400 * 0.86),7,6,6);
         root.add(notchAndTimePanel,0,0,1,1);
 
         //open a specific app based on the block that was clicked on
@@ -268,6 +274,28 @@ public class PhoneGui extends LightweightGuiDescription {
     public void tick() {
         //Main.LOGGER.info("ticked");
         time.setText(MutableText.of(new Literal(dtf.format(LocalDateTime.now()))).setStyle(Style.EMPTY.withColor((currentApp==null)?0xFFFFFF:currentApp.timeColor)));
+        if(connectedToWifi){
+            double distanceToAp = playerPosition.distanceTo(apBlockPos.toCenterPos());
+            int strength;
+            if(distanceToAp > 22.5){
+                strength = 1;
+            }else if(distanceToAp > 15){
+                strength = 2;
+            }else if(distanceToAp > 7.5){
+                strength = 3;
+            }else{
+                strength = 4;
+            }
+            String color = getIconColor();
+            wifiIcon.setImage(Identifier.of(Main.namespace,"textures/icon/wifi_"+strength+"_"+color+".png"));
+        }else{
+            wifiIcon.setImage(Identifier.of(Main.namespace,"textures/icon/wifi_0.png"));
+        }
+        if(deviceOnline || !connectedToWifi){
+            noInternetIcon.setImage(Identifier.of(Main.namespace,"textures/icon/blank.png"));
+        }else{
+            noInternetIcon.setImage(Identifier.of(Main.namespace,"textures/icon/wifi_no_network.png"));
+        }
         if(currentApp!=null){
             currentApp.tick();
             if(currentApp.requestSave) {
@@ -276,6 +304,21 @@ public class PhoneGui extends LightweightGuiDescription {
             }
             currentApp.getPanel().setHost(this);
         }
+    }
+
+    @NotNull
+    private String getIconColor() {
+        String color = "white";
+        if(currentApp !=null){
+            int timeColor = currentApp.timeColor;
+            timeColor &= 0xFFFFFF;//cut off any supplied alpha channel
+            int red = timeColor >> 16 & 0xFF;
+            int green = timeColor >> 8 & 0xFF;
+            int blue = timeColor & 0xFF;
+            int luminance = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
+            color = luminance < 127 ? "black": "white";
+        }
+        return color;
     }
 
     /**Launch an app and open its GUI for the user
@@ -400,6 +443,11 @@ public class PhoneGui extends LightweightGuiDescription {
                 closeDist = dist;
             }
         }
+        //check if this AP is even in range
+        if(closeDist > 30){//30 block range
+            return;
+        }
+
         //check if this one is closer than any that is currently connected
         if(closeDist < distToAp) {
             distToAp = closeDist;
@@ -413,7 +461,6 @@ public class PhoneGui extends LightweightGuiDescription {
             }
 
             //try to connect to that one
-            Main.LOGGER.info("sending: "+new ConnectToWifiNetworkRequestPacket(world.getRegistryKey(),closePos,pass,mac,phoneName));
             ClientPlayNetworking.send(new ConnectToWifiNetworkRequestPacket(world.getRegistryKey(),closePos,pass,mac,phoneName));
 
             //update the stored AP position
@@ -425,9 +472,9 @@ public class PhoneGui extends LightweightGuiDescription {
 
     public void handleWifiConnectionResponse(ClientWifiConnectionResultPacket response){
         if(response.incorrectPassword() || response.networkFull()){
-            if(response.incorrectPassword()){
+            if(response.incorrectPassword() && ! response.networkFull()){
                 wifiConnectError = 1;
-            }else if(response.networkFull()){
+            }else if(response.networkFull() && ! response.incorrectPassword()){
                 wifiConnectError = 2;
             }else{
                 wifiConnectError = 3;
