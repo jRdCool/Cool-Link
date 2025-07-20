@@ -100,7 +100,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
 
     private void logInScreen(AIOBlockEntity blockA,boolean changePass)
     {
-        Main.LOGGER.info("LOGIN SCREEEN: "+blockA+" change pass: "+changePass);
+        //Main.LOGGER.info("LOGIN SCREEEN: "+blockA+" change pass: "+changePass);
         ((WPlainPanel)root).add(logInPanel,0,0);
         adminPasswordField = new WPasswordField(MutableText.of(new Literal("admins may be able to see text entered here")));
         adminPasswordField.setMaxLength(96);

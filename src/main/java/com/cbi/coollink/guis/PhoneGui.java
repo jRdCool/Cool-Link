@@ -55,6 +55,18 @@ public class PhoneGui extends LightweightGuiDescription {
     private final ArrayList<WifiNetworkInfo> savedNetworks = new ArrayList<>();
     public int backgroundNumber=0;
 
+    public boolean isWifiConnectFinished() {
+        return wifiConnectFinished;
+    }
+
+    public void setWifiConnectFinished(boolean wifiConnectFinished) {
+        this.wifiConnectFinished = wifiConnectFinished;
+    }
+
+    public int getWifiConnectError() {
+        return wifiConnectError;
+    }
+
     public  enum ClockTimeType{AMPM,HOUR24}
     public ClockTimeType clockTimeType = ClockTimeType.AMPM;
     public String phoneName;
@@ -72,6 +84,9 @@ public class PhoneGui extends LightweightGuiDescription {
     private String wifiSsid = "";
 
     private boolean deviceOnline = false;
+
+    private boolean wifiConnectFinished = false;
+    private int wifiConnectError = 0;
 
     public PhoneGui(World world, ItemStack phoneInstance, Vec3d playerPosition) {
         installedApps.add(new PhoneAppInfo(SettingsPhoneApp.ID, (world1, blockEntity, nbtCompound, networkInterface) -> new SettingsPhoneApp(world1,blockEntity,this), SettingsPhoneApp.ICON,true, (be) -> false));
@@ -408,7 +423,13 @@ public class PhoneGui extends LightweightGuiDescription {
 
     public void handleWifiConnectionResponse(ClientWifiConnectionResultPacket response){
         if(response.incorrectPassword() || response.networkFull()){
-            //show error condition
+            if(response.incorrectPassword()){
+                wifiConnectError = 1;
+            }else if(response.networkFull()){
+                wifiConnectError = 2;
+            }else{
+                wifiConnectError = 3;
+            }
         }else{
             for(WifiNetworkInfo net: savedNetworks){
                 if(net.ssid.equals(response.ssid())){
@@ -419,9 +440,12 @@ public class PhoneGui extends LightweightGuiDescription {
                     networkInterface = new PhoneNetworkInterface(mac,deviceIp,world,apBlockPos,deviceOnline);
                 }else{
                     //send disconnect packet
+
                 }
             }
+            wifiConnectError = 0;
         }
+        wifiConnectFinished = true;
     }
 
     public Mac getMac(){
@@ -432,8 +456,24 @@ public class PhoneGui extends LightweightGuiDescription {
         return wifiSsid;
     }
 
+    public ArrayList<WifiNetworkInfo> getSavedNetworks(){
+        return savedNetworks;
+    }
+
+    public void updateSavedNetwork(WifiNetworkInfo networkInfo){
+        //check if there is a network with this name already in the list
+        for(int i=0;i<savedNetworks.size();i++){
+            if(savedNetworks.get(i).ssid().equals(networkInfo.ssid())){
+                savedNetworks.set(i,networkInfo);
+                return;
+            }
+        }
+        savedNetworks.add(networkInfo);
+        saveData();
+    }
+
     protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){}
-    protected record WifiNetworkInfo(String ssid,String password,Identifier dimension, int apX,int apY,int apZ){
+    public record WifiNetworkInfo(String ssid,String password,Identifier dimension, int apX,int apY,int apZ){
         public NbtCompound toNbt(){
             NbtCompound compound = new NbtCompound();
             compound.putString("ssid",ssid);
