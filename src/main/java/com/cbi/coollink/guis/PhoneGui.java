@@ -96,7 +96,7 @@ public class PhoneGui extends LightweightGuiDescription {
 
         installedApps.add(new PhoneAppInfo(AIOSettingApp.ID,(world1, blockEntity, nbtCompound, networkInterface) -> new AIOSettingApp(world1, blockEntity), AIOSettingApp.ICON,true, AIOSettingApp::openOnBlockEntity));
 
-        installedApps.add(new PhoneAppInfo(AppStore.ID,(world1, blockEntity, nbtCompound, networkInterface) -> new AppStore(this), AppStore.ICON,true, (be)-> false));
+        installedApps.add(new PhoneAppInfo(AppStore.ID,(world1, blockEntity, nbtCompound, networkInterface) -> new AppStore(this,networkInterface), AppStore.ICON,true, (be)-> false));
 
 
         numberOfPreinstalledApps = installedApps.size();

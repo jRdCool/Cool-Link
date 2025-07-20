@@ -40,6 +40,10 @@ public class SnakeGameApp extends AbstractPhoneApp{
         apples.add(new int[]{r.nextInt(0,14),r.nextInt(0,14)});
         gameOverText.setHorizontalAlignment(HorizontalAlignment.CENTER);
         gameOverText.setVerticalAlignment(VerticalAlignment.CENTER);
+        WLabel howToPlay  = new WLabel(Text.of("Play with the"));
+        WLabel howToPlay2 = new WLabel(Text.of("arrow keys"));
+        ((WPlainPanel) root).add(howToPlay,300,phoneHeight / 2);
+        ((WPlainPanel) root).add(howToPlay2,300,phoneHeight / 2+12);
 
     }
     @Override

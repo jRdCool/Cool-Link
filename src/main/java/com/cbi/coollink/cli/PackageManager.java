@@ -14,9 +14,11 @@ public class PackageManager implements CliProgram{
     private boolean running = true;
     private final String programEnv;
     private final CommandLineContext cli;
+    private final ProgramNetworkInterface networkInterface;
 
     public PackageManager(String[] args, HashMap<String,String> env, CommandTextOutputArea stdOut, CommandLineContext cli, ProgramNetworkInterface networkInterface){
         programEnv = env.get("PLATFORM");
+        this.networkInterface = networkInterface;
         this.cli=cli;
         if(args.length<1){
             stdOut.addLine("Missing arguments");
@@ -56,6 +58,7 @@ public class PackageManager implements CliProgram{
 
     void installPath(String[] args, CommandTextOutputArea stdOut){
         if(isOffline()){
+            stdOut.addLine("Device is not connected to the internet, connect to the internet to install packages");
             return;
         }
         if(args.length < 2) {
@@ -83,6 +86,7 @@ public class PackageManager implements CliProgram{
     }
     void searchPath(String[] args, CommandTextOutputArea stdOut){
         if(isOffline()){
+            stdOut.addLine("Device is not connected to the internet, connect to the internet to search packages");
             return;
         }
         if(args.length < 2) {
@@ -95,7 +99,7 @@ public class PackageManager implements CliProgram{
             stdOut.addLine("No packages found");
         }else{
             for(CliCommandPackage commands: packages){
-                stdOut.addLine(commands.getId().toString());
+                stdOut.addLine("§2"+commands.getId().toString()+"§r");
                 String[] description = commands.getDescription().split("\n");
                 for(String line: description){
                     stdOut.addLine(line);
@@ -129,6 +133,6 @@ public class PackageManager implements CliProgram{
     }
 
     boolean isOffline(){
-        return false;
+        return !networkInterface.isDeviceOnline();
     }
 }

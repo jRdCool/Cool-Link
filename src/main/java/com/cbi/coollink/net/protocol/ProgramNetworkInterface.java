@@ -34,4 +34,8 @@ abstract public class ProgramNetworkInterface {
     public interface PacketReceiver{
         void receive(IpDataPacket receivedData);
     }
+
+    public abstract boolean isConnectedToNetwork();
+
+    public abstract boolean isDeviceOnline();
 }
