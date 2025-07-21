@@ -279,6 +279,23 @@ public class SettingsPhoneApp extends AbstractRootApp{
             errorText.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.CENTER);
         }
 
+        WButton forgetNetwork = new WButton(Text.of("Forget network"));
+        connectToNetworkPanel.add(forgetNetwork,170,150,90,20);
+        boolean hasNetwork = false;
+        for(PhoneGui.WifiNetworkInfo wifi:phoneInstance.getSavedNetworks()){
+            if(wifi.ssid().equals(network.ssid())){
+                hasNetwork = true;
+                break;
+            }
+        }
+        forgetNetwork.setEnabled(hasNetwork);
+        forgetNetwork.setOnClick(() -> {
+            phoneInstance.updateSavedNetwork(new PhoneGui.WifiNetworkInfo(network.ssid(),"",Identifier.of("delete-this"),Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE));
+            root.remove(connectToNetworkPanel);
+            ((WPlainPanel)root).add(primaryPanel,0,0);
+            primaryPanel.layout();
+        });
+
         connectToNetworkPanel.layout();
     }
 

@@ -511,9 +511,20 @@ public class PhoneGui extends LightweightGuiDescription {
 
     public void updateSavedNetwork(WifiNetworkInfo networkInfo){
         //check if there is a network with this name already in the list
+        boolean delete = networkInfo.dimension().equals(Identifier.of("delete-this"));
+
         for(int i=0;i<savedNetworks.size();i++){
             if(savedNetworks.get(i).ssid().equals(networkInfo.ssid())){
-                savedNetworks.set(i,networkInfo);
+                if(delete){
+                    savedNetworks.remove(i);
+                    if(wifiSsid.equals(networkInfo.ssid())){
+                        //disconnect
+                        connectedToWifi = false;
+                    }
+                }else {
+                    savedNetworks.set(i, networkInfo);
+                }
+                saveData();
                 return;
             }
         }
