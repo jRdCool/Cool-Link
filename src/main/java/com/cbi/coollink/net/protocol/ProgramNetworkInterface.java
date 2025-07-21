@@ -19,6 +19,10 @@ abstract public class ProgramNetworkInterface {
         sendIpPacketOverNetwork(data);
     }
 
+    /**Sends a packet over the network via device specific means.
+     * Note: if you are writing a program you should be using sendRawData
+     * @param data The packet to send over the network
+     */
     public abstract void sendIpPacketOverNetwork(IpDataPacket data);
 
     public void processReceivedDataPacket(IpDataPacket receivedData){

@@ -10,6 +10,7 @@ import com.cbi.coollink.blocks.wallports.*;
 import com.cbi.coollink.cli.CliProgramInit;
 import com.cbi.coollink.cli.example.HelloWorld;
 import com.cbi.coollink.cli.example.Loading;
+import com.cbi.coollink.cli.lowlevelnet.SendPackCommand;
 import com.cbi.coollink.cli.repo.CliCommandPackage;
 import com.cbi.coollink.cli.repo.CliPackageRepository;
 import com.cbi.coollink.items.*;
@@ -412,6 +413,12 @@ public class Main implements ModInitializer {
                     new CliCommandPackage.CommandInfo("load",CliProgramInit.of(Loading::new,"Loading example of how a command can execute over time"))
                 ),
             CliPackageRepository.ANY_ENVIRONMENT);//end of example package
+        CliPackageRepository.registerPackage(new CliCommandPackage(
+                    Identifier.of(namespace,"low-level-net"),
+                    "A collection of low level network utilities",
+                    new CliCommandPackage.CommandInfo("sendpack",CliProgramInit.of(SendPackCommand::new,"Usage: sendpack <ip> <nbtdata>\nManually craft and send a packet over the network to the desired ipaddress. Spaces can be present in the raw nbt data. Does not wait for a response from the target device"))
+                ),
+            CliPackageRepository.ANY_ENVIRONMENT);
 
     }
 

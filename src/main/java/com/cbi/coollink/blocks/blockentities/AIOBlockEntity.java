@@ -167,6 +167,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			be.onlineCheckCounter = 0;
 		}
 
+		be.switchProcessPacketQueue();
 	}//run on tick
 	public void updateStates(){
 		if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
@@ -330,7 +331,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			//handle packet
 			handleRouterPacket(data);
 		}else {
-
+			//Main.LOGGER.info("AIO sending packet to switching queue: "+data);
 			//otherwise send this indo the switching queue
 			switchingPacketQueue.add(data);
 		}
@@ -371,6 +372,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 */
 	@Override
 	public void processIncomingWifiPacket(WIFIClientIpPacket packet, ServerPlayerEntity player) {
+		Main.LOGGER.info("AIO received WIFI packet: "+packet);
 		//apply delay based on distance
 		mobileClientRouting.put(packet.payload().getSourceMacAddress(), player);
 		//check if this packet is going to this AOI and process it if so
@@ -460,6 +462,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	private void sendPacket(IpDataPacket packet) {
+		//Main.LOGGER.info("AIO processing send packet: "+packet);
 		//figure out what port to send out the paket on/if the packet needs to be sent over wifi
 		int port = -1;
 		if(eth0SwitchingTable.contains(packet.getDestinationMacAddress())){
@@ -486,6 +489,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			return;
 		}
 		if(portConnected.getBlockEntity() instanceof IWireNode otherDevice){
+			//Main.LOGGER.info("AIO sending packet on port: "+port+" "+packet);
 			otherDevice.transmitData(portConnected.getIndex(), packet);
 		}else{
 			//uhhhhh i guess the packet is lost then

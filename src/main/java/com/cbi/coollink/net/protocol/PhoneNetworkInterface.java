@@ -33,6 +33,7 @@ public class PhoneNetworkInterface extends ProgramNetworkInterface{
             Main.LOGGER.error("App tried to send data packet but device is offline");
             return;
         }
+        Main.LOGGER.info("Phone sending packet: "+data);
         ClientPlayNetworking.send(new WIFIClientIpPacket(playerWorld.getRegistryKey(),accessPointPos,data));
 
     }

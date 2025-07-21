@@ -188,6 +188,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
                     routerMac = ipData.getSourceMacAddress();
                     Main.LOGGER.info("Set device Ip to "+deviceIp);
                 }
+                default -> Main.LOGGER.info("Received data RSS: "+data+" on port: "+connectionIndex+" at "+getPos());
             }
         }
     }

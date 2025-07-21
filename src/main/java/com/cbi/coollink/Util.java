@@ -91,4 +91,19 @@ public class Util {
         }
         return -1;
     }
+
+    public static boolean validIp(String rawIp){
+        rawIp = parseIpGetIp(rawIp);
+        String[] pts = rawIp.split("\\.");
+        if(pts.length!=4){
+            return false;
+        }
+        for (String pt : pts) {
+            int pv = Integer.parseInt(pt);
+            if (pv < 0 || pv > 255) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

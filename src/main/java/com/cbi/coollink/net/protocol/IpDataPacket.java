@@ -111,7 +111,7 @@ public class IpDataPacket implements WireDataPacket{
      * @return ture if the mac is not present
      */
     public boolean hasDestinationMac(){
-        return  destinationIpAddress != null;
+        return  destinationMacAddress != null;
     }
 
     /**Set the destination mac address
