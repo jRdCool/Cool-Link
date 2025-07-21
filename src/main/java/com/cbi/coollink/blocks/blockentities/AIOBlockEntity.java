@@ -306,8 +306,16 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	private void handleEthernetPacket(IpDataPacket data, int nodeIndex){
 		//Main.LOGGER.info("Received data AIO: "+data+" on port: "+nodeIndex+" at "+getPos());
 		switch (nodeIndex){
-			case 0 -> eth0SwitchingTable.add(data.getSourceMacAddress());
-			case 1 -> eth1SwitchingTable.add(data.getSourceMacAddress());
+			case 0 -> {
+				if(!eth0SwitchingTable.contains(data.getSourceMacAddress())) {
+					eth0SwitchingTable.add(data.getSourceMacAddress());
+				}
+			}
+			case 1 -> {
+				if(!eth1SwitchingTable.contains(data.getSourceMacAddress())) {
+					eth1SwitchingTable.add(data.getSourceMacAddress());
+				}
+			}
 		}
 
 		//check if this packet is intended for this router
