@@ -3,6 +3,7 @@ package com.cbi.coollink.blocks.blockentities;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.Util;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import com.cbi.coollink.blocks.networkdevices.RedstoneControllerWired;
 import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.WireDataPacket;
@@ -188,6 +189,16 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
                     routerMac = ipData.getSourceMacAddress();
                     Main.LOGGER.info("Set device Ip to "+deviceIp);
                 }
+                case "setpower" -> {
+                    //TODO filter this to only be awable on the Sender block
+                    int powerLevel = ipData.getData().getInt("power",0);
+                    powerLevel = Math.min(15,Math.max(0,powerLevel));
+                    World world = getWorld();
+                    if(world != null){
+                        world.setBlockState(getPos(),getCachedState().with(RedstoneControllerWired.POWER,powerLevel));
+                        Main.LOGGER.info("RSS set power to: "+powerLevel);
+                    }
+                }
                 default -> Main.LOGGER.info("Received data RSS: "+data+" on port: "+connectionIndex+" at "+getPos());
             }
         }
@@ -203,6 +214,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
             redstoneControllerWiredBE.networkPingCounter = 0;
             NbtCompound payload = new NbtCompound();
             payload.putString("type","connect");
+            //TODO set the device name based on the actual device type
             payload.putString("deviceName","Redstone Receiver Wired");
             if(redstoneControllerWiredBE.routerMac == null) {
                 redstoneControllerWiredBE.sendPacket(new IpDataPacket("169.0.0.1", redstoneControllerWiredBE.deviceIp, redstoneControllerWiredBE.mac, payload));

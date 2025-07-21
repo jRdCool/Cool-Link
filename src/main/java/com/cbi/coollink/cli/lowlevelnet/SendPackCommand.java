@@ -2,15 +2,12 @@ package com.cbi.coollink.cli.lowlevelnet;
 
 import com.cbi.coollink.Util;
 import com.cbi.coollink.cli.CliProgram;
-import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import com.cbi.coollink.terminal.CommandTextOutputArea;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.StringNbtReader;
 
-import java.io.DataInput;
 import java.util.HashMap;
 
 public class SendPackCommand implements CliProgram {
@@ -37,7 +34,7 @@ public class SendPackCommand implements CliProgram {
         try {
             packetNbt = StringNbtReader.readCompound(rawStringNbt);
         } catch (CommandSyntaxException e) {
-            stdout.addLine("§cError parsing NBT:§r "+e.getRawMessage());
+            stdout.addLine("§cError parsing NBT:§r "+e.getMessage());
             return;
         }
         networkInterface.sendRawData(destIp,packetNbt);
