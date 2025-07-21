@@ -75,4 +75,20 @@ public class Util {
 
         throw new IllegalStateException("Index out of bounds after shell computation");
     }
+
+    public static String parseIpGetIp(String rawIp){
+        String[] ipart = rawIp.split(":");
+        return ipart[0];
+    }
+
+    public static int parseIpGetPort(String rawIp){
+        String[] ipart = rawIp.split(":");
+        if(ipart.length == 1){
+            return -1;
+        }
+        if(ipart.length>=2){
+            return Integer.parseInt(ipart[1]);
+        }
+        return -1;
+    }
 }

@@ -1,6 +1,7 @@
 package com.cbi.coollink.blocks.blockentities;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.Util;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.blocks.networkdevices.AccessPoint;
 import com.cbi.coollink.blocks.networkdevices.Modem;
@@ -68,6 +69,14 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 	private int onlineCheckCounter = 0;
 	private boolean online = false;
+
+	private final Queue<IpDataPacket> switchingPacketQueue = new ArrayDeque<>();
+
+	private final ArrayList<Mac> eth0SwitchingTable = new ArrayList<>();
+
+	private final ArrayList<Mac> eth1SwitchingTable = new ArrayList<>();
+
+	private final HashMap<Mac, ServerPlayerEntity> mobileClientRouting = new HashMap<>();
 
 
 	// Serialize the BlockEntity
@@ -285,7 +294,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		if(data instanceof CoaxDataPacket coax){
 			handleCoaxPacket(coax);
 		}else if(data instanceof IpDataPacket ip){
-			handleEthernetPacker(ip,connectionIndex);
+			handleEthernetPacket(ip,connectionIndex);
 		}
 	}
 
@@ -294,7 +303,28 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		onlineCheckCounter = 0;
 	}
 
-	private void handleEthernetPacker(IpDataPacket data,int nodeIndex){
+	private void handleEthernetPacket(IpDataPacket data, int nodeIndex){
+		switch (nodeIndex){
+			case 0 -> eth0SwitchingTable.add(data.getSourceMacAddress());
+			case 1 -> eth1SwitchingTable.add(data.getSourceMacAddress());
+		}
+
+		//check if this packet is intended for this router
+		//if so process this packet
+		if(!data.hasDestinationMac()){
+			//resolve IP
+			if(resolveMacAddress(data)){
+				return;//if this is a device joining the network do not add the packet to the routing queue
+			}
+		}
+		if(Util.parseIpGetIp(data.getDestinationIpAddress()).equals("169.0.0.1")){
+			//handle packet
+			handleRouterPacket(data);
+		}else {
+
+			//otherwise send this indo the switching queue
+			switchingPacketQueue.add(data);
+		}
 
 	}
 
@@ -332,7 +362,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 */
 	@Override
 	public void processIncomingWifiPacket(WIFIClientIpPacket packet, ServerPlayerEntity player) {
-
+		//apply delay based on distance
+		mobileClientRouting.put(packet.payload().getSourceMacAddress(), player);
+		//check if this packet is going to this AOI and process it if so
+		//place the packet in the routing queue
+		handleEthernetPacket(packet.payload(),-1);
 	}
 
 	/**
@@ -347,7 +381,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 	@Override
 	public void handleClientWifiConnectionRequest(String password, Mac deviceMacAddress, ServerPlayerEntity player, String deviceName) {
-		//in this situation we are already at the rougher swo we can just process this immediately, but if wer were not at the rougher then we would have to send a packet to the rougher with the info
+		//in this situation we are already at the rougher so we can just process this immediately, but if wer were not at the rougher then we would have to send a packet to the rougher with the info
 
 		//check if this is device is already connected
 		for(ConnectedDevice device: connectedDevices){
@@ -402,6 +436,121 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}while (ipExsists);
 
 		return ip;
+	}
+
+	@Override
+	public void switchProcessPacketQueue() {
+		final int maxPackersPerTick = 5;
+		for(int i=0;i<maxPackersPerTick;i++){
+			IpDataPacket packet = switchingPacketQueue.poll();
+			if(packet == null){
+				return;
+			}
+			sendPacket(packet);
+		}
+	}
+
+	private void sendPacket(IpDataPacket packet) {
+		//figure out what port to send out the paket on/if the packet needs to be sent over wifi
+		int port = -1;
+		if(eth0SwitchingTable.contains(packet.getDestinationMacAddress())){
+			port = 0;
+		}
+		if(eth1SwitchingTable.contains(packet.getDestinationMacAddress())){
+			port = 1;
+		}
+
+		if(port == -1){
+			//check for wifi routing
+			return;
+		}
+
+		LocalNode portConnected = getDestinationNode(port);
+		if(portConnected == null){
+			//this port is not connected, remove every mac from this
+			//TODO remove these devices from the device list before clearing the list
+			switch (port){
+				case 0 -> eth0SwitchingTable.clear();
+				case 1 -> eth1SwitchingTable.clear();
+			}
+			//also i guess the packet is lost then
+			return;
+		}
+		if(portConnected.getBlockEntity() instanceof IWireNode otherDevice){
+			otherDevice.transmitData(portConnected.getIndex(), packet);
+		}else{
+			//uhhhhh i guess the packet is lost then
+		}
+	}
+
+
+	@Override
+	public boolean resolveMacAddress(IpDataPacket data) {
+		String ip = Util.parseIpGetIp(data.getDestinationIpAddress());
+		if(ip.equals("169.0.0.1")){
+			setupNewEthDevice(data);
+			return true;
+		}else{
+			//just resolve the Mac
+			ConnectedDevice device = null;
+			for(ConnectedDevice cd: connectedDevices){
+				if(cd.ipAddress().equals(ip)){
+					device = cd;
+					break;
+				}
+			}
+			if(device == null){//if the device is not found on the network then eat the packet and send a 404 type response
+				//TODO send some sort of no device found result
+				return true;
+			}
+			data.setDestinationMacAddress(device.deviceMac());
+			return false;
+		}
+
+	}
+
+	private void setupNewEthDevice(IpDataPacket data) {
+		data.setDestinationMacAddress(mac1);
+		//having to add the device to the network
+		//see if this device is already on the net
+		ConnectedDevice device = null;
+		for(ConnectedDevice cd: connectedDevices){
+			if(cd.deviceMac().equals(data.getSourceMacAddress())){
+				device = cd;
+				break;
+			}
+		}
+		if(device != null) {
+			//if so then send them the valid packet back
+			NbtCompound response = new NbtCompound();
+			response.putString("type","connected");
+			response.putBoolean("online",online);
+			sendPacket(new IpDataPacket(device.ipAddress(),"169.0.0.1",mac1,device.deviceMac(),response));
+			return;
+		}
+
+		//check to see if the network is full
+		if(connectedDevices.size() >= MAX_CONNECTED_DEVICES) {
+			//if it is then send a rejection packet
+			//perhaps do this later
+			return;
+		}
+
+		//register this device on the network and send it its IP back
+		String deviceIp = generateNewIp();
+		String deviceName = data.getData().getString("deviceName","Unnamed device");
+		connectedDevices.add(new ConnectedDevice(deviceIp, data.getSourceMacAddress(),deviceName));
+		NbtCompound response = new NbtCompound();
+		response.putString("type","connected");
+		response.putBoolean("online",online);
+		sendPacket(new IpDataPacket(deviceIp,"169.0.0.1",mac1, data.getSourceMacAddress(),response));
+	}
+
+	public void handleRouterPacket(IpDataPacket data){
+		String type = data.getData().getString("type","unknown");
+		switch (type) {
+			case "connect" -> setupNewEthDevice(data);
+		}
 	}
 
 	public record ConnectedDevice(String ipAddress, Mac deviceMac, String deviceName){

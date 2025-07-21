@@ -2,14 +2,12 @@ package com.cbi.coollink.net.protocol;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.util.math.BlockPos;
 
 import java.nio.charset.Charset;
 
-public class IpDataPacket {
+public class IpDataPacket implements WireDataPacket{
 
     public static final PacketCodec<ByteBuf, IpDataPacket> PACKET_CODEC = new PacketCodec<ByteBuf, IpDataPacket>() {
         public IpDataPacket decode(ByteBuf byteBuf) {
