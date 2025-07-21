@@ -3,6 +3,7 @@ package com.cbi.coollink.blocks.blockentities;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.Util;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import com.cbi.coollink.blocks.networkdevices.NetworkDevice;
 import com.cbi.coollink.blocks.networkdevices.RedstoneControllerWired;
 import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode {
+public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode, NetworkDevice {
 
     public RedstoneControllerWiredBE(BlockPos pos, BlockState state, BlockEntityType<?> type) {
         super(type, pos, state);
@@ -187,7 +188,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
                 case "connected" -> {
                     deviceIp = Util.parseIpGetIp(ipData.getDestinationIpAddress());
                     routerMac = ipData.getSourceMacAddress();
-                    Main.LOGGER.info("Set device Ip to "+deviceIp);
+                    //Main.LOGGER.info("Set device Ip to "+deviceIp);
                 }
                 case "setpower" -> {
                     //TODO filter this to only be awable on the Sender block
@@ -196,10 +197,10 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
                     World world = getWorld();
                     if(world != null){
                         world.setBlockState(getPos(),getCachedState().with(RedstoneControllerWired.POWER,powerLevel));
-                        Main.LOGGER.info("RSS set power to: "+powerLevel);
+                        //Main.LOGGER.info("RSS set power to: "+powerLevel);
                     }
                 }
-                default -> Main.LOGGER.info("Received data RSS: "+data+" on port: "+connectionIndex+" at "+getPos());
+                //default -> Main.LOGGER.info("Received data RSS: "+data+" on port: "+connectionIndex+" at "+getPos());
             }
         }
     }
@@ -286,4 +287,8 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
     }//checks if the connection is null
 
 
+    @Override
+    public String getIpAddress() {
+        return deviceIp;
+    }
 }

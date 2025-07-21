@@ -3,10 +3,7 @@ package com.cbi.coollink.blocks.blockentities;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.Util;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
-import com.cbi.coollink.blocks.networkdevices.AccessPoint;
-import com.cbi.coollink.blocks.networkdevices.Modem;
-import com.cbi.coollink.blocks.networkdevices.Router;
-import com.cbi.coollink.blocks.networkdevices.Switch;
+import com.cbi.coollink.blocks.networkdevices.*;
 import com.cbi.coollink.net.AccessPointLocationPacket;
 import com.cbi.coollink.net.ClientWifiConnectionResultPacket;
 import com.cbi.coollink.net.WIFIClientIpPacket;
@@ -39,7 +36,7 @@ import java.util.*;
 // Made with Blockbench 4.5.2
 // Exported for Minecraft version 1.17+ for Yarn
 // Paste this class into your mod and generate all required imports
-public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoint, Router, Switch, Modem {
+public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoint, Router, Switch, Modem, NetworkDevice {
 	public AIOBlockEntity(BlockPos pos, BlockState state) {
 		super(Main.AIO_BLOCK_ENTITY, pos, state);
 		//String currentThread = Thread.currentThread().getName();
@@ -564,6 +561,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		switch (type) {
 			case "connect" -> setupNewEthDevice(data);
 		}
+	}
+
+	@Override
+	public String getIpAddress() {
+		return "169.0.0.1";
 	}
 
 	public record ConnectedDevice(String ipAddress, Mac deviceMac, String deviceName){

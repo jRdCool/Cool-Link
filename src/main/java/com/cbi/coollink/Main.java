@@ -18,6 +18,7 @@ import com.cbi.coollink.net.*;
 import com.cbi.coollink.rendering.IWireNode;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -29,6 +30,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.render.BlockRenderLayer;
+import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -42,8 +44,9 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -343,7 +346,7 @@ public class Main implements ModInitializer {
             //execute code on the server thread
             context.server().execute(() ->{
                 BlockEntity be = context.server().getWorld(wrk).getBlockEntity(pos);
-                if(be instanceof com.cbi.coollink.blocks.blockentities.ConduitBlockEntity conduitBlockEntity){
+                if(be instanceof ConduitBlockEntity conduitBlockEntity){
                     if(ns.getRegistryEntry().getIdAsString().equals("minecraft:air")){
                         conduitBlockEntity.setCoverBlock(null);
                     }else{
@@ -401,7 +404,28 @@ public class Main implements ModInitializer {
             });
         });
 
-
+        CommandRegistrationCallback.EVENT.register((dispatcher, commandRegistryAccess, registrationEnvironment) -> dispatcher.register(CommandManager.literal("getIp")
+                .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
+                        .executes(commandContext -> {
+                            BlockPos pos = BlockPosArgumentType.getBlockPos(commandContext,"pos");
+                            BlockEntity block = commandContext.getSource().getWorld().getBlockEntity(pos);
+                            if(block == null){
+                                commandContext.getSource().sendError(Text.of("That block is not a block entity"));
+                                return 1;
+                            }
+                            if(block instanceof NetworkDevice netDevice){
+                                //Text.of("This block's ip address is: "+netDevice.getIpAddress()
+                                MutableText ipText = MutableText.of(new PlainTextContent.Literal(netDevice.getIpAddress())).withColor(0x00FF00);
+                                ipText.setStyle(ipText.getStyle().withClickEvent(new ClickEvent.CopyToClipboard(netDevice.getIpAddress()))
+                                        .withHoverEvent(new HoverEvent.ShowText(Text.of("Click to Copy"))));
+                                commandContext.getSource().sendMessage(MutableText.of(new PlainTextContent.Literal("This block's ip address is: ")).append(ipText));
+                                return 0;
+                            }else {
+                                commandContext.getSource().sendError(Text.of("This block is not a network device with an ip"));
+                                return 1;
+                            }
+                        })
+                )));
 
 
 
