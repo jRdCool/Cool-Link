@@ -6,6 +6,7 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.registry.RegistryKey;
@@ -20,6 +21,7 @@ import net.minecraft.world.WorldView;
 import net.minecraft.world.block.OrientationHelper;
 import net.minecraft.world.block.WireOrientation;
 import net.minecraft.world.tick.ScheduledTickView;
+import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.state.property.Properties.FACING;
 
@@ -82,6 +84,8 @@ public class RSSenderWired extends RedstoneControllerWired{
 
         this.updateNeighbors(world, pos, state);
     }
+
+
 /*
     private void scheduleTick(WorldView world, ScheduledTickView tickView, BlockPos pos) {
         if (!world.isClient() && !tickView.getBlockTickScheduler().isQueued(pos, this)) {

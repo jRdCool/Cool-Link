@@ -7,6 +7,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -131,53 +132,6 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
         int i = world.getReceivedRedstonePower(pos);
         this.wiresGivePower = true;
         return i;
-    }
-
-
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-       //TODO : input power logic here
-
-        /*if (direction == Direction.DOWN) {
-            return !this.canRunOnTop(world, neighborPos, neighborState) ? Blocks.AIR.getDefaultState() : state;
-        } else if (direction == Direction.UP) {
-            return this.getPlacementState(world, state, pos);
-        } else {
-            WireConnection wireConnection = this.getRenderConnectionType(world, pos, direction);
-            return wireConnection.isConnected() == ((WireConnection)state.get((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction))).isConnected() && !isFullyConnected(state) ? (BlockState)state.with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction), wireConnection) : this.getPlacementState(world, (BlockState)((BlockState)this.dotState.with(POWER, (Integer)state.get(POWER))).with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction), wireConnection), pos);
-        }*/
-        return state.with(POWER,6);
-    }
-
-    private void shouldExtend(RedstoneView world, BlockPos pos, Direction facing) {
-        Direction[] var4 = Direction.values();
-        int var5 = var4.length;
-
-        int var6;
-        for(var6 = 0; var6 < var5; ++var6) {
-            Direction direction = var4[var6];
-            if (direction != facing && world.isEmittingRedstonePower(pos.offset(direction), direction)) {
-                world.getBlockState(pos).with(POWERED,true);
-                return;
-            }
-        }
-        //world.
-        if (world.isEmittingRedstonePower(pos, Direction.DOWN)) {
-            world.getBlockState(pos).with(POWERED,true);
-            return;
-        } else {
-            BlockPos blockPos = pos.up();
-            Direction[] var10 = Direction.values();
-            var6 = var10.length;
-
-            for(int var11 = 0; var11 < var6; ++var11) {
-                Direction direction2 = var10[var11];
-                if (direction2 != Direction.DOWN && world.isEmittingRedstonePower(blockPos.offset(direction2), direction2)) {
-                    world.getBlockState(pos).with(POWERED,true);
-                    return;
-                }
-            }
-            world.getBlockState(pos).with(POWERED,false);
-        }
     }
 
 
