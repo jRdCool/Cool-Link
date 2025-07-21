@@ -9,6 +9,8 @@ import com.cbi.coollink.blocks.networkdevices.Switch;
 import com.cbi.coollink.net.AccessPointLocationPacket;
 import com.cbi.coollink.net.ClientWifiConnectionResultPacket;
 import com.cbi.coollink.net.WIFIClientIpPacket;
+import com.cbi.coollink.net.protocol.CoaxDataPacket;
+import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
@@ -54,7 +56,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	private final boolean[] isNodeUsed = new boolean[nodeCount];
 	public String password;
 	public String ssid;
-	public String netPass;
+	public String netPass = "";
 	private final LocalNode[] localNodes;
 	private static final int deviceID = 0x11;
 	public Mac mac1,mac2;
@@ -63,6 +65,9 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 	public static final int MAX_CONNECTED_DEVICES = 15;
 	public ArrayList<ConnectedDevice> connectedDevices=new ArrayList<>();
+
+	private int onlineCheckCounter = 0;
+	private boolean online = false;
 
 
 	// Serialize the BlockEntity
@@ -134,6 +139,25 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//called from the AIONetwork block class
+		if(world.isClient){
+			return;
+		}
+		be.onlineCheckCounter ++;
+		if(be.onlineCheckCounter == 5*20){//if the check online counter is at the check level
+			LocalNode output = be.getDestinationNode(2);//get the other end of the coax cable
+			if(output == null){//if there was nothing at the other end
+				be.online = false;//then you are offline
+			}else{
+				if(output.getBlockEntity() instanceof IWireNode outputNode){//convert the output to a wire node
+					//send a request to the other end asking if it is online
+					outputNode.transmitData(output.getIndex(), CoaxDataPacket.ofRequest());
+				}
+			}
+		}else if(be.onlineCheckCounter >= 10*20){
+			be.online =false;
+			be.onlineCheckCounter = 0;
+		}
+
 	}//run on tick
 	public void updateStates(){
 		if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
@@ -257,8 +281,21 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 */
 	@Override
 	public void transmitData(int connectionIndex, WireDataPacket data) {
-		//TODO
-		Main.LOGGER.info("Received data: "+data+" on port: "+connectionIndex+" at "+getPos());
+		//Main.LOGGER.info("Received data: "+data+" on port: "+connectionIndex+" at "+getPos());
+		if(data instanceof CoaxDataPacket coax){
+			handleCoaxPacket(coax);
+		}else if(data instanceof IpDataPacket ip){
+			handleEthernetPacker(ip,connectionIndex);
+		}
+	}
+
+	private void handleCoaxPacket(CoaxDataPacket cdp){
+		online = cdp.isUplinkOnline();
+		onlineCheckCounter = 0;
+	}
+
+	private void handleEthernetPacker(IpDataPacket data,int nodeIndex){
+
 	}
 
 
@@ -316,7 +353,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		for(ConnectedDevice device: connectedDevices){
 			if(device.deviceMac().equals(deviceMacAddress)){
 				//this device is already connected
-				ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(false,false,device.ipAddress(),ssid,false));
+				ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(false,false,device.ipAddress(),ssid,online));
 				return;
 			}
 		}
@@ -330,7 +367,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		if(netPass.isEmpty() || password.equals(netPass)){//correct password
 			String deviceIp = generateNewIp();
 			connectedDevices.add(new ConnectedDevice(deviceIp,deviceMacAddress,deviceName));
-			ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(false,false,deviceIp,ssid,false));
+			ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(false,false,deviceIp,ssid,online));
 		}else{
 			//incorrect password
 			ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(true,false,"",ssid,false));

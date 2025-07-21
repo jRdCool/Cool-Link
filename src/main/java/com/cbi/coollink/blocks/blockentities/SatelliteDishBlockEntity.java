@@ -3,6 +3,7 @@ package com.cbi.coollink.blocks.blockentities;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
+import com.cbi.coollink.net.protocol.CoaxDataPacket;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
@@ -18,8 +19,10 @@ import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Heightmap;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
@@ -182,8 +185,35 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
      */
     @Override
     public void transmitData(int connectionIndex, WireDataPacket data) {
-        //TODO
-        Main.LOGGER.error("Unimplemented method in SatelliteDishBlockEntity: transmitData");
+        if(data instanceof CoaxDataPacket coaxData){
+            if(coaxData.isRequestOnline()){
+                boolean online = false;
+                //check assembled
+                boolean assembled = Objects.requireNonNull(getWorld()).getBlockState(getPos()).get(Main.ASSEMBLED_BOOLEAN_PROPERTY);
+                if(assembled){
+                    //check if there is sky axis
+                    BlockPos thisBlockPos = getPos();
+                    BlockPos thisBlockPos2 = thisBlockPos.south();
+                    BlockPos thisBlockPos3 = thisBlockPos.east();
+                    BlockPos thisBlockPos4 = thisBlockPos2.east();
+                    int topBlock = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos.getX(),thisBlockPos.getZ());
+                    int topBlock2 = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos2.getX(),thisBlockPos2.getZ());
+                    int topBlock3 = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos3.getX(),thisBlockPos3.getZ());
+                    int topBlock4 = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos4.getX(),thisBlockPos4.getZ());
+                    int aboveThisBlock = getPos().getY()+2;
+                    if(topBlock == aboveThisBlock && topBlock2 == aboveThisBlock && topBlock3 == aboveThisBlock && topBlock4 == aboveThisBlock){
+                        //sky axis
+                        online = true;
+                    }
+                }
+                LocalNode other = getDestinationNode(0);
+                if(other != null){
+                    if(other.getBlockEntity() instanceof IWireNode otherNode){
+                        otherNode.transmitData(other.getIndex(),CoaxDataPacket.ofResponse(online));
+                    }
+                }
+            }
+        }
     }
 
     @Override
