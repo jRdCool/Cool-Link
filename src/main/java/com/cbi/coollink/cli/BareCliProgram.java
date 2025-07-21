@@ -1,5 +1,6 @@
 package com.cbi.coollink.cli;
 
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import com.cbi.coollink.terminal.CommandTextOutputArea;
 
 import java.util.HashMap;
@@ -8,7 +9,7 @@ import java.util.HashMap;
  */
 public interface BareCliProgram extends CliProgram{
 
-    void init(String[] args, HashMap<String,String> env, CommandTextOutputArea stdOut);
+    void init(String[] args, HashMap<String,String> env, CommandTextOutputArea stdOut, ProgramNetworkInterface networkInterface);
 
     @Override
     default boolean isProgramRunning(){

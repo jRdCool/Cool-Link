@@ -1,5 +1,6 @@
 package com.cbi.coollink.cli;
 
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import com.cbi.coollink.terminal.CommandTextOutputArea;
 
 import java.util.HashMap;
@@ -8,11 +9,11 @@ public class InternalCommands {
 
     /**Repeat the users args back to them on the output
      */
-    public static final BareCliProgram ECHO = (args, env, stdOut) -> stdOut.addLine(String.join(" ",args));
+    public static final BareCliProgram ECHO = (args, env, stdOut,networkInterface) -> stdOut.addLine(String.join(" ",args));
 
     /**Set an environment variable
      */
-    public static final BareCliProgram EXPORT = (args, env, stdOut) -> {
+    public static final BareCliProgram EXPORT = (args, env, stdOut,networkInterface) -> {
         if(args.length==0){
             stdOut.addLine("Error: No arguments provided");
             return;
@@ -27,7 +28,7 @@ public class InternalCommands {
 
     /**List all current environment variables
      */
-    public static final BareCliProgram ENV = (args, env, stdOut) -> {
+    public static final BareCliProgram ENV = (args, env, stdOut,networkInterface) -> {
         String[] keys = env.keySet().toArray(new String[0]);
         for(String key: keys){
             stdOut.addLine(key+"="+env.get(key));
@@ -38,8 +39,8 @@ public class InternalCommands {
     public static CliProgramInit initOf(BareCliProgram program, String helpText){
         return new CliProgramInit(){
             @Override
-            public CliProgram main(String[] args, HashMap<String, String> env, CommandTextOutputArea stdOut) {
-                program.init(args,env,stdOut);
+            public CliProgram main(String[] args, HashMap<String, String> env, CommandTextOutputArea stdOut, ProgramNetworkInterface networkInterface) {
+                program.init(args,env,stdOut,networkInterface);
                 return program;
             }
             @Override

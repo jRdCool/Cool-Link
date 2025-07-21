@@ -7,6 +7,7 @@ import com.cbi.coollink.cli.InternalCommands;
 import com.cbi.coollink.cli.PackageManager;
 import com.cbi.coollink.cli.repo.CliCommandPackage;
 import com.cbi.coollink.cli.repo.CliPackageRepository;
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -56,9 +57,9 @@ public class PhoneCommandLineContext extends CommandLineContext {
         programRepository.put("echo", InternalCommands.initOf(InternalCommands.ECHO,"Print the passed in arguments to the output"));
         programRepository.put("export", InternalCommands.initOf(InternalCommands.EXPORT,"Usage: export <var>=<value>\nSet an environment variable"));
         programRepository.put("env", InternalCommands.initOf(InternalCommands.ENV,"List all environment variables"));
-        programRepository.put("cmds", InternalCommands.initOf((args, env, stdOut) -> printCommands(),"List all installed commands"));
-        programRepository.put("help", InternalCommands.initOf((args, env, stdOut) -> printHelpText(args),"Usage: help <command>\nGet the help text for a given command"));
-        programRepository.put("package", InternalCommands.initOf((args, env, stdOut) -> new PackageManager(args,env,stdOut,this),"Usage: package <install | uninstall | search | list>\nInstall and manage packages of command line programs\n\ninstall <packageId> - install new packages\nuninstall <packageId> - uninstall a package\nsearch <searchString> - search for available packages\nlist - list installed packages"));
+        programRepository.put("cmds", InternalCommands.initOf((args, env, stdOut, networkInterface) -> printCommands(),"List all installed commands"));
+        programRepository.put("help", InternalCommands.initOf((args, env, stdOut, networkInterface) -> printHelpText(args),"Usage: help <command>\nGet the help text for a given command"));
+        programRepository.put("package", InternalCommands.initOf((args, env, stdOut, networkInterface) -> new PackageManager(args,env,stdOut,this, networkInterface),"Usage: package <install | uninstall | search | list>\nInstall and manage packages of command line programs\n\ninstall <packageId> - install new packages\nuninstall <packageId> - uninstall a package\nsearch <searchString> - search for available packages\nlist - list installed packages"));
         //load commands from packages here
         NbtList installedPackages = terminalData.getListOrEmpty("installed_packages");
         if(installedPackages.isEmpty()){
@@ -78,7 +79,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
     private final CommandTextOutputArea textOut;
 
     @Override
-    public void executeCommand(String command) {
+    public void executeCommand(String command, ProgramNetworkInterface networkInterface) {
         //check if the command should be echoed back to the user
         String echoValue = environmentVariables.get("ECHO");//get the value of the environment variable
         boolean echo = true;
@@ -111,7 +112,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
         ).toArray(String[]::new);
         //run the program
 
-        currentExecutingProgram = initProgram.main(args, environmentVariables, textOut);
+        currentExecutingProgram = initProgram.main(args, environmentVariables, textOut, networkInterface);
 
     }
 

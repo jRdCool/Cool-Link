@@ -10,6 +10,7 @@ import com.cbi.coollink.blocks.wallports.*;
 import com.cbi.coollink.cli.CliProgramInit;
 import com.cbi.coollink.cli.example.HelloWorld;
 import com.cbi.coollink.cli.example.Loading;
+import com.cbi.coollink.cli.lowlevelnet.SendPackCommand;
 import com.cbi.coollink.cli.repo.CliCommandPackage;
 import com.cbi.coollink.cli.repo.CliPackageRepository;
 import com.cbi.coollink.items.*;
@@ -17,6 +18,7 @@ import com.cbi.coollink.net.*;
 import com.cbi.coollink.rendering.IWireNode;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -28,6 +30,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.render.BlockRenderLayer;
+import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -41,11 +44,13 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,6 +213,11 @@ public class Main implements ModInitializer {
         PayloadTypeRegistry.playS2C().register(OpenPortSelectGuiPacket.ID,OpenPortSelectGuiPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(WireInfoDataPacket.ID,WireInfoDataPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(UpdateConduitBlockCover.ID,UpdateConduitBlockCover.CODEC);
+        PayloadTypeRegistry.playC2S().register(WIFIClientIpPacket.ID,WIFIClientIpPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(AccessPointLocationPacket.ID,AccessPointLocationPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(RequestAccessPointPositionsPacket.ID,RequestAccessPointPositionsPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(ConnectToWifiNetworkRequestPacket.ID,ConnectToWifiNetworkRequestPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(ClientWifiConnectionResultPacket.ID,ClientWifiConnectionResultPacket.CODEC);
 
         //register a packet listener to listen for the aio-set-password packet
         ServerPlayNetworking.registerGlobalReceiver(AioSetAdminPasswordPacket.ID, (payload, context) -> {
@@ -336,7 +346,7 @@ public class Main implements ModInitializer {
             //execute code on the server thread
             context.server().execute(() ->{
                 BlockEntity be = context.server().getWorld(wrk).getBlockEntity(pos);
-                if(be instanceof com.cbi.coollink.blocks.blockentities.ConduitBlockEntity conduitBlockEntity){
+                if(be instanceof ConduitBlockEntity conduitBlockEntity){
                     if(ns.getRegistryEntry().getIdAsString().equals("minecraft:air")){
                         conduitBlockEntity.setCoverBlock(null);
                     }else{
@@ -345,6 +355,78 @@ public class Main implements ModInitializer {
                 }
             });
         });
+
+        ServerPlayNetworking.registerGlobalReceiver(WIFIClientIpPacket.ID,(wifiClientIpPacket, context) -> {
+            RegistryKey<World> wrk=wifiClientIpPacket.world();
+            BlockPos apLocation = wifiClientIpPacket.accessPointPosition();
+            World world = context.server().getWorld(wrk);
+            if(world == null){
+                LOGGER.error("Wold was null");
+                return;
+            }
+            context.server().execute(()->{
+                BlockEntity be = world.getBlockEntity(apLocation);
+                if(be instanceof AccessPoint ap){
+                    ap.processIncomingWifiPacket(wifiClientIpPacket,context.player());
+                }
+            });
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(RequestAccessPointPositionsPacket.ID,(wifiClientIpPacket, context) -> {
+            RegistryKey<World> wrk=wifiClientIpPacket.world();
+            BlockPos apLocation = wifiClientIpPacket.accessPointPosition();
+            World world = context.server().getWorld(wrk);
+            if(world == null){
+                LOGGER.error("Wold was null");
+                return;
+            }
+            context.server().execute(()->{
+                BlockEntity be = world.getBlockEntity(apLocation);
+                if(be instanceof AccessPoint ap){
+                    ap.getNetworkAccessPointLocations(context.player());
+                }
+            });
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(ConnectToWifiNetworkRequestPacket.ID, (connectToWifiNetworkRequestPacket, context) -> {
+            RegistryKey<World> wrk=connectToWifiNetworkRequestPacket.world();
+            BlockPos apLocation = connectToWifiNetworkRequestPacket.accessPointPosition();
+            World world = context.server().getWorld(wrk);
+            if(world == null){
+                LOGGER.error("Wold was null");
+                return;
+            }
+            context.server().execute(()->{
+                BlockEntity be = world.getBlockEntity(apLocation);
+                if(be instanceof AccessPoint ap){
+                    ap.handleClientWifiConnectionRequest(connectToWifiNetworkRequestPacket.password(),connectToWifiNetworkRequestPacket.deviceMacAddress(),context.player(),connectToWifiNetworkRequestPacket.deviceName());
+                }
+            });
+        });
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, commandRegistryAccess, registrationEnvironment) -> dispatcher.register(CommandManager.literal("getIp")
+                .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
+                        .executes(commandContext -> {
+                            BlockPos pos = BlockPosArgumentType.getBlockPos(commandContext,"pos");
+                            BlockEntity block = commandContext.getSource().getWorld().getBlockEntity(pos);
+                            if(block == null){
+                                commandContext.getSource().sendError(Text.of("That block is not a block entity"));
+                                return 1;
+                            }
+                            if(block instanceof NetworkDevice netDevice){
+                                //Text.of("This block's ip address is: "+netDevice.getIpAddress()
+                                MutableText ipText = MutableText.of(new PlainTextContent.Literal(netDevice.getIpAddress())).withColor(0x00FF00);
+                                ipText.setStyle(ipText.getStyle().withClickEvent(new ClickEvent.CopyToClipboard(netDevice.getIpAddress()))
+                                        .withHoverEvent(new HoverEvent.ShowText(Text.of("Click to Copy"))));
+                                commandContext.getSource().sendMessage(MutableText.of(new PlainTextContent.Literal("This block's ip address is: ")).append(ipText));
+                                return 0;
+                            }else {
+                                commandContext.getSource().sendError(Text.of("This block is not a network device with an ip"));
+                                return 1;
+                            }
+                        })
+                )));
+
 
 
         //Register Cli program packages
@@ -355,6 +437,12 @@ public class Main implements ModInitializer {
                     new CliCommandPackage.CommandInfo("load",CliProgramInit.of(Loading::new,"Loading example of how a command can execute over time"))
                 ),
             CliPackageRepository.ANY_ENVIRONMENT);//end of example package
+        CliPackageRepository.registerPackage(new CliCommandPackage(
+                    Identifier.of(namespace,"low-level-net"),
+                    "A collection of low level network utilities",
+                    new CliCommandPackage.CommandInfo("sendpack",CliProgramInit.of(SendPackCommand::new,"Usage: sendpack <ip> <nbtdata>\nManually craft and send a packet over the network to the desired ipaddress. Spaces can be present in the raw nbt data. Does not wait for a response from the target device"))
+                ),
+            CliPackageRepository.ANY_ENVIRONMENT);
 
     }
 

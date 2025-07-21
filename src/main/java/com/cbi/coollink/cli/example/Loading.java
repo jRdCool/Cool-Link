@@ -1,6 +1,7 @@
 package com.cbi.coollink.cli.example;
 
 import com.cbi.coollink.cli.CliProgram;
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import com.cbi.coollink.terminal.CommandTextOutputArea;
 
 import java.util.HashMap;
@@ -10,7 +11,7 @@ public class Loading implements CliProgram {
     private final CommandTextOutputArea stdout;
     private int counter = 40;
 
-    public Loading(String[] ignoredArgs, HashMap<String,String> ignoredEnv, CommandTextOutputArea stdout){
+    public Loading(String[] ignoredArgs, HashMap<String,String> ignoredEnv, CommandTextOutputArea stdout, ProgramNetworkInterface networkInterface){
         this.stdout = stdout;
     }
 

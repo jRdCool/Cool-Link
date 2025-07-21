@@ -127,5 +127,9 @@ public class LocalNode {
         this.invalid = true;
     }
 
+    public BlockEntity getBlockEntity(){
+        return entity;
+    }
+
 
 }
