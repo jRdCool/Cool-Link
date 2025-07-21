@@ -1,10 +1,13 @@
 package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.blocks.blockentities.RedstoneControllerWiredBE;
 import com.cbi.coollink.rendering.IWireNode;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
@@ -113,5 +116,15 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
         super.onExploded(state, world, pos, explosion, stackMerger);
     }
 
-
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        if(state.getBlock() instanceof RSReceiverWired){
+            return validateTicker(type, Main.RS_RECEIVER_WIRED_BLOCK_ENTITY, RedstoneControllerWiredBE::tick);
+        }
+        if(state.getBlock() instanceof RSSenderWired){
+            return validateTicker(type, Main.RS_SENDER_WIRED_BLOCK_ENTITY, RedstoneControllerWiredBE::tick);
+        }
+        return null;
+    }
 }

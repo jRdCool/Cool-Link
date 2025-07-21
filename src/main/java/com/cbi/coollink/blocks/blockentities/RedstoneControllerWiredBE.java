@@ -1,7 +1,9 @@
 package com.cbi.coollink.blocks.blockentities;
 
 import com.cbi.coollink.Main;
+import com.cbi.coollink.Util;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
@@ -37,11 +39,16 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
 
     private static final int deviceID = 0x52;
     public Mac mac;
-    public ArrayList<String> deviceIP=new ArrayList<>();
     private final LocalNode[] localNodes;
 
     private static final int nodeCount = 1;
     private final boolean[] isNodeUsed = new boolean[nodeCount];
+
+    private String deviceIp = "127.0.0.1";
+
+    private int networkPingCounter = 0;
+
+    private Mac routerMac;
 
     public static RedstoneControllerWiredBE of( BlockPos pos, BlockState state,int type) {
         return switch (type){
@@ -172,8 +179,46 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
      */
     @Override
     public void transmitData(int connectionIndex, WireDataPacket data) {
-        //TODO
-        Main.LOGGER.info("Received data: "+data+" on port: "+connectionIndex+" at "+getPos());
+        //Main.LOGGER.info("Received data RSS: "+data+" on port: "+connectionIndex+" at "+getPos());
+        if(data instanceof IpDataPacket ipData) {
+            String type = ipData.getData().getString("type", "unknown");
+            switch (type) {
+                case "connected" -> {
+                    deviceIp = Util.parseIpGetIp(ipData.getDestinationIpAddress());
+                    routerMac = ipData.getSourceMacAddress();
+                    Main.LOGGER.info("Set device Ip to "+deviceIp);
+                }
+            }
+        }
+    }
+
+    public static void tick(World world, BlockPos blockPos, BlockState blockState, RedstoneControllerWiredBE redstoneControllerWiredBE) {
+        if(world.isClient){
+            return;
+        }
+        redstoneControllerWiredBE.networkPingCounter++;
+        if(redstoneControllerWiredBE.networkPingCounter == 5*20){
+            //Main.LOGGER.info("Sending Ip request packet");
+            redstoneControllerWiredBE.networkPingCounter = 0;
+            NbtCompound payload = new NbtCompound();
+            payload.putString("type","connect");
+            payload.putString("deviceName","Redstone Receiver Wired");
+            if(redstoneControllerWiredBE.routerMac == null) {
+                redstoneControllerWiredBE.sendPacket(new IpDataPacket("169.0.0.1", redstoneControllerWiredBE.deviceIp, redstoneControllerWiredBE.mac, payload));
+            }else{
+                redstoneControllerWiredBE.sendPacket(new IpDataPacket("169.0.0.1", redstoneControllerWiredBE.deviceIp, redstoneControllerWiredBE.mac,redstoneControllerWiredBE.routerMac, payload));
+            }
+        }
+    }
+
+    void sendPacket(IpDataPacket data){
+        LocalNode portConnected = getDestinationNode(0);
+        if(portConnected == null){
+            return;
+        }
+        if(portConnected.getBlockEntity() instanceof IWireNode otherDevice){
+            otherDevice.transmitData(portConnected.getIndex(), data);
+        }
     }
 
     @Override
@@ -226,4 +271,6 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode 
         //Main.LOGGER.info(index+"");
         return localNodes[index] != null;
     }//checks if the connection is null
+
+
 }
