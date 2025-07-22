@@ -538,6 +538,7 @@ public class PhoneGui extends LightweightGuiDescription {
 
     public void handleIncomingDataPacket(IpDataPacket data){
         //handle basic low level packets for the phone its self like ping
+        Main.LOGGER.info("Phone Received packet: "+data);
         networkInterface.processReceivedDataPacket(data);
     }
 

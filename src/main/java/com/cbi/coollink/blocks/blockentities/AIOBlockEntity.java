@@ -514,6 +514,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	void sendWifiClientPacket(IpDataPacket data, ServerPlayerEntity player){
+		Main.LOGGER.error("AIO Sending packet to client: "+data+" "+player.getName());
 		ServerPlayNetworking.send(player,new WIFIServerIpPacket(data, getPos()));
 	}
 
