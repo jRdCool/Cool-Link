@@ -77,9 +77,11 @@ public class PhoneCommandLineContext extends CommandLineContext {
     }
 
     private final CommandTextOutputArea textOut;
+    private ProgramNetworkInterface networkInterface;
 
     @Override
     public void executeCommand(String command, ProgramNetworkInterface networkInterface) {
+        this.networkInterface = networkInterface;
         //check if the command should be echoed back to the user
         String echoValue = environmentVariables.get("ECHO");//get the value of the environment variable
         boolean echo = true;
@@ -127,6 +129,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
             currentExecutingProgram.tick();
         }else if(currentExecutingProgram != null && !currentExecutingProgram.isProgramRunning()){
             currentExecutingProgram = null;
+            networkInterface.clearPacketReceivers();
         }
     }
 
@@ -184,6 +187,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
     @Override
     public void terminateRunningProgram() {
         currentExecutingProgram = null;
+        networkInterface.clearPacketReceivers();
         textOut.addLine("^C");
     }
 

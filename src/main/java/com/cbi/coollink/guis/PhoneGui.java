@@ -6,6 +6,7 @@ import com.cbi.coollink.net.ClientWifiConnectionResultPacket;
 import com.cbi.coollink.net.ConnectToWifiNetworkRequestPacket;
 import com.cbi.coollink.net.RequestAccessPointPositionsPacket;
 import com.cbi.coollink.net.SavePhoneDataPacket;
+import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.PhoneNetworkInterface;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
@@ -211,6 +212,9 @@ public class PhoneGui extends LightweightGuiDescription {
                 root.add(appPanel,0,0);
                 root.remove(homeButtonPanel);
                 saveData();
+                if(networkInterface != null){
+                    networkInterface.clearPacketReceivers();
+                }
             }
             currentApp=null;
         });
@@ -530,6 +534,11 @@ public class PhoneGui extends LightweightGuiDescription {
         }
         savedNetworks.add(networkInfo);
         saveData();
+    }
+
+    public void handleIncomingDataPacket(IpDataPacket data){
+        //handle basic low level packets for the phone its self like ping
+        networkInterface.processReceivedDataPacket(data);
     }
 
     protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){}

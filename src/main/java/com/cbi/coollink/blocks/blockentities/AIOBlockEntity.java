@@ -7,6 +7,7 @@ import com.cbi.coollink.blocks.networkdevices.*;
 import com.cbi.coollink.net.AccessPointLocationPacket;
 import com.cbi.coollink.net.ClientWifiConnectionResultPacket;
 import com.cbi.coollink.net.WIFIClientIpPacket;
+import com.cbi.coollink.net.WIFIServerIpPacket;
 import com.cbi.coollink.net.protocol.CoaxDataPacket;
 import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
@@ -482,6 +483,14 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 		if(port == -1){
 			//check for wifi routing
+			//checkPhoneRouting
+			ServerPlayerEntity player = mobileClientRouting.get(packet.getDestinationMacAddress());
+			if(player != null){
+				//check if the player is in the same dimension
+				if(player.getWorld().equals(getWorld())) {
+					sendWifiClientPacket(packet, player);
+				}
+			}
 			return;
 		}
 
@@ -502,6 +511,10 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}else{
 			//uhhhhh i guess the packet is lost then
 		}
+	}
+
+	void sendWifiClientPacket(IpDataPacket data, ServerPlayerEntity player){
+		ServerPlayNetworking.send(player,new WIFIServerIpPacket(data, getPos()));
 	}
 
 

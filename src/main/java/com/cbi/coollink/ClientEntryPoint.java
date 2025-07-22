@@ -9,6 +9,7 @@ import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
 import com.cbi.coollink.blocks.networkdevices.SwitchSimple;
 import com.cbi.coollink.guis.*;
 import com.cbi.coollink.net.*;
+import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.rendering.blockentities.SatelliteDishBlockEntityRenderer;
 import com.cbi.coollink.rendering.blockentities.ServerRackBlockEntityRenderer;
 import com.cbi.coollink.rendering.WireNodeRenderer;
@@ -20,9 +21,12 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
+
+import java.util.Objects;
 
 public class ClientEntryPoint implements ClientModInitializer {
     @Override
@@ -100,6 +104,19 @@ public class ClientEntryPoint implements ClientModInitializer {
                 if(screen.getDescription() instanceof PhoneGui phone){
                     phone.handleWifiConnectionResponse(clientWifiConnectionResultPacket);
                 }
+            }
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(WIFIServerIpPacket.ID, (wifiServerIpPacket, context) -> {
+            if(context.client().currentScreen instanceof PhoneScreen screen){
+                if(screen.getDescription() instanceof PhoneGui phone){
+                    phone.handleIncomingDataPacket(wifiServerIpPacket.data());
+                }
+            }else{
+                //send back a device disconnect packet
+                NbtCompound response = new NbtCompound();
+                response.putString("type","disconnect");
+                ClientPlayNetworking.send(new WIFIClientIpPacket(Objects.requireNonNull(context.client().world).getRegistryKey(),wifiServerIpPacket.apPos(),new IpDataPacket("169.0.0.1",wifiServerIpPacket.data().getDestinationIpAddress(),wifiServerIpPacket.data().getDestinationMacAddress(),response)));
             }
         });
 

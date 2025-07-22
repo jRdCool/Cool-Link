@@ -35,6 +35,11 @@ abstract public class ProgramNetworkInterface {
         packetReceiver = receiver;
     }
 
+    public void clearPacketReceivers(){
+        //NOTE: this will also have to delete any ports that are being listened on
+        packetReceiver = null;
+    }
+
     public interface PacketReceiver{
         void receive(IpDataPacket receivedData);
     }
@@ -42,4 +47,8 @@ abstract public class ProgramNetworkInterface {
     public abstract boolean isConnectedToNetwork();
 
     public abstract boolean isDeviceOnline();
+
+    public String getDeviceIp(){
+        return deviceIp;
+    };
 }
