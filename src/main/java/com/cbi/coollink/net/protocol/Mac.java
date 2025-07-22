@@ -2,10 +2,27 @@ package com.cbi.coollink.net.protocol;
 
 
 import com.cbi.coollink.Main;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 
 import java.beans.ConstructorProperties;
+import java.util.Arrays;
 
 public class Mac {
+
+    public static final PacketCodec<ByteBuf, Mac> PACKET_CODEC = new PacketCodec<>() {
+        @Override
+        public Mac decode(ByteBuf buf) {
+            return new Mac(new int[]{buf.readInt(),buf.readInt(),buf.readInt()});
+        }
+
+        @Override
+        public void encode(ByteBuf buf, Mac value) {
+            buf.writeInt(value.getMac()[0]);
+            buf.writeInt(value.getMac()[1]);
+            buf.writeInt(value.getMac()[2]);
+        }
+    };
 
     private int[] mac;
 
@@ -96,5 +113,18 @@ public class Mac {
         if(cd.length()==1){cd="0"+cd;}//adds on a leading 0 if the number is 1 character long
         if(ef.length()==1){ef="0"+ef;}//adds on a leading 0 if the number is 1 character long
         return ab+":"+cd+":"+ef;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Mac mac1 = (Mac) o;
+        return Arrays.equals(mac, mac1.mac);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(mac);
     }
 }

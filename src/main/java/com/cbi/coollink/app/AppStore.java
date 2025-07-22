@@ -1,6 +1,7 @@
 package com.cbi.coollink.app;
 
 import com.cbi.coollink.guis.PhoneGui;
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;
@@ -17,7 +18,7 @@ public final class AppStore extends AbstractRootApp{
     public static final Identifier ID = Identifier.of("cool-link","app-store");
     public static final Identifier ICON = Identifier.of("cool-link","textures/gui/app_shop_icon.png");
 
-    public AppStore(PhoneGui phone) {
+    public AppStore(PhoneGui phone, ProgramNetworkInterface networkInterface) {
         super(ID);
         this.phone=phone;
         icon = ICON;
@@ -27,34 +28,45 @@ public final class AppStore extends AbstractRootApp{
         title.setHorizontalAlignment(HorizontalAlignment.CENTER);
         panel.add(title,phoneWidth/2,3);
         timeColor=TIME_COLOR_BLACK;
-        scrollBar = new WScrollBar(Axis.VERTICAL);
-        //set this value to 16 + number of apps that don't fit on screen
-        scrollBar.setMaxValue(AppRegistry.getAppIds().length+12);
-        panel.add(scrollBar,380,15,20,170);
-        for(int i=0;i<4;i++) {
-            descriptions[i]=new WText(Text.empty());
-            panel.add(descriptions[i],70,12+50*i,phoneWidth-150,40);
-            installButtons[i]=new WButton(Text.of("Install"));
-            panel.add(installButtons[i],318,13+50*i,60,20);
-            int n = i;
-            installButtons[i].setOnClick(()->{handleAppInstallation(n);});
+        if(networkInterface.isDeviceOnline()) {
+
+            scrollBar = new WScrollBar(Axis.VERTICAL);
+            //set this value to 16 + number of apps that don't fit on screen
+            scrollBar.setMaxValue(AppRegistry.getAppIds().length + 12);
+            panel.add(scrollBar, 380, 15, 20, 170);
+            for (int i = 0; i < 4; i++) {
+                descriptions[i] = new WText(Text.empty());
+                panel.add(descriptions[i], 70, 12 + 50 * i, phoneWidth - 150, 40);
+                installButtons[i] = new WButton(Text.of("Install"));
+                panel.add(installButtons[i], 318, 13 + 50 * i, 60, 20);
+                int n = i;
+                installButtons[i].setOnClick(() -> {
+                    handleAppInstallation(n);
+                });
+            }
+        }else{
+            WLabel offline = new WLabel(Text.of("§4Device offline! Connect to the internet to install apps"));
+            offline.setHorizontalAlignment(HorizontalAlignment.CENTER);
+            panel.add(offline,phoneWidth/2,20);
         }
 
     }
 
     @Override
     public void tick() {
-        for(int i=0; i < 4 && i + scrollBar.getValue() < AppRegistry.size(); i++){
-            if(AppRegistry.getDescription(i+scrollBar.getValue())!=null) {
-                descriptions[i].setText(AppRegistry.getDescription(i+scrollBar.getValue()));
-            }else {
-                descriptions[i].setText(Text.empty());
+        if(scrollBar != null) {
+            for (int i = 0; i < 4 && i + scrollBar.getValue() < AppRegistry.size(); i++) {
+                if (AppRegistry.getDescription(i + scrollBar.getValue()) != null) {
+                    descriptions[i].setText(AppRegistry.getDescription(i + scrollBar.getValue()));
+                } else {
+                    descriptions[i].setText(Text.empty());
+                }
             }
-        }
-        for(int i=0;i<4;i++){
-            installButtons[i].setEnabled(i + scrollBar.getValue() < AppRegistry.size() && (phone.getNumInstalledApps() < 105 || phone.isAppInstalled(AppRegistry.getId(i+scrollBar.getValue()))));
-            if(installButtons[i].isEnabled()){
-                installButtons[i].setLabel(phone.isAppInstalled(AppRegistry.getId(i+scrollBar.getValue())) ? Text.of("Uninstall") : Text.of("Install"));
+            for (int i = 0; i < 4; i++) {
+                installButtons[i].setEnabled(i + scrollBar.getValue() < AppRegistry.size() && (phone.getNumInstalledApps() < 105 || phone.isAppInstalled(AppRegistry.getId(i + scrollBar.getValue()))));
+                if (installButtons[i].isEnabled()) {
+                    installButtons[i].setLabel(phone.isAppInstalled(AppRegistry.getId(i + scrollBar.getValue())) ? Text.of("Uninstall") : Text.of("Install"));
+                }
             }
         }
     }
@@ -66,8 +78,10 @@ public final class AppStore extends AbstractRootApp{
             ScreenDrawing.coloredRect(matrices,left+30,top+phoneHeight/4-5,phoneWidth-60,1,0XFF_000000);
             ScreenDrawing.coloredRect(matrices,left+30,top+phoneHeight/2-5,phoneWidth-60,1,0XFF_000000);
             ScreenDrawing.coloredRect(matrices,left+30,top+(int)(phoneHeight*3.0/4)-5,phoneWidth-60,1,0XFF_000000);
-            for(int i=0; i < 4 && i + scrollBar.getValue() < AppRegistry.size(); i++){
-                ScreenDrawing.texturedRect(matrices,left+30,top+5+50*i,35,35,AppRegistry.getIcon(i+scrollBar.getValue()),0XFF_FFFFFF);
+            if(scrollBar != null) {
+                for (int i = 0; i < 4 && i + scrollBar.getValue() < AppRegistry.size(); i++) {
+                    ScreenDrawing.texturedRect(matrices, left + 30, top + 5 + 50 * i, 35, 35, AppRegistry.getIcon(i + scrollBar.getValue()), 0XFF_FFFFFF);
+                }
             }
         });
     }

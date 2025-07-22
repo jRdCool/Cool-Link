@@ -1,12 +1,13 @@
 package com.cbi.coollink.terminal;
 
 import com.cbi.coollink.cli.repo.CliCommandPackage;
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
 import net.minecraft.util.Identifier;
 
 public abstract class CommandLineContext {
 
-    abstract public void executeCommand(String command);
+    abstract public void executeCommand(String command, ProgramNetworkInterface networkInterface);
     abstract public WWidget getTextOutput();
     abstract public void tick();
 

@@ -1,11 +1,12 @@
 package com.cbi.coollink.cli;
 
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import com.cbi.coollink.terminal.CommandTextOutputArea;
 
 import java.util.HashMap;
 
 public interface CliProgramInit {
-    CliProgram main(String[] args, HashMap<String,String> env, CommandTextOutputArea stdOut);
+    CliProgram main(String[] args, HashMap<String,String> env, CommandTextOutputArea stdOut, ProgramNetworkInterface networkInterface);
 
     /**Get the help text for this program
      * @return the help text of the given program
@@ -22,8 +23,8 @@ public interface CliProgramInit {
     static CliProgramInit of(CliProgramInit program, String helpText){
         return new CliProgramInit(){
             @Override
-            public CliProgram main(String[] args, HashMap<String, String> env, CommandTextOutputArea stdOut) {
-                return program.main(args,env,stdOut);
+            public CliProgram main(String[] args, HashMap<String, String> env, CommandTextOutputArea stdOut,ProgramNetworkInterface networkInterface) {
+                return program.main(args,env,stdOut,networkInterface);
             }
             @Override
             public String helpText() {

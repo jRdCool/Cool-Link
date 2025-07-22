@@ -1,5 +1,6 @@
 package com.cbi.coollink.guis;
 
+import com.cbi.coollink.Main;
 import io.github.cottonmc.cotton.gui.GuiDescription;
 import io.github.cottonmc.cotton.gui.client.CottonClientScreen;
 
@@ -36,7 +37,12 @@ public class PhoneScreen extends CottonClientScreen {
         if(description instanceof PhoneGui phoneGui){
             phoneGui.keyPressed(ch,keyCode,modifiers);
         }
-        return super.keyPressed(ch,keyCode,modifiers);
+        try {
+            return super.keyPressed(ch, keyCode, modifiers);
+        } catch (Exception e){
+            Main.LOGGER.error("Error processing keyboard in phone GUI: ",e);
+        }
+        return false;
     }
 
     @Override

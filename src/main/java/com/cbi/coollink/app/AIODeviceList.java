@@ -10,7 +10,7 @@ public class AIODeviceList extends WPlainPanel {
 
     public AIODeviceList() {
         device = new WButton(Text.of("name"));
-        this.add(device,5,5,160,20);
+        this.add(device,5,5,150,20);
 
         this.setSize(130,180);
 

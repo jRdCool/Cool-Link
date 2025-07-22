@@ -1,5 +1,6 @@
 package com.cbi.coollink.app;
 
+import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
@@ -28,7 +29,7 @@ public class SnakeGameApp extends AbstractPhoneApp{
     WLabel gameOverText = new WLabel(MutableText.of(new PlainTextContent.Literal("Game OVER")).setStyle(Style.EMPTY.withBold(true).withUnderline(true).withColor(0xFFFF0000)));
     boolean gameOver =false,gameOverShown=false;
 
-    public SnakeGameApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData){
+    public SnakeGameApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface){
         super(appID);//the id of the app
         icon = ICON;
         root=new WPlainPanel();//create the panel witch all widget will sit on
@@ -39,6 +40,10 @@ public class SnakeGameApp extends AbstractPhoneApp{
         apples.add(new int[]{r.nextInt(0,14),r.nextInt(0,14)});
         gameOverText.setHorizontalAlignment(HorizontalAlignment.CENTER);
         gameOverText.setVerticalAlignment(VerticalAlignment.CENTER);
+        WLabel howToPlay  = new WLabel(Text.of("Play with the"));
+        WLabel howToPlay2 = new WLabel(Text.of("arrow keys"));
+        ((WPlainPanel) root).add(howToPlay,300,phoneHeight / 2);
+        ((WPlainPanel) root).add(howToPlay2,300,phoneHeight / 2+12);
 
     }
     @Override
