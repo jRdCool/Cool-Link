@@ -170,16 +170,8 @@ public class PhoneGui extends LightweightGuiDescription {
                 }
             }
 
-            NbtList macNbt = nbt.getListOrEmpty("mac");
-            if(macNbt.isEmpty()){
-                mac = new Mac(0x31);
-            }else{
-                int[] mc = new int[3];
-                mc[0] = macNbt.getInt(0,0);
-                mc[1] = macNbt.getInt(1,0);
-                mc[2] = macNbt.getInt(2,0);
-                mac = new Mac(mc);
-            }
+            Optional<int[]> raw_mac_opt = nbt.getIntArray("mac");
+            mac = raw_mac_opt.map(Mac::new).orElseGet(() -> new Mac(0x31));
 
             //end of nbt is not empty
         }else{
@@ -408,6 +400,7 @@ public class PhoneGui extends LightweightGuiDescription {
             networks.add(wifi.toNbt());
         }
         nbt.put("networks",networks);
+        nbt.putIntArray("mac",mac.getMac());
 
         //write the data
         phoneInstance.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));

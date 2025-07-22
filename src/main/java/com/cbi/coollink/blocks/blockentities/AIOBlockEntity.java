@@ -412,6 +412,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 		if(netPass.isEmpty() || password.equals(netPass)){//correct password
 			String deviceIp = generateNewIp();
+			Main.LOGGER.info("generated new Ip: "+deviceIp+" for mac: "+deviceMacAddress+" connectedDevices: "+connectedDevices);
 			connectedDevices.add(new ConnectedDevice(deviceIp,deviceMacAddress,deviceName));
 			ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false,false,deviceIp,getSsid(),online);
 			mobileClientRouting.put(deviceMacAddress, player);
@@ -554,6 +555,13 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			}
 		}
 		if(device != null) {
+
+			String packetType = data.getData().getString("type","connect");
+			//if the device is requesting a service other than connection
+			if(!packetType.equals("connect")){
+				handleRouterPacket(data);
+				return;
+			}
 			//if so then send them the valid packet back
 			NbtCompound response = new NbtCompound();
 			response.putString("type","connected");
