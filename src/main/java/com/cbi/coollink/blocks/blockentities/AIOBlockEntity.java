@@ -52,8 +52,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	//Variable definitions
 	private static final int nodeCount = 3;
 	private final boolean[] isNodeUsed = new boolean[nodeCount];
-	public String password;
-	public String ssid;
+	public String password = "password123456";
+	public String ssid = "Unconfigured Network";
 	public String netPass = "";
 	private final LocalNode[] localNodes;
 	private static final int deviceID = 0x11;
@@ -384,7 +384,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 */
 	@Override
 	public void getNetworkAccessPointLocations(ServerPlayerEntity player) {
-		ServerPlayNetworking.send(player,new AccessPointLocationPacket(new BlockPos[]{getPos()},ssid));
+		ServerPlayNetworking.send(player,new AccessPointLocationPacket(new BlockPos[]{getPos()},getSsid()));
 	}
 
 	@Override
@@ -395,24 +395,32 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		for(ConnectedDevice device: connectedDevices){
 			if(device.deviceMac().equals(deviceMacAddress)){
 				//this device is already connected
-				ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(false,false,device.ipAddress(),ssid,online));
+				ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false,false,device.ipAddress(),getSsid(),online);
+				Main.LOGGER.info("Sending packet: "+cpn+" "+Integer.toHexString(hashCode()));
+				ServerPlayNetworking.send(player,cpn);
 				return;
 			}
 		}
 
 		if(connectedDevices.size() >= MAX_CONNECTED_DEVICES){
 			//fail, too many connected devices
-			ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(false,true,"",ssid,false));
+			ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false,true,"",getSsid(),false);
+			Main.LOGGER.info("Sending packet: "+cpn+" "+Integer.toHexString(hashCode()));
+			ServerPlayNetworking.send(player,cpn);
 			return;
 		}
 
 		if(netPass.isEmpty() || password.equals(netPass)){//correct password
 			String deviceIp = generateNewIp();
 			connectedDevices.add(new ConnectedDevice(deviceIp,deviceMacAddress,deviceName));
-			ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(false,false,deviceIp,ssid,online));
+			ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false,false,deviceIp,getSsid(),online);
+			Main.LOGGER.info("Sending packet: "+cpn+" "+Integer.toHexString(hashCode()));
+			ServerPlayNetworking.send(player,cpn);
 		}else{
 			//incorrect password
-			ServerPlayNetworking.send(player,new ClientWifiConnectionResultPacket(true,false,"",ssid,false));
+			ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(true,false,"",getSsid(),false);
+			Main.LOGGER.info("Sending packet: "+cpn+" "+Integer.toHexString(hashCode()));
+			ServerPlayNetworking.send(player,cpn);
 		}
 	}
 
@@ -423,6 +431,9 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 */
 	@Override
 	public String getSsid() {
+		if(ssid == null){
+			Main.LOGGER.error("AIO SSID NULL!");
+		}
 		return ssid;
 	}
 

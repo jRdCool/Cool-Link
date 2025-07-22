@@ -1,7 +1,12 @@
 package com.cbi.coollink;
 
 import com.cbi.coollink.app.*;
+import com.cbi.coollink.blocks.ServerRack;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
+import com.cbi.coollink.blocks.cables.CoaxCable;
+import com.cbi.coollink.blocks.networkdevices.AIO_Network;
+import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
+import com.cbi.coollink.blocks.networkdevices.SwitchSimple;
 import com.cbi.coollink.guis.*;
 import com.cbi.coollink.net.*;
 import com.cbi.coollink.rendering.blockentities.SatelliteDishBlockEntityRenderer;
@@ -10,7 +15,9 @@ import com.cbi.coollink.rendering.WireNodeRenderer;
 import com.cbi.coollink.rendering.blockentities.ConduitBlockEntityRender;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
@@ -104,5 +111,10 @@ public class ClientEntryPoint implements ClientModInitializer {
         BlockEntityRendererFactories.register(Main.MEDIUM_CONDUIT_BLOCK_ENTITY, ConduitBlockEntityRender::new);
 
 
+        BlockRenderLayerMap.putBlock(AIO_Network.ENTRY, BlockRenderLayer.CUTOUT);
+        BlockRenderLayerMap.putBlock(ServerRack.ENTRY, BlockRenderLayer.CUTOUT);
+        BlockRenderLayerMap.putBlock(SatelliteDishBlock.ENTRY, BlockRenderLayer.CUTOUT);
+        BlockRenderLayerMap.putBlock(CoaxCable.ENTRY, BlockRenderLayer.CUTOUT);
+        BlockRenderLayerMap.putBlock(SwitchSimple.ENTRY, BlockRenderLayer.CUTOUT);
     }
 }

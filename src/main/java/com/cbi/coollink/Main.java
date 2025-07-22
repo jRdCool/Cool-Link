@@ -111,7 +111,7 @@ public class Main implements ModInitializer {
 
         //aio network
         Registry.register(Registries.BLOCK, AIO_Network.BLOCK_KEY, AIO_Network.ENTRY);
-        BlockRenderLayerMap.putBlock(AIO_Network.ENTRY, BlockRenderLayer.CUTOUT);
+
         Registry.register(Registries.ITEM, AIO_Network.ITEM_KEY,new BlockItem(AIO_Network.ENTRY, new Item.Settings().registryKey(AIO_Network.ITEM_KEY)));
 
         //smartphone
@@ -131,12 +131,12 @@ public class Main implements ModInitializer {
 
         //server Rack
         Registry.register(Registries.BLOCK, ServerRack.BLOCK_KEY, ServerRack.ENTRY);
-        BlockRenderLayerMap.putBlock(ServerRack.ENTRY, BlockRenderLayer.CUTOUT);
+
         Registry.register(Registries.ITEM, ServerRack.ITEM_KEY,new BlockItem(ServerRack.ENTRY, new Item.Settings().registryKey(ServerRack.ITEM_KEY) ));
 
         //satellite dish
         Registry.register(Registries.BLOCK, SatelliteDishBlock.BLOCK_KEY, SatelliteDishBlock.ENTRY);
-        BlockRenderLayerMap.putBlock(SatelliteDishBlock.ENTRY, BlockRenderLayer.CUTOUT);
+
         Registry.register(Registries.ITEM, SatelliteDishBlock.ITEM_KEY,new BlockItem(SatelliteDishBlock.ENTRY, new Item.Settings().registryKey(SatelliteDishBlock.ITEM_KEY)));
 
         //small conduit
@@ -153,11 +153,11 @@ public class Main implements ModInitializer {
 
         //coax cable
         Registry.register(Registries.BLOCK, CoaxCable.BLOCK_KEY, CoaxCable.ENTRY);
-        BlockRenderLayerMap.putBlock(CoaxCable.ENTRY, BlockRenderLayer.CUTOUT);
+
 
         //Switch(Simple)
         Registry.register(Registries.BLOCK, SwitchSimple.BLOCK_KEY, SwitchSimple.ENTRY);
-        BlockRenderLayerMap.putBlock(SwitchSimple.ENTRY, BlockRenderLayer.CUTOUT);
+
         Registry.register(Registries.ITEM, SwitchSimple.ITEM_KEY,new BlockItem(SwitchSimple.ENTRY, new Item.Settings().registryKey(SwitchSimple.ITEM_KEY)));
 
         //legacy Items
