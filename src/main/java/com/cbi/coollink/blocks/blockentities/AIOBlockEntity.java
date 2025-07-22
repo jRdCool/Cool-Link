@@ -396,8 +396,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		for(ConnectedDevice device: connectedDevices){
 			if(device.deviceMac().equals(deviceMacAddress)){
 				//this device is already connected
+				mobileClientRouting.put(deviceMacAddress, player);
 				ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false,false,device.ipAddress(),getSsid(),online);
-				Main.LOGGER.info("Sending packet: "+cpn+" "+Integer.toHexString(hashCode()));
 				ServerPlayNetworking.send(player,cpn);
 				return;
 			}
@@ -406,7 +406,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		if(connectedDevices.size() >= MAX_CONNECTED_DEVICES){
 			//fail, too many connected devices
 			ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false,true,"",getSsid(),false);
-			Main.LOGGER.info("Sending packet: "+cpn+" "+Integer.toHexString(hashCode()));
 			ServerPlayNetworking.send(player,cpn);
 			return;
 		}
@@ -415,12 +414,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			String deviceIp = generateNewIp();
 			connectedDevices.add(new ConnectedDevice(deviceIp,deviceMacAddress,deviceName));
 			ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false,false,deviceIp,getSsid(),online);
-			Main.LOGGER.info("Sending packet: "+cpn+" "+Integer.toHexString(hashCode()));
+			mobileClientRouting.put(deviceMacAddress, player);
 			ServerPlayNetworking.send(player,cpn);
 		}else{
 			//incorrect password
 			ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(true,false,"",getSsid(),false);
-			Main.LOGGER.info("Sending packet: "+cpn+" "+Integer.toHexString(hashCode()));
 			ServerPlayNetworking.send(player,cpn);
 		}
 	}
@@ -585,12 +583,25 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		String type = data.getData().getString("type","unknown");
 		switch (type) {
 			case "connect" -> setupNewEthDevice(data);
+			case "disconnect" -> processDisconnect(data.getSourceMacAddress());
 		}
 	}
 
 	@Override
 	public String getIpAddress() {
 		return "169.0.0.1";
+	}
+
+	void processDisconnect(Mac disconnectedMac){
+		//in the case that this disconnect is from a wifi client
+		mobileClientRouting.remove(disconnectedMac);
+		//remove from connected devices
+		for(int i=0;i<connectedDevices.size();i++){
+			if(connectedDevices.get(i).deviceMac.equals(disconnectedMac)){
+				connectedDevices.remove(i);
+				break;
+			}
+		}
 	}
 
 	public record ConnectedDevice(String ipAddress, Mac deviceMac, String deviceName){
