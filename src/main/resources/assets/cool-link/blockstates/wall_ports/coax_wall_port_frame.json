@@ -1,0 +1,11 @@
+{
+  "variants":
+  {
+    "facing=north": {"model": "cool-link:block/wall_ports/wallport_base"},
+    "facing=east": {"model": "cool-link:block/wall_ports/wallport_base","y": 90},
+    "facing=south": {"model": "cool-link:block/wall_ports/wallport_base","y": 180},
+    "facing=west": {"model": "cool-link:block/wall_ports/wallport_base","y": 270},
+    "facing=up": {"model": "cool-link:block/wall_ports/wallport_base","y": 0},
+    "facing=down": {"model": "cool-link:block/wall_ports/wallport_base","y": 0}
+  }
+}

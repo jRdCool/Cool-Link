@@ -57,7 +57,7 @@ public class Main implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("cool-link");
 
     public static final String namespace = "cool-link";
-    public static final String[] woodTypes = {"oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry","bamboo","crimson","warped","pale_oak"};
+    public static final String[] woodTypes = {"oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry","bamboo","crimson","warped","pale_oak","frame"};
 
     public static final BooleanProperty ASSEMBLED_BOOLEAN_PROPERTY = BooleanProperty.of("assembled");
 
@@ -169,6 +169,9 @@ public class Main implements ModInitializer {
             Registry.register(Registries.BLOCK, BLOCK_KEY, block);
             Registry.register(Registries.ITEM, ITEM_KEY, new BlockItem(block, new Item.Settings().registryKey(ITEM_KEY)));
             coaxWallPortSingleBlockEntities.put(wood, registerBlockEntity(Identifier.of(namespace,"coax_wall_port_single_block_entity_"+wood), CoaxWallPortSingleBE.of(wood),block));
+            if(wood.equals("frame")){
+                BlockRenderLayerMap.putBlock(block, BlockRenderLayer.CUTOUT);
+            }
         }
 
         Registry.register(Registries.BLOCK,AIOWallPort.BLOCK_KEY,AIOWallPort.ENTRY);

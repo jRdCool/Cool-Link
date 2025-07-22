@@ -54,7 +54,6 @@ public class RSReceiverWired extends RedstoneControllerWired {
 
 
     protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-        //TODO : input power logic here
         //Main.LOGGER.info(neighborPos.toString());
         return shouldPower(world,pos,direction);
 
