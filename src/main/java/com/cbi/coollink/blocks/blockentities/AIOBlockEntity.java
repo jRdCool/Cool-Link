@@ -272,7 +272,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 		LocalNode outputNode = IWireNode.traverseWire(localNodes[connectionIndex]);
 		if(outputNode == null || outputNode.getType() != localNodes[connectionIndex].getType()){
-			Main.LOGGER.error("Null destination or incorrect output wire type (from AIO_BLOCK_ENTITY port: "+connectionIndex+")");
+			Main.LOGGER.error("Null destination or incorrect output wire type (from AIO_BLOCK_ENTITY port: "+connectionIndex+") "+getPos());
 			return null;
 		}
 		return outputNode;
@@ -289,7 +289,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 */
 	@Override
 	public void transmitData(int connectionIndex, WireDataPacket data) {
-		//Main.LOGGER.info("Received data: "+data+" on port: "+connectionIndex+" at "+getPos());
 		if(data instanceof CoaxDataPacket coax){
 			handleCoaxPacket(coax);
 		}else if(data instanceof IpDataPacket ip){
@@ -303,7 +302,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	private void handleEthernetPacket(IpDataPacket data, int nodeIndex){
-		//Main.LOGGER.info("Received data AIO: "+data+" on port: "+nodeIndex+" at "+getPos());
 		switch (nodeIndex){
 			case 0 -> {
 				if(!eth0SwitchingTable.contains(data.getSourceMacAddress())) {
@@ -329,7 +327,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			//handle packet
 			handleRouterPacket(data);
 		}else {
-			//Main.LOGGER.info("AIO sending packet to switching queue: "+data);
 			//otherwise send this indo the switching queue
 			switchingPacketQueue.add(data);
 		}
@@ -339,7 +336,6 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 	@Override
 	public boolean hasConnection(int index) {
-		//Main.LOGGER.info(index+"");
 		return localNodes[index] != null;
 	}//checks if the connection is null
 
@@ -370,7 +366,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 */
 	@Override
 	public void processIncomingWifiPacket(WIFIClientIpPacket packet, ServerPlayerEntity player) {
-		Main.LOGGER.info("AIO received WIFI packet: "+packet);
+		//Main.LOGGER.info("AIO received WIFI packet: "+packet);
 		//apply delay based on distance
 		mobileClientRouting.put(packet.payload().getSourceMacAddress(), player);
 		//check if this packet is going to this AOI and process it if so
@@ -412,7 +408,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 		if(netPass.isEmpty() || password.equals(netPass)){//correct password
 			String deviceIp = generateNewIp();
-			Main.LOGGER.info("generated new Ip: "+deviceIp+" for mac: "+deviceMacAddress+" connectedDevices: "+connectedDevices);
+			//Main.LOGGER.info("generated new Ip: "+deviceIp+" for mac: "+deviceMacAddress+" connectedDevices: "+connectedDevices);
 			connectedDevices.add(new ConnectedDevice(deviceIp,deviceMacAddress,deviceName));
 			ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false,false,deviceIp,getSsid(),online);
 			mobileClientRouting.put(deviceMacAddress, player);
@@ -513,7 +509,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	void sendWifiClientPacket(IpDataPacket data, ServerPlayerEntity player){
-		Main.LOGGER.error("AIO Sending packet to client: "+data+" "+player.getName());
+		//Main.LOGGER.error("AIO Sending packet to client: "+data+" "+player.getName());
 		ServerPlayNetworking.send(player,new WIFIServerIpPacket(data, getPos()));
 	}
 

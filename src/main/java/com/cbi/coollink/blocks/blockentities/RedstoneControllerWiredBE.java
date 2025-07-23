@@ -4,6 +4,8 @@ import com.cbi.coollink.Main;
 import com.cbi.coollink.Util;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.blocks.networkdevices.NetworkDevice;
+import com.cbi.coollink.blocks.networkdevices.RSReceiverWired;
+import com.cbi.coollink.blocks.networkdevices.RSSenderWired;
 import com.cbi.coollink.blocks.networkdevices.RedstoneControllerWired;
 import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
@@ -27,9 +29,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode, NetworkDevice {
 
@@ -37,6 +37,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
         super(type, pos, state);
         this.localNodes = new LocalNode[getNodeCount()];
         mac = new Mac(deviceID);
+        isSender = state.getBlock() instanceof RSSenderWired;
     }
 
     private static final int deviceID = 0x52;
@@ -51,6 +52,12 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
     private int networkPingCounter = 0;
 
     private Mac routerMac;
+
+    private String onChangeIp = "";
+
+    private final boolean isSender;
+
+    private int previousPowerLevel = 0;
 
     public static RedstoneControllerWiredBE of( BlockPos pos, BlockState state,int type) {
         return switch (type){
@@ -181,7 +188,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
      */
     @Override
     public void transmitData(int connectionIndex, WireDataPacket data) {
-        //Main.LOGGER.info("Received data RSS: "+data+" on port: "+connectionIndex+" at "+getPos());
+        //TODO auto ip mac cashing
         if(data instanceof IpDataPacket ipData) {
             String type = ipData.getData().getString("type", "unknown");
             switch (type) {
@@ -191,13 +198,40 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
                     //Main.LOGGER.info("Set device Ip to "+deviceIp);
                 }
                 case "setpower" -> {
-                    //TODO filter this to only be awable on the Sender block
-                    int powerLevel = ipData.getData().getInt("power",0);
-                    powerLevel = Math.min(15,Math.max(0,powerLevel));
-                    World world = getWorld();
-                    if(world != null){
-                        world.setBlockState(getPos(),getCachedState().with(RedstoneControllerWired.POWER,powerLevel));
-                        //Main.LOGGER.info("RSS set power to: "+powerLevel);
+                    if(isReceiver()){
+                        sendPacket(generateNotSupportedPacket("set power",ipData));
+                    }else {
+                        int powerLevel = ipData.getData().getInt("power", 0);
+                        powerLevel = Math.min(15, Math.max(0, powerLevel));
+                        World world = getWorld();
+                        if (world != null) {
+                            world.setBlockState(getPos(), getCachedState().with(RedstoneControllerWired.POWER, powerLevel));
+                            //Main.LOGGER.info("RSS set power to: "+powerLevel);
+                        }
+                    }
+                }
+                case "getpower" -> {
+                    if(isSender()){
+                        sendPacket(generateNotSupportedPacket("get power",ipData));
+                    } else {
+                        int powerLevel = getCachedState().get(RSReceiverWired.RECEIVED_POWER);
+                        NbtCompound response = new NbtCompound();
+                        response.putString("type","powerlevel");
+                        response.putInt("power",powerLevel);
+                        sendPacket(ipData.createResponsePacket(response));
+                    }
+                }
+                case "setOnPowerChangeIp" -> {
+                    if(isSender()){
+                        sendPacket(generateNotSupportedPacket("set power change ip",ipData));
+                    } else {
+                        onChangeIp = ipData.getData().getString("ip","");
+                        if(!onChangeIp.isEmpty()){
+                            if(!Util.validIp(onChangeIp)){
+                                onChangeIp = "";
+                            }
+                        }
+                        markDirty();
                     }
                 }
                 //default -> Main.LOGGER.info("Received data RSS: "+data+" on port: "+connectionIndex+" at "+getPos());
@@ -211,16 +245,27 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
         }
         redstoneControllerWiredBE.networkPingCounter++;
         if(redstoneControllerWiredBE.networkPingCounter == 5*20){
-            //Main.LOGGER.info("Sending Ip request packet");
             redstoneControllerWiredBE.networkPingCounter = 0;
             NbtCompound payload = new NbtCompound();
             payload.putString("type","connect");
-            //TODO set the device name based on the actual device type
-            payload.putString("deviceName","Redstone Receiver Wired");
+            payload.putString("deviceName","Redstone "+(redstoneControllerWiredBE.isReceiver()?"Receiver":"Sender")+" Wired");
             if(redstoneControllerWiredBE.routerMac == null) {
                 redstoneControllerWiredBE.sendPacket(new IpDataPacket("169.0.0.1", redstoneControllerWiredBE.deviceIp, redstoneControllerWiredBE.mac, payload));
             }else{
                 redstoneControllerWiredBE.sendPacket(new IpDataPacket("169.0.0.1", redstoneControllerWiredBE.deviceIp, redstoneControllerWiredBE.mac,redstoneControllerWiredBE.routerMac, payload));
+            }
+        }
+
+        if(redstoneControllerWiredBE.isReceiver()){
+            int currentPower = blockState.get(RSReceiverWired.RECEIVED_POWER);
+            if(currentPower != redstoneControllerWiredBE.previousPowerLevel){
+                redstoneControllerWiredBE.previousPowerLevel = currentPower;
+                if(!redstoneControllerWiredBE.onChangeIp.isEmpty()){
+                    NbtCompound data = new NbtCompound();
+                    data.putString("type","powerChange");
+                    data.putInt("power",currentPower);
+                    redstoneControllerWiredBE.sendPacket(new IpDataPacket(redstoneControllerWiredBE.onChangeIp, redstoneControllerWiredBE.deviceIp, redstoneControllerWiredBE.mac,data));
+                }
             }
         }
     }
@@ -249,6 +294,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
                 localNodes[i].write(connection);
             }
         }
+        view.putString("onChangeIp",onChangeIp);
 
         //view.put("connections",,nodeIDS);
     }//Writing data
@@ -275,6 +321,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
                 isNodeUsed[i] = false;
             }
         }
+        onChangeIp = view.getString("onChangeIp","");
     }//reading data
 
     public void updateStates(){
@@ -290,5 +337,20 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
     @Override
     public String getIpAddress() {
         return deviceIp;
+    }
+
+    private boolean isSender(){
+        return isSender;
+    }
+
+    private boolean isReceiver(){
+        return !isSender;
+    }
+
+    private IpDataPacket generateNotSupportedPacket(String component,IpDataPacket original){
+        NbtCompound data = new NbtCompound();
+        data.putString("type","error");
+        data.putString("message","Unsupported operation: "+component);
+        return original.createResponsePacket(data);
     }
 }
