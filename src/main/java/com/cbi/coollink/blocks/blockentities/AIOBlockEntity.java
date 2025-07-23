@@ -76,6 +76,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 	private final HashMap<Mac, ServerPlayerEntity> mobileClientRouting = new HashMap<>();
 
+	private final ArrayList<ConnectedDevice> rememberedDevices = new ArrayList<>();
+
 
 	// Serialize the BlockEntity
 	@Override
@@ -98,7 +100,10 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			}
 		}
 
-		//view.put("connections",,nodeIDS);
+		WriteView.ListView rememberedDevicesList = view.getList("rememberedDevices");
+		for(ConnectedDevice device: rememberedDevices){
+			device.writeToView(rememberedDevicesList.add());
+		}
 	}//Writing data
 
 
@@ -128,6 +133,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			}else{
 				isNodeUsed[i] = false;
 			}
+		}
+		ReadView.ListReadView rememberedDevicesList = view.getListReadView("rememberedDevices");
+		rememberedDevices.clear();
+		for(ReadView device: rememberedDevicesList){
+			rememberedDevices.add(new ConnectedDevice(device));
 		}
 	}//reading data
 
@@ -407,12 +417,21 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 
 		if(netPass.isEmpty() || password.equals(netPass)){//correct password
-			String deviceIp = generateNewIp();
-			//Main.LOGGER.info("generated new Ip: "+deviceIp+" for mac: "+deviceMacAddress+" connectedDevices: "+connectedDevices);
-			connectedDevices.add(new ConnectedDevice(deviceIp,deviceMacAddress,deviceName));
-			ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false,false,deviceIp,getSsid(),online);
-			mobileClientRouting.put(deviceMacAddress, player);
-			ServerPlayNetworking.send(player,cpn);
+			ConnectedDevice remembered = getRememberedDevice(deviceMacAddress);
+			if(remembered!=null) {
+				connectedDevices.add(remembered);
+				ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false, false, remembered.ipAddress(), getSsid(), online);
+				mobileClientRouting.put(deviceMacAddress, player);
+				ServerPlayNetworking.send(player, cpn);
+			}else {
+				String deviceIp = generateNewIp();
+				ConnectedDevice newDevice = new ConnectedDevice(deviceIp, deviceMacAddress, deviceName);
+				connectedDevices.add(newDevice);
+				rememberDevice(newDevice);
+				ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false, false, deviceIp, getSsid(), online);
+				mobileClientRouting.put(deviceMacAddress, player);
+				ServerPlayNetworking.send(player, cpn);
+			}
 		}else{
 			//incorrect password
 			ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(true,false,"",getSsid(),false);
@@ -572,15 +591,26 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			//perhaps do this later
 			return;
 		}
-
-		//register this device on the network and send it its IP back
-		String deviceIp = generateNewIp();
-		String deviceName = data.getData().getString("deviceName","Unnamed device");
-		connectedDevices.add(new ConnectedDevice(deviceIp, data.getSourceMacAddress(),deviceName));
-		NbtCompound response = new NbtCompound();
-		response.putString("type","connected");
-		response.putBoolean("online",online);
-		sendPacket(new IpDataPacket(deviceIp,"169.0.0.1",mac1, data.getSourceMacAddress(),response));
+		//see if this device has been on the network before
+		ConnectedDevice remembered = getRememberedDevice(data.getSourceMacAddress());
+		if(remembered!=null){
+			connectedDevices.add(remembered);
+			NbtCompound response = new NbtCompound();
+			response.putString("type","connected");
+			response.putBoolean("online",online);
+			sendPacket(new IpDataPacket(remembered.ipAddress(),"169.0.0.1",mac1, data.getSourceMacAddress(),response));
+		}else {
+			//register this device on the network and send it its IP back
+			String deviceIp = generateNewIp();
+			String deviceName = data.getData().getString("deviceName", "Unnamed device");
+			ConnectedDevice newDevice = new ConnectedDevice(deviceIp, data.getSourceMacAddress(), deviceName);
+			connectedDevices.add(newDevice);
+			rememberDevice(newDevice);
+			NbtCompound response = new NbtCompound();
+			response.putString("type", "connected");
+			response.putBoolean("online", online);
+			sendPacket(new IpDataPacket(deviceIp, "169.0.0.1", mac1, data.getSourceMacAddress(), response));
+		}
 	}
 
 	public void handleRouterPacket(IpDataPacket data){
@@ -608,6 +638,35 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 	}
 
+	void rememberDevice(ConnectedDevice device){
+		//check if the list needs to be purged a bit
+		int MAX_REMEMBERED_DEVICES = 60;
+		if(rememberedDevices.size()>=MAX_REMEMBERED_DEVICES){
+			//find the first one that is not online and remove that one
+			for(int i=0;i<rememberedDevices.size();i++){
+				if(!connectedDevices.contains(rememberedDevices.get(i))){
+					rememberedDevices.remove(i);
+					break;
+				}
+
+			}
+		}
+
+		//add this new device
+		rememberedDevices.add(device);
+
+		markDirty();//save changes to the server
+	}
+
+	ConnectedDevice getRememberedDevice(Mac deviceMac){
+		for(ConnectedDevice device:rememberedDevices){
+			if(device.deviceMac().equals(deviceMac)){
+				return device;
+			}
+		}
+		return null;
+	}
+
 	public record ConnectedDevice(String ipAddress, Mac deviceMac, String deviceName){
 		@Override
 		public String toString() {
@@ -616,6 +675,16 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 					", deviceMac=" + deviceMac +
 					", deviceName='" + deviceName + '\'' +
 					'}';
+		}
+
+		public ConnectedDevice(ReadView view){
+			this(view.getString("ip","0.0.0.0"),new Mac(view.getOptionalIntArray("mac").orElse(new int[]{0,0,0})),view.getString("name","Forgotten device"));
+		}
+
+		public void writeToView(WriteView output){
+			output.putString("ip",ipAddress);
+			output.putIntArray("mac",deviceMac.getMac());
+			output.putString("name",deviceName);
 		}
 	}
 }
