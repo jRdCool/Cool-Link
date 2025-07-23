@@ -2,10 +2,7 @@ package com.cbi.coollink.guis;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.app.*;
-import com.cbi.coollink.net.ClientWifiConnectionResultPacket;
-import com.cbi.coollink.net.ConnectToWifiNetworkRequestPacket;
-import com.cbi.coollink.net.RequestAccessPointPositionsPacket;
-import com.cbi.coollink.net.SavePhoneDataPacket;
+import com.cbi.coollink.net.*;
 import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.PhoneNetworkInterface;
@@ -33,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -464,6 +462,12 @@ public class PhoneGui extends LightweightGuiDescription {
             apBlockPos = closePos;
 
             //if already connected to a network then disconnect
+            if(connectedToWifi){
+                connectedToWifi = false;
+                NbtCompound goAway = new NbtCompound();
+                goAway.putString("type","disconnect");
+                networkInterface.sendRawData("169.0.0.1",goAway);
+            }
         }
     }
 
@@ -479,14 +483,18 @@ public class PhoneGui extends LightweightGuiDescription {
         }else{
             for(WifiNetworkInfo net: savedNetworks){
                 if(net.ssid.equals(response.ssid())){
-                    connectedToWifi = true;
-                    deviceIp = response.deviceIp();
-                    wifiSsid = response.ssid();
-                    deviceOnline = response.connectedToTheInternet();
-                    networkInterface = new PhoneNetworkInterface(mac,deviceIp,world,apBlockPos,deviceOnline);
-                }else{
-                    //send disconnect packet
-
+                    if(apBlockPos.equals(new BlockPos(net.apX,net.apY,net.apZ))) {//if this is the network we want to be connected to
+                        connectedToWifi = true;
+                        deviceIp = response.deviceIp();
+                        wifiSsid = response.ssid();
+                        deviceOnline = response.connectedToTheInternet();
+                        networkInterface = new PhoneNetworkInterface(mac, deviceIp, world, apBlockPos, deviceOnline);
+                    }else{
+                        //send disconnect packet
+                        NbtCompound goAway = new NbtCompound();
+                        goAway.putString("type","disconnect");
+                        ClientPlayNetworking.send(new WIFIClientIpPacket(world.getRegistryKey(),new BlockPos(net.apX,net.apY,net.apZ),new IpDataPacket("169.0.0.1", response.deviceIp(), mac,goAway)));
+                    }
                 }
             }
             wifiConnectError = 0;
@@ -517,6 +525,9 @@ public class PhoneGui extends LightweightGuiDescription {
                     if(wifiSsid.equals(networkInfo.ssid())){
                         //disconnect
                         connectedToWifi = false;
+                        NbtCompound goAway = new NbtCompound();
+                        goAway.putString("type","disconnect");
+                        networkInterface.sendRawData("169.0.0.1",goAway);
                     }
                 }else {
                     savedNetworks.set(i, networkInfo);

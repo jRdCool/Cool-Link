@@ -62,8 +62,6 @@ abstract public class ProgramNetworkInterface {
     public void processReceivedDataPacket(IpDataPacket receivedData){
         //when a new packet comes in
 
-        //update the internal ip to mac cash
-
         //check if the port responded on has a handler associated with it
         int responsePort = Util.parseIpGetPort(receivedData.getDestinationIpAddress());
         if(responsePort != -1) {//if -1 then no port was included so just go to the normal handler
