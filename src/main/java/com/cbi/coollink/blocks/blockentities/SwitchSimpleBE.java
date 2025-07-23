@@ -2,6 +2,10 @@ package com.cbi.coollink.blocks.blockentities;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
+import com.cbi.coollink.blocks.networkdevices.Router;
+import com.cbi.coollink.blocks.networkdevices.Switch;
+import com.cbi.coollink.net.protocol.IpDataPacket;
+import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
@@ -18,11 +22,12 @@ import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class SwitchSimpleBE extends BlockEntity implements IWireNode {
+public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
 
     public SwitchSimpleBE(BlockPos pos, BlockState state) {
         super(Main.SWITCH_SIMPLE_BLOCK_ENTITY, pos, state);
@@ -34,6 +39,14 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode {
     private static final int nodeCount = 5;
     private final boolean[] isNodeUsed = new boolean[nodeCount];
     private final LocalNode[] localNodes;
+
+    private int routerPort = -1;
+
+    private int routerCheckCounter = 0;
+
+    private final Queue<IpDataPacket> switchingQueue = new ArrayDeque<>();
+
+    private final ArrayList<Mac>[] switchingTables = new ArrayList[]{new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>()};
 
     @Override
     protected void writeData(WriteView view) {
@@ -157,7 +170,7 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode {
      */
     @Override
     public LocalNode getDestinationNode(int connectionIndex) {
-        if(connectionIndex < 0 || connectionIndex > 2){
+        if(connectionIndex < 0 || connectionIndex > 5){
             return null;
         }
         if(localNodes[connectionIndex] == null){
@@ -165,7 +178,7 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode {
         }
         LocalNode outputNode = IWireNode.traverseWire(localNodes[connectionIndex]);
         if(outputNode == null || outputNode.getType() != localNodes[connectionIndex].getType()){
-            Main.LOGGER.error("Null destination or incorrect output wire type (from AIO_BLOCK_ENTITY port: "+connectionIndex+")");
+            Main.LOGGER.error("Null destination or incorrect output wire type (from Simple switch port: "+connectionIndex+") "+getPos());
             return null;
         }
         return outputNode;
@@ -182,8 +195,13 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode {
      */
     @Override
     public void transmitData(int connectionIndex, WireDataPacket data) {
-        //TODO
-        Main.LOGGER.info("Received data: "+data+" on port: "+connectionIndex+" at "+getPos());
+        if(data instanceof IpDataPacket ipPacket) {
+            //add the mac from this port to the switching table
+            if(connectionIndex != routerPort){
+                switchingTables[connectionIndex].add(ipPacket.getSourceMacAddress());
+            }
+            switchingQueue.add(ipPacket);
+        }
     }
 
     @Override
@@ -215,4 +233,96 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode {
         return createNbt(registryLookup);
     }//Rendering crucial
 
+    @Override
+    public void switchProcessPacketQueue() {
+        for(int i = 0; i<15 && !switchingQueue.isEmpty(); i++){
+            IpDataPacket packet = switchingQueue.poll();
+            if(packet.hasDestinationMac()){
+                int port = getOutputPort(packet);
+                if(port != -1){
+                    //send
+                    sendPacket(packet,port);
+                }
+            }else{
+                if(routerPort != -1){
+                    //send
+                    sendPacket(packet,routerPort);
+                }
+            }
+        }
+    }
+
+    private int getOutputPort(IpDataPacket packet){
+        for(int i=0;i<5;i++){
+            if(i == routerPort){
+                continue;
+            }
+            for(Mac addr: switchingTables[i]){
+                if(addr.equals(packet.getDestinationMacAddress())){
+                    return i;
+                }
+            }
+        }
+
+        return routerPort;
+    }
+
+    void sendPacket(IpDataPacket packet,int port){
+        LocalNode connectedDevice = getDestinationNode(port);
+        if(connectedDevice != null){
+            BlockEntity otherBlock = connectedDevice.getBlockEntity();
+            if(otherBlock instanceof IWireNode node){
+                node.transmitData(connectedDevice.getIndex(),packet);
+            }
+        }else{
+            //this port is now a null destination so dump the routing table for this port
+            switchingTables[port].clear();
+        }
+    }
+
+    @Override
+    public boolean knowsWhereRouterIs() {
+        return routerPort >= 0;
+    }
+
+    private void findRouter(){
+        for(int i=0;i<5;i++){
+
+            if(localNodes[i] != null){
+                LocalNode connectedDevice = getDestinationNode(i);
+                if(connectedDevice == null){
+                    continue;
+                }
+                //Main.LOGGER.info("Searching for router: "+i+" "+getPos());
+                BlockEntity connectedBlockEntity = connectedDevice.getBlockEntity();
+                if(connectedBlockEntity instanceof Router){
+                    //Main.LOGGER.info("Found router on port: "+i);
+                    routerPort = i;
+                    return;
+                }
+                if(connectedBlockEntity instanceof Switch otherSwitch){
+                    if(otherSwitch.knowsWhereRouterIs()){
+                        //Main.LOGGER.info("Found a block that knows where the router is: "+i);
+                        routerPort = i;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void tick(World world, BlockPos blockPos, BlockState blockState, SwitchSimpleBE switchBE) {
+        if(world.isClient){
+            return;
+        }
+        switchBE.routerCheckCounter ++;
+        if((switchBE.knowsWhereRouterIs() && switchBE.routerCheckCounter >= 200) || (!switchBE.knowsWhereRouterIs() && switchBE.routerCheckCounter >= 20)){
+            //int prs = switchBE.routerPort;
+            switchBE.findRouter();
+            switchBE.routerCheckCounter = 0;
+//            if(prs != switchBE.routerPort){
+//                Main.LOGGER.info("Router found!: "+switchBE.getPos());
+//            }
+        }
+        switchBE.switchProcessPacketQueue();
+    }
 }

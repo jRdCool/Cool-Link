@@ -484,6 +484,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 	}
 
+	@Override
+	public boolean knowsWhereRouterIs() {
+		return true;
+	}
+
 	private void sendPacket(IpDataPacket packet) {
 		//Main.LOGGER.info("AIO processing send packet: "+packet);
 		//figure out what port to send out the paket on/if the packet needs to be sent over wifi

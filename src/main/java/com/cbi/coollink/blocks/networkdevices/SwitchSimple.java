@@ -6,6 +6,8 @@ import com.cbi.coollink.rendering.IWireNode;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
@@ -118,4 +120,9 @@ public class SwitchSimple extends BlockWithEntity implements BlockEntityProvider
         super.onExploded(state, world, pos, explosion, stackMerger);
     }
 
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return validateTicker(type,Main.SWITCH_SIMPLE_BLOCK_ENTITY, SwitchSimpleBE::tick);
+    }
 }
