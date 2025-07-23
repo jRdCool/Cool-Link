@@ -445,7 +445,7 @@ public class Main implements ModInitializer {
                     Identifier.of(namespace,"low-level-net"),
                     "A collection of low level network utilities",
                     new CliCommandPackage.CommandInfo("sendpack",CliProgramInit.of(SendPackCommand::new,"Usage: sendpack <ip> <nbtdata>\nManually craft and send a packet over the network to the desired ipaddress. Spaces can be present in the raw nbt data. Does not wait for a response from the target device")),
-                    new CliCommandPackage.CommandInfo("revpack", CliProgramInit.of(ReceivePacketCommand::new,"Waits for this device to receive a packet then prints its content")),
+                    new CliCommandPackage.CommandInfo("revpack", CliProgramInit.of(ReceivePacketCommand::new,"Waits for this device to receive a packet then prints its content. If the argument \"nolimit\" is present then the program will continue to run after a packet has been received.")),
                     new CliCommandPackage.CommandInfo("sendpacknwait", CliProgramInit.of(SendPackAndWaitCommand::new,"Usage: sendpack <ip> <nbtdata>\nManually craft and send a packet over the network to the desired ipaddress. Then wait for a response from the other device. Spaces can be present in the raw nbt data."))
                 ),
             CliPackageRepository.ANY_ENVIRONMENT);

@@ -9,13 +9,26 @@ import java.util.HashMap;
 public class ReceivePacketCommand implements CliProgram {
 
     boolean responseFound = false;
+    boolean noLimit = false;
 
     public ReceivePacketCommand(String[] args, HashMap<String,String> ignoredEnv, CommandTextOutputArea stdout, ProgramNetworkInterface networkInterface) {
         if (networkInterface.isConnectedToNetwork()) {
+            //arg parsing
+            if(args.length > 0){
+                if(args[0].equals("nolimit")){
+                    noLimit = true;
+                }else{
+                    stdout.addLine("Unknown argument: "+args[0]);
+                    responseFound = true;
+                    return;
+                }
+            }
             stdout.addLine("Waiting for any packet on all ports");
             networkInterface.setOnPacketReceived(receivedData -> {
                 stdout.addLine("Received data from: " + receivedData.getSourceIpAddress() + " " + receivedData.getData());
-                responseFound = true;
+                if(!noLimit) {
+                    responseFound = true;
+                }
             });
         } else {
             responseFound = true;
