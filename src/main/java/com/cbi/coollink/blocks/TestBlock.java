@@ -25,11 +25,10 @@ public class TestBlock extends Block {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        int testing = 0b11000000;
-        int test2 = testing >>> 6;
+        int testing = 0b11000000 >>> 6;
 
 
-        Main.LOGGER.info(test2+"");
+        Main.LOGGER.info(testing+"");
 
 
         return super.onUse(state, world, pos, player, hit);
