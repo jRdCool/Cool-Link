@@ -14,6 +14,7 @@ import com.cbi.coollink.cli.lowlevelnet.ReceivePacketCommand;
 import com.cbi.coollink.cli.lowlevelnet.SendPackAndWaitCommand;
 import com.cbi.coollink.cli.lowlevelnet.SendPackCommand;
 import com.cbi.coollink.cli.netutils.IfConfigProgram;
+import com.cbi.coollink.cli.netutils.PingProgram;
 import com.cbi.coollink.cli.repo.CliCommandPackage;
 import com.cbi.coollink.cli.repo.CliPackageRepository;
 import com.cbi.coollink.items.*;
@@ -455,7 +456,8 @@ public class Main implements ModInitializer {
         CliPackageRepository.registerPackage(new CliCommandPackage(
                     Identifier.of(namespace,"net-utils"),
                     "Common network utility programs",
-                    new CliCommandPackage.CommandInfo("ifconfig",CliProgramInit.of(IfConfigProgram::new,"Prints ip information"))
+                    new CliCommandPackage.CommandInfo("ifconfig",CliProgramInit.of(IfConfigProgram::new,"Prints ip information")),
+                    new CliCommandPackage.CommandInfo("ping", CliProgramInit.of(PingProgram::new,"Usage: ping <ip>\nSends a ping packet to the provided ip address and waits for a response"))
                 ),
             CliPackageRepository.ANY_ENVIRONMENT);
 

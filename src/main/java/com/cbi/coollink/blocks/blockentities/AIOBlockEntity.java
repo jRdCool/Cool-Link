@@ -175,7 +175,26 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			be.onlineCheckCounter = 0;
 		}
 
-		be.switchProcessPacketQueue();
+		be.switchProcessPacketQueue();//process packets that need to be switched
+
+		//verify the devices connected to the network by sending them a ping packet every 10 seconds
+		ArrayList<ConnectedDevice> disconnectList = new ArrayList<>();
+
+		for(ConnectedDevice device: be.connectedDevices){
+			device.connectionTimer[0]++;
+
+			if(device.connectionTimer[0] == 200){
+				be.sendPingPacket(device);
+			}
+
+			if(device.connectionTimer[0] == 400){//disconnect them if it has been 20 seconds
+				disconnectList.add(device);
+				device.connectionTimer[0] = 0;
+			}
+		}
+		for(ConnectedDevice device: disconnectList){
+			be.processDisconnect(device.deviceMac);
+		}
 	}//run on tick
 	public void updateStates(){
 		if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
@@ -425,7 +444,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 				ServerPlayNetworking.send(player, cpn);
 			}else {
 				String deviceIp = generateNewIp();
-				ConnectedDevice newDevice = new ConnectedDevice(deviceIp, deviceMacAddress, deviceName);
+				ConnectedDevice newDevice = new ConnectedDevice(deviceIp, deviceMacAddress, deviceName,new int[]{0});
 				connectedDevices.add(newDevice);
 				rememberDevice(newDevice);
 				ClientWifiConnectionResultPacket cpn = new ClientWifiConnectionResultPacket(false, false, deviceIp, getSsid(), online);
@@ -482,6 +501,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			}
 			sendPacket(packet);
 		}
+	}
+
+	@Override
+	public boolean knowsWhereRouterIs() {
+		return true;
 	}
 
 	private void sendPacket(IpDataPacket packet) {
@@ -581,6 +605,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			NbtCompound response = new NbtCompound();
 			response.putString("type","connected");
 			response.putBoolean("online",online);
+			device.connectionTimer()[0]=0;
 			sendPacket(new IpDataPacket(device.ipAddress(),"169.0.0.1",mac1,device.deviceMac(),response));
 			return;
 		}
@@ -598,12 +623,13 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			NbtCompound response = new NbtCompound();
 			response.putString("type","connected");
 			response.putBoolean("online",online);
+			remembered.connectionTimer()[0]=0;
 			sendPacket(new IpDataPacket(remembered.ipAddress(),"169.0.0.1",mac1, data.getSourceMacAddress(),response));
 		}else {
 			//register this device on the network and send it its IP back
 			String deviceIp = generateNewIp();
 			String deviceName = data.getData().getString("deviceName", "Unnamed device");
-			ConnectedDevice newDevice = new ConnectedDevice(deviceIp, data.getSourceMacAddress(), deviceName);
+			ConnectedDevice newDevice = new ConnectedDevice(deviceIp, data.getSourceMacAddress(), deviceName,new int[]{0});
 			connectedDevices.add(newDevice);
 			rememberDevice(newDevice);
 			NbtCompound response = new NbtCompound();
@@ -618,6 +644,18 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		switch (type) {
 			case "connect" -> setupNewEthDevice(data);
 			case "disconnect" -> processDisconnect(data.getSourceMacAddress());
+			case "ping" -> {
+				NbtCompound pongCompound = new NbtCompound();
+				pongCompound.putString("type","pong");
+				sendPacket(data.createResponsePacket(pongCompound));
+			}
+			case "pong" -> {
+				for(ConnectedDevice cd: connectedDevices){
+					if(cd.deviceMac().equals(data.getSourceMacAddress())){
+						cd.connectionTimer()[0]=0;
+					}
+				}
+			}
 		}
 	}
 
@@ -632,6 +670,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		//remove from connected devices
 		for(int i=0;i<connectedDevices.size();i++){
 			if(connectedDevices.get(i).deviceMac.equals(disconnectedMac)){
+				connectedDevices.get(i).connectionTimer()[0]=0;
 				connectedDevices.remove(i);
 				break;
 			}
@@ -658,6 +697,12 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		markDirty();//save changes to the server
 	}
 
+	private void sendPingPacket(ConnectedDevice device){
+		NbtCompound pingCompound =  new NbtCompound();
+		pingCompound.putString("type","ping");
+		sendPacket(new IpDataPacket(device.ipAddress(), "169.0.0.1", mac1,device.deviceMac() ,pingCompound));
+	}
+
 	ConnectedDevice getRememberedDevice(Mac deviceMac){
 		for(ConnectedDevice device:rememberedDevices){
 			if(device.deviceMac().equals(deviceMac)){
@@ -667,7 +712,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		return null;
 	}
 
-	public record ConnectedDevice(String ipAddress, Mac deviceMac, String deviceName){
+	public record ConnectedDevice(String ipAddress, Mac deviceMac, String deviceName, int[] connectionTimer){
+
 		@Override
 		public String toString() {
 			return "ConnectedDevice{" +
@@ -678,7 +724,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 
 		public ConnectedDevice(ReadView view){
-			this(view.getString("ip","0.0.0.0"),new Mac(view.getOptionalIntArray("mac").orElse(new int[]{0,0,0})),view.getString("name","Forgotten device"));
+			this(view.getString("ip","0.0.0.0"),new Mac(view.getOptionalIntArray("mac").orElse(new int[]{0,0,0})),view.getString("name","Forgotten device"),new int[]{0});
 		}
 
 		public void writeToView(WriteView output){
