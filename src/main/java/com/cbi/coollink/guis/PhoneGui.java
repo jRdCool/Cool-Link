@@ -2,10 +2,8 @@ package com.cbi.coollink.guis;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.app.*;
-import com.cbi.coollink.net.ClientWifiConnectionResultPacket;
-import com.cbi.coollink.net.ConnectToWifiNetworkRequestPacket;
-import com.cbi.coollink.net.RequestAccessPointPositionsPacket;
-import com.cbi.coollink.net.SavePhoneDataPacket;
+import com.cbi.coollink.net.*;
+import com.cbi.coollink.net.protocol.IpDataPacket;
 import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.PhoneNetworkInterface;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
@@ -32,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -169,16 +168,8 @@ public class PhoneGui extends LightweightGuiDescription {
                 }
             }
 
-            NbtList macNbt = nbt.getListOrEmpty("mac");
-            if(macNbt.isEmpty()){
-                mac = new Mac(0x31);
-            }else{
-                int[] mc = new int[3];
-                mc[0] = macNbt.getInt(0,0);
-                mc[1] = macNbt.getInt(1,0);
-                mc[2] = macNbt.getInt(2,0);
-                mac = new Mac(mc);
-            }
+            Optional<int[]> raw_mac_opt = nbt.getIntArray("mac");
+            mac = raw_mac_opt.map(Mac::new).orElseGet(() -> new Mac(0x31));
 
             //end of nbt is not empty
         }else{
@@ -211,6 +202,9 @@ public class PhoneGui extends LightweightGuiDescription {
                 root.add(appPanel,0,0);
                 root.remove(homeButtonPanel);
                 saveData();
+                if(networkInterface != null){
+                    networkInterface.clearPacketReceivers();
+                }
             }
             currentApp=null;
         });
@@ -404,6 +398,7 @@ public class PhoneGui extends LightweightGuiDescription {
             networks.add(wifi.toNbt());
         }
         nbt.put("networks",networks);
+        nbt.putIntArray("mac",mac.getMac());
 
         //write the data
         phoneInstance.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
@@ -467,6 +462,12 @@ public class PhoneGui extends LightweightGuiDescription {
             apBlockPos = closePos;
 
             //if already connected to a network then disconnect
+            if(connectedToWifi){
+                connectedToWifi = false;
+                NbtCompound goAway = new NbtCompound();
+                goAway.putString("type","disconnect");
+                networkInterface.sendRawData("169.0.0.1",goAway);
+            }
         }
     }
 
@@ -482,14 +483,18 @@ public class PhoneGui extends LightweightGuiDescription {
         }else{
             for(WifiNetworkInfo net: savedNetworks){
                 if(net.ssid.equals(response.ssid())){
-                    connectedToWifi = true;
-                    deviceIp = response.deviceIp();
-                    wifiSsid = response.ssid();
-                    deviceOnline = response.connectedToTheInternet();
-                    networkInterface = new PhoneNetworkInterface(mac,deviceIp,world,apBlockPos,deviceOnline);
-                }else{
-                    //send disconnect packet
-
+                    if(apBlockPos.equals(new BlockPos(net.apX,net.apY,net.apZ))) {//if this is the network we want to be connected to
+                        connectedToWifi = true;
+                        deviceIp = response.deviceIp();
+                        wifiSsid = response.ssid();
+                        deviceOnline = response.connectedToTheInternet();
+                        networkInterface = new PhoneNetworkInterface(mac, deviceIp, world, apBlockPos, deviceOnline);
+                    }else{
+                        //send disconnect packet
+                        NbtCompound goAway = new NbtCompound();
+                        goAway.putString("type","disconnect");
+                        ClientPlayNetworking.send(new WIFIClientIpPacket(world.getRegistryKey(),new BlockPos(net.apX,net.apY,net.apZ),new IpDataPacket("169.0.0.1", response.deviceIp(), mac,goAway)));
+                    }
                 }
             }
             wifiConnectError = 0;
@@ -520,6 +525,9 @@ public class PhoneGui extends LightweightGuiDescription {
                     if(wifiSsid.equals(networkInfo.ssid())){
                         //disconnect
                         connectedToWifi = false;
+                        NbtCompound goAway = new NbtCompound();
+                        goAway.putString("type","disconnect");
+                        networkInterface.sendRawData("169.0.0.1",goAway);
                     }
                 }else {
                     savedNetworks.set(i, networkInfo);
@@ -530,6 +538,12 @@ public class PhoneGui extends LightweightGuiDescription {
         }
         savedNetworks.add(networkInfo);
         saveData();
+    }
+
+    public void handleIncomingDataPacket(IpDataPacket data){
+        //handle basic low level packets for the phone its self like ping
+        Main.LOGGER.info("Phone Received packet: "+data);
+        networkInterface.processReceivedDataPacket(data);
     }
 
     protected record PhoneAppInfo(Identifier appId, AppRegistry.AppLauncher launcher,Identifier icon,boolean isRoot, AppRegistry.OpenOnBlockEntityCheck openOnBlockEntityCheck){}

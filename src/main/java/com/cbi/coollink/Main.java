@@ -10,7 +10,10 @@ import com.cbi.coollink.blocks.wallports.*;
 import com.cbi.coollink.cli.CliProgramInit;
 import com.cbi.coollink.cli.example.HelloWorld;
 import com.cbi.coollink.cli.example.Loading;
+import com.cbi.coollink.cli.lowlevelnet.ReceivePacketCommand;
+import com.cbi.coollink.cli.lowlevelnet.SendPackAndWaitCommand;
 import com.cbi.coollink.cli.lowlevelnet.SendPackCommand;
+import com.cbi.coollink.cli.netutils.IfConfigProgram;
 import com.cbi.coollink.cli.repo.CliCommandPackage;
 import com.cbi.coollink.cli.repo.CliPackageRepository;
 import com.cbi.coollink.items.*;
@@ -221,6 +224,7 @@ public class Main implements ModInitializer {
         PayloadTypeRegistry.playC2S().register(RequestAccessPointPositionsPacket.ID,RequestAccessPointPositionsPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(ConnectToWifiNetworkRequestPacket.ID,ConnectToWifiNetworkRequestPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(ClientWifiConnectionResultPacket.ID,ClientWifiConnectionResultPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(WIFIServerIpPacket.ID,WIFIServerIpPacket.CODEC);
 
         //register a packet listener to listen for the aio-set-password packet
         ServerPlayNetworking.registerGlobalReceiver(AioSetAdminPasswordPacket.ID, (payload, context) -> {
@@ -443,7 +447,15 @@ public class Main implements ModInitializer {
         CliPackageRepository.registerPackage(new CliCommandPackage(
                     Identifier.of(namespace,"low-level-net"),
                     "A collection of low level network utilities",
-                    new CliCommandPackage.CommandInfo("sendpack",CliProgramInit.of(SendPackCommand::new,"Usage: sendpack <ip> <nbtdata>\nManually craft and send a packet over the network to the desired ipaddress. Spaces can be present in the raw nbt data. Does not wait for a response from the target device"))
+                    new CliCommandPackage.CommandInfo("sendpack",CliProgramInit.of(SendPackCommand::new,"Usage: sendpack <ip> <nbtdata>\nManually craft and send a packet over the network to the desired ipaddress. Spaces can be present in the raw nbt data. Does not wait for a response from the target device")),
+                    new CliCommandPackage.CommandInfo("revpack", CliProgramInit.of(ReceivePacketCommand::new,"Waits for this device to receive a packet then prints its content. If the argument \"nolimit\" is present then the program will continue to run after a packet has been received.")),
+                    new CliCommandPackage.CommandInfo("sendpacknwait", CliProgramInit.of(SendPackAndWaitCommand::new,"Usage: sendpack <ip> <nbtdata>\nManually craft and send a packet over the network to the desired ipaddress. Then wait for a response from the other device. Spaces can be present in the raw nbt data."))
+                ),
+            CliPackageRepository.ANY_ENVIRONMENT);
+        CliPackageRepository.registerPackage(new CliCommandPackage(
+                    Identifier.of(namespace,"net-utils"),
+                    "Common network utility programs",
+                    new CliCommandPackage.CommandInfo("ifconfig",CliProgramInit.of(IfConfigProgram::new,"Prints ip information"))
                 ),
             CliPackageRepository.ANY_ENVIRONMENT);
 
