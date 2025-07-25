@@ -234,6 +234,11 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
                         markDirty();
                     }
                 }
+                case "ping" -> {
+                    NbtCompound pongCompound = new NbtCompound();
+                    pongCompound.putString("type","pong");
+                    sendPacket(ipData.createResponsePacket(pongCompound));
+                }
                 //default -> Main.LOGGER.info("Received data RSS: "+data+" on port: "+connectionIndex+" at "+getPos());
             }
         }

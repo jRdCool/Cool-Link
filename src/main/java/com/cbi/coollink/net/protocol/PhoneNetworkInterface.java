@@ -44,6 +44,7 @@ public class PhoneNetworkInterface extends ProgramNetworkInterface{
                 data.setDestinationMacAddress(destmac);
             }
         }
+        //Main.LOGGER.info("Sending packet: "+data);
         ClientPlayNetworking.send(new WIFIClientIpPacket(playerWorld.getRegistryKey(),accessPointPos,data));
 
     }
