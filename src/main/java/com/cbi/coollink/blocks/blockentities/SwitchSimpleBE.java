@@ -46,6 +46,9 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
 
     private final Queue<IpDataPacket> switchingQueue = new ArrayDeque<>();
 
+    private final ArrayList<IncomingPacket> incomingPackets = new ArrayList<>();
+
+
     private final ArrayList<Mac>[] switchingTables = new ArrayList[]{new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>()};
 
     @Override
@@ -200,7 +203,11 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
             if(connectionIndex != routerPort){
                 switchingTables[connectionIndex].add(ipPacket.getSourceMacAddress());
             }
-            switchingQueue.add(ipPacket);
+            World w = getWorld();
+            if(w == null){
+                return;
+            }
+            incomingPackets.add(new IncomingPacket(ipPacket, w.getTime()));
         }
     }
 
@@ -316,13 +323,25 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
         }
         switchBE.routerCheckCounter ++;
         if((switchBE.knowsWhereRouterIs() && switchBE.routerCheckCounter >= 200) || (!switchBE.knowsWhereRouterIs() && switchBE.routerCheckCounter >= 20)){
-            //int prs = switchBE.routerPort;
             switchBE.findRouter();
             switchBE.routerCheckCounter = 0;
-//            if(prs != switchBE.routerPort){
-//                Main.LOGGER.info("Router found!: "+switchBE.getPos());
-//            }
         }
+
+        //prevent packets that just came in from being instantly transmitted
+
+        long currentTime = world.getTime();
+        //go through all the incoming packets
+        for(int i=0;i<switchBE.incomingPackets.size();i++){
+            //if the packet did not come in the current tick
+            if(switchBE.incomingPackets.get(i).tickTime != currentTime){
+                //add it to the switching queue
+                switchBE.switchingQueue.add(switchBE.incomingPackets.remove(i).packet);
+                i--;
+            }
+        }
+        //process packets in the switching queue
         switchBE.switchProcessPacketQueue();
     }
+
+    private record IncomingPacket(IpDataPacket packet, long tickTime){}
 }
