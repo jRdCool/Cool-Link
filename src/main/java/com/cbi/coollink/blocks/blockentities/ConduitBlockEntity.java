@@ -214,9 +214,24 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
             }
             return new Vec3d(x,y13,z);
         }
-        //todo: Create function to determine the x/z offset (side dependent)
-
-
+        switch (direction){
+            case SOUTH -> {
+                x=nodeOffsetHelp(tube,wire,true);
+                z=0.0;
+            }
+            case WEST -> {
+                x=1.0;
+                z=nodeOffsetHelp(tube,wire,true);
+            }
+            case EAST -> {
+                x=0.0;
+                z=nodeOffsetHelp(tube,wire,false);
+            }
+            default -> {
+                x=nodeOffsetHelp(tube,wire,false);
+                z=1.0;
+            }
+        }
         return new Vec3d(x,y[yOffset],z);
     }
 
@@ -226,27 +241,35 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     @Override
     public int getOtherNodeIndex(int index) {
-        return 0;
+        return localNodes[index].getOtherIndex();
     }
 
     @Override
     public LocalNode getLocalNode(int index) {
-        return null;
+        return localNodes[index];
     }
 
     @Override
     public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
-
+        this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
+        isNodeUsed[index]=true;
+        markDirty();
+        assert world != null;
+        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
     }
 
     @Override
     public void removeNode(int index, boolean dropWire) {
-
+        this.localNodes[index] = null;
+        markDirty();
+        assert world != null;
+        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        this.setIsNodeUsed(index,false);
     }
 
     @Override
     public WireType getPortType(int index) {
-        return null;
+        return WireType.CAT6;
     }
 
     @Override
@@ -276,7 +299,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
 
     private Direction nodeDirection(int node){
-        int direction = (node ^ 0b11000000) >>> 6;//take the direction bits and shift the bits to the right
+        int direction = (node & 0b11000000) >>> 6;//take the direction bits and shift the bits to the right
         return switch(direction){
             case 0b00 -> Direction.NORTH;//North
             case 0b01 -> Direction.SOUTH;//South
@@ -287,14 +310,27 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     }
 
     private int intNodeDirection(int node){
-        return (node ^ 0b11000000) >>> 6;//take the direction bits and shift the bits to the right
+        return (node & 0b11000000) >>> 6;//take the direction bits and shift the bits to the right
     }
 
     private int tubeNumber(int node){
-        return (node ^ 0b00111100) >>> 2;//take the tube bits and shift them to the right
+        return (node & 0b00111100) >>> 2;//take the tube bits and shift them to the right
     }
 
     private int wireNum(int node){
-        return node ^ 0b00000011;
+        return node & 0b00000011;
+    }
+
+    private double nodeOffsetHelp(int tube,int wire, boolean notOrient){
+        double wireOffset = 0.05;
+        double nodeOffset = 0.0;
+        if(wire>1){
+            wireOffset = -0.05;
+        }
+        nodeOffset = (tube * 0.10)+0.1+wireOffset;
+        if(notOrient){
+            nodeOffset = 1.0 - nodeOffset;
+        }
+        return nodeOffset;
     }
 }

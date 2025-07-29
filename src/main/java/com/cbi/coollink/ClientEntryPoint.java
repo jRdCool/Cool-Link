@@ -3,6 +3,7 @@ package com.cbi.coollink;
 import com.cbi.coollink.app.*;
 import com.cbi.coollink.blocks.ServerRack;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
+import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
 import com.cbi.coollink.blocks.cables.CoaxCable;
 import com.cbi.coollink.blocks.networkdevices.AIO_Network;
 import com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock;
@@ -86,7 +87,12 @@ public class ClientEntryPoint implements ClientModInitializer {
             context.client().execute(() ->{
                 if(clientWorld.getRegistryKey().equals(payload.world())){
                     BlockEntity clickedOnBlockEntity = clientWorld.getBlockEntity(payload.pos());
-                    context.client().setScreen(new BasicScreen(new PortSelectGUI(payload.ofType(),payload.type(),clickedOnBlockEntity,payload.heldItem())));
+                    if(!(clientWorld.getBlockEntity(payload.pos()) instanceof ConduitBlockEntity)){
+                        context.client().setScreen(new BasicScreen(new PortSelectGUI(payload.ofType(),payload.type(),clickedOnBlockEntity,payload.heldItem())));
+                    }
+                    else{
+                        context.client().setScreen(new BasicScreen(new PortSelectGUIConduit(payload.ofType(),payload.type(),clickedOnBlockEntity,payload.heldItem())));
+                    }
                 }
             });
         });
