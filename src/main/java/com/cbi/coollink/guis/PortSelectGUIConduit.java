@@ -109,17 +109,20 @@ public class PortSelectGUIConduit extends LightweightGuiDescription implements W
                     if (node.isNodeInUse(ofType.get(i))) {
                         portButtons.getLast().setEnabled(false);
                     }
-                    //Main.LOGGER.info("length: "+portButtons.size());
-                    portButtons.getLast().setSize(14,15);
+                    if(!portButtons.isEmpty()) {
+                        //Main.LOGGER.info("length: "+portButtons.size());
+                        portButtons.getLast().setSize(14, 15);
+                    }
                 }
 
             }
-
-            Main.LOGGER.info("with: "+((portButtons.size()*1.5*(portButtons.get(0).getWidth()+1.5))/4)+" num buttons: "+portButtons.size()+" button width: "+portButtons.get(0).getWidth());
-            root.setSize((int)(((portButtons.size()/2)*1.2*(portButtons.get(0).getWidth()+1.5))/2)+portButtons.get(0).getWidth(),portButtons.get(0).getHeight()*8+5);
+            int halfPortButtons = portButtons.size()/2;
+            float hPB= (float) portButtons.size()/2; //same as line above only as a float to work better in the window sizing context
+            //Main.LOGGER.info("with: "+((portButtons.size()*1.5*(portButtons.getFirst().getWidth()+1.5))/4)+" num buttons: "+portButtons.size()+" button width: "+portButtons.getFirst().getWidth());
+            root.setSize((int)(((hPB)*1.2*(portButtons.getFirst().getWidth()+1.5))/2)+portButtons.getFirst().getWidth(),portButtons.getFirst().getHeight()*8+5);//Set the Windows size
             setRootPanel(root);
             //add to the panel
-            int halfPortButtons = portButtons.size()/2;
+
             for(int i=0;i<halfPortButtons;i+=2){
                 root.add(portButtons.get(i),(int)(i*portButtons.get(i).getWidth()/1.525)+(int)(portButtons.get(i).getWidth()/1.5)+3,(int)(portButtons.get(i).getHeight()*.5)+10);
                 root.add(portButtons.get(i+1),(int)(i*portButtons.get(i+1).getWidth()/1.525)+(int)(portButtons.get(i).getWidth()/1.5),(int)(portButtons.get(i).getHeight()*1.5)+10);

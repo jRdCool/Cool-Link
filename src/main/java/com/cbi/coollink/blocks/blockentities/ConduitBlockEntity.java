@@ -159,9 +159,13 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         int tube = tubeNumber(node);
         int wire = wireNum(node);
         int yOffset = ((tube % 2) << 1) + (wire % 2) ;
-        double[] y = {0.05,0.10,0.15,0.20};
+        double[] y = {0.085,0.035,0.195,0.145};
         double x = 0.0;
         double z = 0.0;
+        if(direction==null){
+            Main.LOGGER.error("!!Node Index Too Large!! Setting Offset to block origin.");
+            return new Vec3d(0,0,0);
+        }//Handles the case of a null direction
         if(tube == 13){
             boolean coax = (this.getPortType(node) == WireType.COAX);
             boolean left = wire < 2;
@@ -171,10 +175,10 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
                     x=1.0;
                     if(coax){z=0.5;}
                     else if(left){
-                        z=0.5+.05;
+                        z=0.5-.05;
                     }
                     else{
-                        z=0.5-.05;
+                        z=0.5+.05;
                     }
                 }
                 case EAST -> {
@@ -214,7 +218,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
             }
             //Main.LOGGER.info("X:"+ x+" Y:"+y13+" Z:"+z);
             return new Vec3d(x,y13,z);
-        }
+        }//Handles the wall ports
         switch (direction){
             case SOUTH -> {
                 x=nodeOffsetHelp(tube,wire,false);
@@ -232,7 +236,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
                 x=nodeOffsetHelp(tube,wire,true);
                 z=0.0;
             }
-        }
+        }//handles the direct conduit ends.
         //Main.LOGGER.info("X:"+ x+" Y:"+y[yOffset]+" Z:"+z);
         return new Vec3d(x,y[yOffset],z);
     }
@@ -324,12 +328,12 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     }
 
     private double nodeOffsetHelp(int tube,int wire, boolean notOrient){
-        double wireOffset = 0.05;
+        double wireOffset = 0.03;
         double nodeOffset = 0.0;
-        if(wire>1){
-            wireOffset = -0.05;
+        if(wire<2){
+            wireOffset = -1*wireOffset;
         }
-        nodeOffset = (tube * 0.10)+0.1+wireOffset;
+        nodeOffset = (tube * 0.0625)+0.125+wireOffset;
         if(notOrient){
             nodeOffset = 1.0 - nodeOffset;
         }
