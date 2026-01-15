@@ -171,10 +171,10 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
                     x=1.0;
                     if(coax){z=0.5;}
                     else if(left){
-                        z=0.5-.05;
+                        z=0.5+.05;
                     }
                     else{
-                        z=0.5+.05;
+                        z=0.5-.05;
                     }
                 }
                 case EAST -> {
@@ -212,12 +212,13 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
                 if(wire % 2 ==0){y13+=0.05;}
                 else{y13-=0.05;}
             }
+            //Main.LOGGER.info("X:"+ x+" Y:"+y13+" Z:"+z);
             return new Vec3d(x,y13,z);
         }
         switch (direction){
             case SOUTH -> {
-                x=nodeOffsetHelp(tube,wire,true);
-                z=0.0;
+                x=nodeOffsetHelp(tube,wire,false);
+                z=1.0;
             }
             case WEST -> {
                 x=1.0;
@@ -228,10 +229,11 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
                 z=nodeOffsetHelp(tube,wire,false);
             }
             default -> {
-                x=nodeOffsetHelp(tube,wire,false);
-                z=1.0;
+                x=nodeOffsetHelp(tube,wire,true);
+                z=0.0;
             }
         }
+        //Main.LOGGER.info("X:"+ x+" Y:"+y[yOffset]+" Z:"+z);
         return new Vec3d(x,y[yOffset],z);
     }
 

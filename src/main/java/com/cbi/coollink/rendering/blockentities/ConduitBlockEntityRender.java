@@ -41,6 +41,7 @@ public class ConduitBlockEntityRender extends WireNodeRenderer<ConduitBlockEntit
             //render the cover block
             blockRenderManager.renderBlock(conduit.getCoverBlock(),conduit.getPos(),conduit.getWorld(),matrixStackIn, vertexConsumer, true, parts);
         }
+        super.render(conduit,partialTicks,matrixStackIn,bufferIn,combinedLightIn,combinedOverlayIn,cameraPos);
     }
 
     //for later when we want to be able to render wires from the conduits

@@ -1,9 +1,11 @@
 package com.cbi.coollink.blocks.conduits;
 
 import com.cbi.coollink.net.OpenConduitGuiPacket;
+import com.cbi.coollink.rendering.IWireNode;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -158,6 +160,20 @@ public abstract class Conduit extends BlockWithEntity {
 
     }
 
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player){
+        BlockEntity be = world.getBlockEntity(pos);
+        if(be instanceof IWireNode self){
+            for(int i=0;i<self.getNodeCount();i++){
+                if(!self.hasConnection(i)) continue;
+                BlockEntity obe =  world.getBlockEntity(self.getLocalNode(i).getTargetPos());
+                if(obe instanceof IWireNode other) {
+                    other.removeNode(self.getOtherNodeIndex(i));
+                }
+            }
+        }
+        return super.onBreak(world,pos,state,player);
+    }
+
     @SuppressWarnings({"deprecation","all"})
     @Override
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
@@ -179,7 +195,6 @@ public abstract class Conduit extends BlockWithEntity {
         BlockPos neighbor3= new BlockPos(pos.getX(),pos.getY(),pos.getZ()+1);//S
         BlockPos neighbor4= new BlockPos(pos.getX(),pos.getY(),pos.getZ()-1);//N
         //Main.LOGGER.info(world.toString());
-
 
         if(world.getBlockState(neighbor1).getBlock() instanceof  Conduit){//check if the neighbor block is a conduit
             //Main.LOGGER.info("west neighbor is conduit");
@@ -206,6 +221,7 @@ public abstract class Conduit extends BlockWithEntity {
             world.setBlockState(neighbor4, world.getBlockState(neighbor4).with(south, false), NOTIFY_ALL);//set the neighbor block to point to this block
             onUpdate(world.getBlockState(neighbor4),world,neighbor4);
         }
+
     }
 
     @SuppressWarnings({"all"})

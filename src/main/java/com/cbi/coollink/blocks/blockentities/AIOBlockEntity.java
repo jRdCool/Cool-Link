@@ -232,7 +232,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			case WEST -> dir=3;
 			default -> {}
 		}
-
+		if(node>nodes[dir].length)return nodes[dir][0];
 		return nodes[dir][node];
 	}//Getting the offset from the block origin for the nodes
 
