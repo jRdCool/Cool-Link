@@ -7,10 +7,8 @@ import com.cbi.coollink.net.WireInfoDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import io.github.cottonmc.cotton.gui.client.CottonClientScreen;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
-import io.github.cottonmc.cotton.gui.widget.WButton;
-import io.github.cottonmc.cotton.gui.widget.WLabel;
-import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
-import io.github.cottonmc.cotton.gui.widget.WText;
+import io.github.cottonmc.cotton.gui.widget.*;
+import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
@@ -32,64 +30,77 @@ public class PortSelectGUIConduit extends LightweightGuiDescription implements W
             root = new WPlainPanel();//.setBackgroundPainter(new BackgroundPainter());
             int size = usedOnBlock.getCachedState().get(Conduit.cableLevel);
             int shape = usedOnBlock.getCachedState().get(Conduit.cableShape);
+            //NSWE
+            boolean[] connectedDirection = {usedOnBlock.getCachedState().get(Conduit.north),usedOnBlock.getCachedState().get(Conduit.south),usedOnBlock.getCachedState().get(Conduit.west),usedOnBlock.getCachedState().get(Conduit.east)};
+
             //figure out the total number of possible ports that can be connected to
             ArrayList<WButton> portButtons = new ArrayList<>();
             ArrayList<Integer> portButtonIndex = new ArrayList<>();
             //create a button for each of them
             int x = 237 ,y1= 7,y2=60;
+            int numDirections=2;
             for (int i = 0; i < ofType.size(); i++) {
                 int tubeDirection = intNodeDirection(ofType.get(i));
                 int tube = tubeNumber(ofType.get(i));
                 int wire = wireNum(ofType.get(i));
 
+
                 boolean outside = (size<=2&&(tube<4||tube>8))||(size==1&&(tube!=6));
                 //Main.LOGGER.info(i+","+nodeDirection(ofType.get(i))+","+tubeDirection+","+tube+","+ wire+","+shape+","+portButtons.size());
             //-----------label positioning
-                if(tube<13) {
+                if(tube<13) {//Main.LOGGER.info("result: "+(outside||connectedDirection[tubeDirection])+" Tube: "+tubeDirection+" CD0: "+connectedDirection[0]+" CD1: "+connectedDirection[1]+" CD2: "+connectedDirection[2]+" CD3: "+connectedDirection[3]);
                     switch (shape) {
                         case 1 -> {
-                            if(outside){break;}
+                            if(outside) break;
+                            if(connectedDirection[tubeDirection]){numDirections=1;break;}
                             if (tubeDirection >= 2) {
                                 portButtons.add(new WButton(Text.of(tube + "," + wire)));
                                 portButtonIndex.add(i);
+                                Main.LOGGER.info("Registered");
                             }
                         }//EW
                         case 4 -> {
-                            if(outside){break;}
+                            if(outside) break;
+                            if(connectedDirection[tubeDirection]){numDirections=1;break;}
                             if (tubeDirection == 0 || tubeDirection == 3) {
                                 portButtons.add(new WButton(Text.of(tube + "," + wire)));
                                 portButtonIndex.add(i);
                             }
                         }//NE
                         case 5 -> {
-                            if(outside){break;}
+                            if(outside) break;
+                            if(connectedDirection[tubeDirection]){numDirections=1;break;}
                             if (tubeDirection % 2 == 1) {
                                 portButtons.add(new WButton(Text.of(tube + "," + wire)));
                                 portButtonIndex.add(i);
                             }
                         }//SE
                         case 6 -> {
-                            if(outside){break;}
+                            if(outside) break;
+                            if(connectedDirection[tubeDirection]){numDirections=1;break;}
                             if (tubeDirection == 1 || tubeDirection == 2) {
                                 portButtons.add(new WButton(Text.of(tube + "," + wire)));
                                 portButtonIndex.add(i);
                             }
                         }//SW
                         case 7 -> {
-                            if(outside){break;}
+                            if(outside) break;
+                            if(connectedDirection[tubeDirection]){numDirections=1;break;}
                             if (tubeDirection % 2 == 0) {
                                 portButtons.add(new WButton(Text.of(tube + "," + wire)));
                                 portButtonIndex.add(i);
                             }
                         }//NW
                         default -> {
-                            if(outside){break;}
+                            if(outside) break;
+                            if(connectedDirection[tubeDirection]){numDirections=1;break;}
                             if (tubeDirection < 2) {
                                 portButtons.add(new WButton(Text.of(tube + "," + wire)));
                                 portButtonIndex.add(i);
                             }
                         }//NS
                     }
+                    //Main.LOGGER.info("Buttons: "+portButtons.size());
                     //disable the ones that already have been connected
                     if (node.isNodeInUse(ofType.get(i))) {
                         portButtons.getLast().setEnabled(false);
@@ -102,51 +113,74 @@ public class PortSelectGUIConduit extends LightweightGuiDescription implements W
 
             }
             switch (size){
-                case 1 ->x=15;//Small
-                case 2 ->x=90;//Medium
+                case 1 ->x=11;//Small
+                case 2 ->x=87;//Medium
                 default ->{}//Large
+            }
+            if(numDirections==1){
+                y2=y1;
             }
             switch (shape){
                 case 1 -> {
-                    root.add(new WLabel(Text.of("West")), x, y1);
-                    root.add(new WLabel(Text.of("East")), x, y2);
+                    if(!connectedDirection[2])root.add(new WLabel(Text.of("West")), x, y1);
+                    if(!connectedDirection[3])root.add(new WLabel(Text.of("East")), x, y2);
                 }//EW
                 case 4-> {
-                    root.add(new WLabel(Text.of("North")), x, y1);
-                    root.add(new WLabel(Text.of("East")), x, y2);
+                    if(!connectedDirection[0])root.add(new WLabel(Text.of("North")), x, y1);
+                    if(!connectedDirection[3])root.add(new WLabel(Text.of("East")), x, y2);
                 }//NS
                 case 5 ->{
-                    root.add(new WLabel(Text.of("South")), x, y1);
-                    root.add(new WLabel(Text.of("East")), x, y2);
+                    if(!connectedDirection[1])root.add(new WLabel(Text.of("South")), x, y1);
+                    if(!connectedDirection[3])root.add(new WLabel(Text.of("East")), x, y2);
                 }//SE
                 case 6 ->{
-                    root.add(new WLabel(Text.of("South")), x, y1);
-                    root.add(new WLabel(Text.of("West")), x, y2);
+                    if(!connectedDirection[1])root.add(new WLabel(Text.of("South")), x, y1);
+                    if(!connectedDirection[2])root.add(new WLabel(Text.of("West")), x, y2);
                 }//SW
                 case 7 ->{
-                    root.add(new WLabel(Text.of("North")), x, y1);
-                    root.add(new WLabel(Text.of("West")), x, y2);
+                    if(!connectedDirection[0])root.add(new WLabel(Text.of("North")), x, y1);
+                    if(!connectedDirection[2])root.add(new WLabel(Text.of("West")), x, y2);
                 }//NW
                 default -> {
-                    root.add(new WLabel(Text.of("North")), x, y1);
-                    root.add(new WLabel(Text.of("South")), x, y2);
+                    if(!connectedDirection[0])root.add(new WLabel(Text.of("North")), x, y1);
+                    if(!connectedDirection[1])root.add(new WLabel(Text.of("South")), x, y2);
                 }//NS
             }
 
 
             int halfPortButtons = portButtons.size()/2;
             float hPB= (float) portButtons.size()/2; //same as line above only as a float to work better in the window sizing context
-            //Main.LOGGER.info("with: "+((portButtons.size()*1.5*(portButtons.getFirst().getWidth()+1.5))/4)+" num buttons: "+portButtons.size()+" button width: "+portButtons.getFirst().getWidth());
-            root.setSize((int)(((hPB)*1.2*(portButtons.getFirst().getWidth()+1.5))/2)+portButtons.getFirst().getWidth(),portButtons.getFirst().getHeight()*8+5);//Set the Windows size
+            Main.LOGGER.info("with: "+((((double) portButtons.size() /numDirections)*1.23*(portButtons.getFirst().getWidth()+1.5))/2)+" num buttons: "+portButtons.size()+" button width: "+portButtons.getFirst().getWidth());
+            //root.setSize((int)(((hPB) * 1.2 * (portButtons.getFirst().getWidth() + 1.5)) / 2) + portButtons.getFirst().getWidth(), portButtons.getFirst().getHeight() * (4*numDirections) + 5);//Set the Windows size
+            int widthOffset =switch(size){
+                case 1 ->10;
+                case 2 ->5;
+                default -> 0;
+            };
+            root.setSize((int)((((double) portButtons.size() /numDirections)*1.23*(portButtons.getFirst().getWidth()+1.5))/2)+widthOffset, portButtons.getFirst().getHeight() * (4*numDirections) + 5);//Set the Windows size
             setRootPanel(root);
+            //Main.LOGGER.info("Panel Width: "+root.getWidth());
             //add to the panel
 
-            for(int i=0;i<halfPortButtons;i+=2){
-                root.add(portButtons.get(i),(int)(i*portButtons.get(i).getWidth()/1.525)+(int)(portButtons.get(i).getWidth()/1.5)+3-4,(int)(portButtons.get(i).getHeight()*.5)+10);
-                root.add(portButtons.get(i+1),(int)(i*portButtons.get(i+1).getWidth()/1.525)+(int)(portButtons.get(i).getWidth()/1.5)-4,(int)(portButtons.get(i).getHeight()*1.5)+10);
+            if(numDirections==2) {
+                for (int i = 0; i < halfPortButtons; i += 2) {
+                    root.add(portButtons.get(i), (int) (i * portButtons.get(i).getWidth() / 1.525) + (int) (portButtons.get(i).getWidth() / 1.5) + 3 - 4, (int) (portButtons.get(i).getHeight() * .5) + 10);
+                    root.add(portButtons.get(i + 1), (int) (i * portButtons.get(i + 1).getWidth() / 1.525) + (int) (portButtons.get(i).getWidth() / 1.5) - 4, (int) (portButtons.get(i).getHeight() * 1.5) + 10);
 
-                root.add(portButtons.get(halfPortButtons+i),(int)(i*portButtons.get(halfPortButtons+i).getWidth()/1.525)+(int)(portButtons.get(i).getWidth()/1.5)-4,(int)(portButtons.get(i).getHeight()*4.0));
-                root.add(portButtons.get(halfPortButtons+i+1),(int)(i*portButtons.get(halfPortButtons+i+1).getWidth()/1.525)+(int)(portButtons.get(i).getWidth()/1.5)-4,(int)(portButtons.get(i).getHeight()*5.15));
+                    root.add(portButtons.get(halfPortButtons + i), (int) (i * portButtons.get(halfPortButtons + i).getWidth() / 1.525) + (int) (portButtons.get(i).getWidth() / 1.5) - 4, (int) (portButtons.get(i).getHeight() * 4.0));
+                    root.add(portButtons.get(halfPortButtons + i + 1), (int) (i * portButtons.get(halfPortButtons + i + 1).getWidth() / 1.525) + (int) (portButtons.get(i).getWidth() / 1.5) - 4, (int) (portButtons.get(i).getHeight() * 5.15));
+                }
+            }else{
+                int buffer =switch(size){
+                    case 1,2 ->(int) (portButtons.getFirst().getWidth() / 2.25);
+                    default -> (int) (portButtons.getFirst().getWidth() / 1.5);
+                };
+                for(int i = 0; i < portButtons.size(); i +=2){
+                    root.add(portButtons.get(i), (int) (i * portButtons.get(i).getWidth() / 1.525)+buffer  , (int) (portButtons.get(i).getHeight() * .5) + 10);
+                    root.add(portButtons.get(i + 1), (int) (i * portButtons.get(i + 1).getWidth() / 1.525) + buffer , (int) (portButtons.get(i).getHeight() * 1.5) + 10);
+                   //
+                }
+                Main.LOGGER.info("Panel Width: "+root.getWidth());
             }
             //set their click events
             for(int i=0;i<portButtons.size();i++){
