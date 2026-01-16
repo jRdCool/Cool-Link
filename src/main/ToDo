@@ -15,3 +15,16 @@ Servers
     Crafting Server
     Load balancer
     General Command server
+
+General ideas:
+for servers/computers create a packet queue that can be enabled through an environment variable
+when enabled incoming packets would be placed into the queue instead of being immediately presented to the program, essentially revpack and similar programs may not work.
+Instead other program would need to be used to check if there are any packets in the queue and get packets from the queue if so
+
+On in game computers make some sort of google drive like service for "cloud" storage of user created scripts and programs
+This would effective store text/data files on the server
+Each user would get their own storage space to store files as well as access to public resources uploaded by other players. potentially file sharing could also be an option.
+Files would be stored in either the config folder or the world folder. for each players private files they would be placed inside a folder named with the player UUID, for public files they would be placed inside a folder named public
+This feature should be able to be disabled by server administrators using a config file as well, they should be able to set a limit for the amount of data each player can upload
+
+A config file option to limit the max data size allowed for phones/computers/servers

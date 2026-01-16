@@ -35,7 +35,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
 
     public PhoneCommandLineContext(NbtCompound terminalData){
         this.terminalData = terminalData;
-        textOut = new CommandTextOutputArea(375,130,100,"CBi Phone OS 1.0 (C) CBi-games 2025, All rights reserved");
+        textOut = new CommandTextOutputArea(370,130,100,"CBi Phone OS 1.0 (C) CBi-games 2025, All rights reserved");
         //set the initial environment variables
         environmentVariables.put("PWD","/");
         environmentVariables.put("ECHO","true");
