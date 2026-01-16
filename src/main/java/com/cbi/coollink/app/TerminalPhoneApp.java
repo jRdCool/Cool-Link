@@ -39,7 +39,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         executeButton = new WButton(Text.of("Execute"));
         panel.add(executeButton,250,180,80,20);
         executeButton.setOnClick(this::executeCommand);
-        panel.add(commandLineContext.getTextOutput(),20,15,375,135);
+        panel.add(commandLineContext.getTextOutput(),20,15,370,135);
         title = new WLabel(Text.of("Terminal"));
         title.setColor(0xFF_FFFFFF);
         title.setDarkmodeColor(0xFF_FFFFFF);
