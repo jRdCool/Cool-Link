@@ -241,11 +241,15 @@ public interface IWireNode {
         for(int i=0;i< wireType.getTransmissionDistance();i++){//loop a maximum number of times for the distance a transition can go
             BlockEntity otherEntity = blockWorld.getBlockEntity(nextBlockPos);
             if(otherEntity instanceof IWireNode wireNode){
-                if(wireNode instanceof ConduitBlockEntity){
+                if(wireNode instanceof ConduitBlockEntity conduit){
+                    nextBlockConnectionIndex = conduit.directionIndexTranslation(nextBlockConnectionIndex);
+
+
                     //mid-wire case
                     //special conduit/wall port transfer case
                     //nextBlockPos = something
                 }else{
+
                     //end of wire case
                     endLocation = wireNode.getLocalNode(nextBlockConnectionIndex);
                 }

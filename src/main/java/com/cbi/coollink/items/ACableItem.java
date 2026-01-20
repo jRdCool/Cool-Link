@@ -2,6 +2,7 @@ package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.WireInfoComponent;
+import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.net.OpenPortSelectGuiPacket;
 import com.cbi.coollink.rendering.IWireNode;
@@ -48,8 +49,9 @@ public abstract class ACableItem extends Item {
             int index = 0;
             int nodeCount = node.getNodeCount();
             ArrayList<Integer> ofType = new ArrayList<>();
+
             for (int i = 0; i < nodeCount; i++) {
-                if (node.getPortType(i) == TYPE) {
+                if ((node.getPortType(i) == TYPE || node.getPortType(i) == WireType.ANY)||(node instanceof ConduitBlockEntity)) {
                     ofType.add(i);
                 }
             }

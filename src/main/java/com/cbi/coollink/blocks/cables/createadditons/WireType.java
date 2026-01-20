@@ -13,7 +13,7 @@ import net.minecraft.network.codec.PacketCodec;
  */
 public enum WireType {//IRON(4, 256, 87, 87, 87, CAItems.IRON_WIRE.asStack(4), CAItems.IRON_SPOOL.asStack());
 	COAX(0, 256, 7, 7, 7),
-	CAT6(1,100, 0,0,255),
+	CAT6(1,100, 50,50,255),
 	FIBER( 2,512,255,255,0),
 	PROGRAMING(3,10,28,46,27),
 	ANY(4,0,255,255,255)
@@ -135,4 +135,8 @@ public enum WireType {//IRON(4, 256, 87, 87, 87, CAItems.IRON_WIRE.asStack(4), C
             return fromIndex(buf.readInt());
         }
     };
+
+	public int rgb(){
+		return getRed()<<16|getGreen()<<8|getBlue();
+	}
 }
