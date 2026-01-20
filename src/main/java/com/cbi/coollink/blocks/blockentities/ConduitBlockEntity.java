@@ -168,7 +168,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param node
-     *            The index of the requested node
+     *            The port on this wire node.
      *
      * @return
      *          The local to the block XYZ position the requested node is
@@ -181,8 +181,8 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         int wire = wireNum(node);
         int yOffset = ((tube % 2) << 1) + (wire % 2) ;
         double[] y = {0.085,0.035,0.195,0.145};
-        double x = 0.0;
-        double z = 0.0;
+        double x ;
+        double z ;
         if(direction==null){
             Main.LOGGER.error("!!Node Index Too Large!! Setting Offset to block origin.");
             return new Vec3d(0,0,0);
@@ -266,7 +266,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param index
-     *          the port on this wire node.
+     *          The port on this wire node.
      *
      * @return
      *          This class
@@ -277,7 +277,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param index
-     *          the port on this wire node
+     *          The port on this wire node.
      * @return
      *          The index of the node on the connected block
      */
@@ -289,7 +289,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param index
-     *          the port on this wire node
+     *          The port on this wire node.
      *
      * @return
      *          The requested {@link LocalNode}
@@ -358,7 +358,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      * Sets the {@link WireType} of the requested node
      * @param index the port on this wire node
-     * @param type
+     * @param type The {@link WireType} to set the node to
      */
     private void setNodeType(int index,WireType type){
         nodeType[index]=type;
@@ -367,7 +367,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param index
-     *          The index of the node to remove.
+     *          The port on this wire node.
      * @param dropWire
      *          Whether to drop wires or not.
      */
@@ -383,7 +383,9 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param index
+     *          The port on this wire node.
      * @return
+     *          The {@link WireType} of the requested node
      */
     @Override
     public WireType getPortType(int index) {
@@ -393,7 +395,9 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param index
+     *          The port on this wire node.
      * @return
+     *          Weather the node is in use
      */
     @Override
     public boolean isNodeInUse(int index) {
@@ -402,8 +406,8 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     /**
      *
-     * @param index
-     * @param set
+     * @param index The port on this wire node.
+     * @param set   The value to set the node status to
      */
     @Override
     public void setIsNodeUsed(int index, boolean set) {
@@ -413,7 +417,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param connectionIndex The index of the start of the connection on this device
-     * @return
+     * @return NULL
      */
     @Override
     public LocalNode getDestinationNode(int connectionIndex) {
@@ -432,7 +436,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     /**
      *
-     * @return
+     * @return The number of nodes the block has
      */
     @Override
     public int getNodeCount() {
@@ -441,8 +445,8 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     /**
      *
-     * @param node
-     * @return
+     * @param node The port on this wire node.
+     * @return A {@link Direction} from the provided node index
      */
     private static Direction nodeDirection(int node){
         int direction = (node & 0b11000000) >>> 6;//take the direction bits and shift the bits to the right
@@ -457,8 +461,8 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     /**
      *
-     * @param node
-     * @return
+     * @param node The port on this wire node.
+     * @return The integer representation of the nodes direction
      */
     private static int intNodeDirection(int node){
         return (node & 0b11000000) >>> 6;//take the direction bits and shift the bits to the right
@@ -466,8 +470,8 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     /**
      *
-     * @param node
-     * @return
+     * @param node  The port on this wire node.
+     * @return  The number of the tube of the provided node.
      */
     private static int tubeNumber(int node){
         return (node & 0b00111100) >>> 2;//take the tube bits and shift them to the right
@@ -475,8 +479,8 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     /**
      *
-     * @param node
-     * @return
+     * @param node  The port on this wire node.
+     * @return  The number of the wire in the tube
      */
     private static int wireNum(int node){
         return node & 0b00000011;
@@ -484,10 +488,10 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     /**
      *
-     * @param tube
-     * @param wire
-     * @param notOrient
-     * @return
+     * @param tube  The number of the tube
+     * @param wire  The number of the wire
+     * @param notOrient Weather to invert the offset from the origin
+     * @return  The requested offset from 0
      */
     private static double nodeOffsetHelp(int tube,int wire, boolean notOrient){
         double wireOffset = 0.03;
@@ -504,10 +508,10 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     /**
      *
-     * @param direction
-     * @param tube
-     * @param wire
-     * @return
+     * @param direction The int direction of the node
+     * @param tube  The number of the tube
+     * @param wire  The number of the wire
+     * @return  The assembled index of the node
      */
     public static int assembleIndex(int direction,int tube,int wire){
         return (direction<<6)+(tube<<2)+wire;
@@ -515,9 +519,9 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     /**
      *
-     * @param out
-     * @param inputIndex
-     * @return
+     * @param out   The output {@link Direction}
+     * @param inputIndex    The inbound index of the node being worked on
+     * @return  The corresponding node on the opposite end of the conduit
      */
     public static int directionIndexTranslation(Direction out,int inputIndex){
         int inputWire=wireNum(inputIndex);
