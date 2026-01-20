@@ -52,6 +52,15 @@ public interface IWireNode {
         return false;
     }
 
+    /**
+     *Used for rendering nodes takes the index of the node and
+     * @param node
+     *            The index of the requested node
+     *
+     * @return
+     *          The local to the block XYZ position the requested node is
+     *          connected to.
+     */
     Vec3d getNodeOffset(int node);
 
     /**

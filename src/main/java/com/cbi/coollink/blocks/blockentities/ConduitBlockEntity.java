@@ -52,7 +52,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     }
     private BlockState coverBlock;
 
-    private BlockState initialBlockState;
+    private final BlockState initialBlockState;
 
     @Override
     public void writeData(WriteView view){
@@ -169,7 +169,11 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param node
+     *            The index of the requested node
+     *
      * @return
+     *          The local to the block XYZ position the requested node is
+     *          connected to.
      */
     @Override
     public Vec3d getNodeOffset(int node) {
@@ -243,11 +247,11 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
                 z=1.0;
             }
             case WEST -> {
-                x=1.0;
+                x=0.0;
                 z=nodeOffsetHelp(tube,wire,true);
             }
             case EAST -> {
-                x=0.0;
+                x=1.0;
                 z=nodeOffsetHelp(tube,wire,false);
             }
             default -> {
@@ -263,9 +267,10 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param index
-     *          The index of the node.
+     *          the port on this wire node.
      *
      * @return
+     *          This class
      */
     @Override
     public IWireNode getWireNode(int index) {return this;}
@@ -273,7 +278,9 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param index
+     *          the port on this wire node
      * @return
+     *          The index of the node on the connected block
      */
     @Override
     public int getOtherNodeIndex(int index) {
@@ -283,9 +290,10 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     /**
      *
      * @param index
-     *          The index of the node.
+     *          the port on this wire node
      *
      * @return
+     *          The requested {@link LocalNode}
      */
     @Override
     public LocalNode getLocalNode(int index) {
@@ -349,8 +357,8 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     }
 
     /**
-     *
-     * @param index
+     * Sets the {@link WireType} of the requested node
+     * @param index the port on this wire node
      * @param type
      */
     private void setNodeType(int index,WireType type){
