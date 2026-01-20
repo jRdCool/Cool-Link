@@ -1,5 +1,6 @@
 package com.cbi.coollink.rendering;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.net.protocol.WireDataPacket;
@@ -251,12 +252,17 @@ public interface IWireNode {
             BlockEntity otherEntity = blockWorld.getBlockEntity(nextBlockPos);
             if(otherEntity instanceof IWireNode wireNode){
                 if(wireNode instanceof ConduitBlockEntity conduit){
-                    nextBlockConnectionIndex = conduit.directionIndexTranslation(nextBlockConnectionIndex);
-
-
                     //mid-wire case
                     //special conduit/wall port transfer case
-                    //nextBlockPos = something
+                    //get the position of the next node and the index the connection is on from the conduit
+                    WireDescriptor connectionDescription = conduit.getConnectedNode(nextBlockConnectionIndex);
+                    //if nothing was returned then there is no complete connection so return null
+                    if(connectionDescription == null) {
+//                        Main.LOGGER.info("COnd Null "+nextBlockPos+" "+nextBlockConnectionIndex);
+                        return null;
+                    }
+                    nextBlockPos = connectionDescription.nextBlock();
+                    nextBlockConnectionIndex = connectionDescription.portIndex();
                 }else{
 
                     //end of wire case
@@ -267,6 +273,17 @@ public interface IWireNode {
             }
         }
         return endLocation;
+    }
+
+    /**
+     *
+     * @param nextBlock Posiiotn of the next conduit/wire node
+     * @param portIndex port index of the input of the next conduit/wire node
+     */
+    public record WireDescriptor(BlockPos nextBlock, int portIndex){
+        public WireDescriptor(LocalNode node){
+            this(node.getTargetPos(),node.getOtherIndex());
+        }
     }
 
 }

@@ -62,6 +62,8 @@ import java.util.HashMap;
 
 
 public class Main implements ModInitializer {
+
+    public static boolean NULL_PACKET_DESK_DEBUG = false;//set to true to log any time a wire traversal fails because the wire dead ends
     public static void blank(){}//This is to kill warnings for unused import of the main class when debug lines are commented out
     public static final Logger LOGGER = LoggerFactory.getLogger("cool-link");
 

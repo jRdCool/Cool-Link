@@ -171,7 +171,9 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
         }
         LocalNode outputNode = IWireNode.traverseWire(localNodes[connectionIndex]);
         if(outputNode == null || outputNode.getType() != WireType.CAT6){
-            Main.LOGGER.error("Null destination or incorrect output wire type (from RedstoneControllerWiredBE)");
+            if(Main.NULL_PACKET_DESK_DEBUG) {
+                Main.LOGGER.error("Null destination or incorrect output wire type (from RedstoneControllerWiredBE)");
+            }
             return null;
         }
         return outputNode;
