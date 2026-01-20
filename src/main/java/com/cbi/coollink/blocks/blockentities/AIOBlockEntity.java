@@ -301,7 +301,9 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 		LocalNode outputNode = IWireNode.traverseWire(localNodes[connectionIndex]);
 		if(outputNode == null || outputNode.getType() != localNodes[connectionIndex].getType()){
-			Main.LOGGER.error("Null destination or incorrect output wire type (from AIO_BLOCK_ENTITY port: "+connectionIndex+") "+getPos());
+			if(Main.NULL_PACKET_DESK_DEBUG) {
+				Main.LOGGER.error("Null destination or incorrect output wire type (from AIO_BLOCK_ENTITY port: " + connectionIndex + ") " + getPos());
+			}
 			return null;
 		}
 		return outputNode;
