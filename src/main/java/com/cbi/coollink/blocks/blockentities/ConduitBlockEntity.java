@@ -166,7 +166,11 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     * medium conduits use tubes 4-8 inclusive
      */
 
-
+    /**
+     *
+     * @param node
+     * @return
+     */
     @Override
     public Vec3d getNodeOffset(int node) {
         Direction direction = nodeDirection(node);
@@ -256,19 +260,45 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     }
 
 
+    /**
+     *
+     * @param index
+     *          The index of the node.
+     *
+     * @return
+     */
     @Override
     public IWireNode getWireNode(int index) {return this;}
 
+    /**
+     *
+     * @param index
+     * @return
+     */
     @Override
     public int getOtherNodeIndex(int index) {
         return localNodes[index].getOtherIndex();
     }
 
+    /**
+     *
+     * @param index
+     *          The index of the node.
+     *
+     * @return
+     */
     @Override
     public LocalNode getLocalNode(int index) {
         return localNodes[index];
     }
 
+    /**
+     *
+     * @param index the port on this wire node
+     * @param otherNode the port on the remote wire node
+     * @param pos the position of the remote node block
+     * @param type the type pof the wire
+     */
     @Override
     public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
         this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
@@ -276,50 +306,64 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         markDirty();
         assert world != null;
         world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
-        int cableShape=world.getBlockState(pos).get(Conduit.cableShape);
-        if(cableShape!=2){
-            Direction inputDir = nodeDirection(index);
-            Direction outputDir=Direction.NORTH;
-            switch (inputDir){
-                case SOUTH -> {
-                    outputDir= switch (cableShape){
-                        case 5-> Direction.EAST;//SE
-                        case 6-> Direction.WEST;//SW
-                        default -> Direction.NORTH;//NS
-                    };
-                }
-                case WEST -> {
-                    outputDir= switch (cableShape){
-                        case 4-> Direction.NORTH;//SE
-                        case 5-> Direction.SOUTH;//SW
-                        default -> Direction.EAST;//NS
-                    };
-                }
-                case EAST -> {
-                    outputDir= switch (cableShape){
-                        case 4-> Direction.NORTH;//SE
-                        case 7-> Direction.WEST;//SW
-                        default -> Direction.WEST;//NS
-                    };
-                }
-                case null -> {nullDirectionError();}
-                default -> {
-                    outputDir= switch (cableShape){
-                        case 4-> Direction.EAST;//SE
-                        case 7-> Direction.WEST;//SW
-                        default -> Direction.SOUTH;//NS
-                    };
-                }//north
+        if(world.getBlockState(pos).getBlock() instanceof Conduit){
+            int cableShape=world.getBlockState(pos).get(Conduit.cableShape);
+            if(cableShape!=2){
+                Direction inputDir = nodeDirection(index);
+                Direction outputDir=Direction.NORTH;
+                switch (inputDir){
+                    case SOUTH -> {
+                        outputDir= switch (cableShape){
+                            case 5-> Direction.EAST;//SE
+                            case 6-> Direction.WEST;//SW
+                            default -> Direction.NORTH;//NS
+                        };
+                    }
+                    case WEST -> {
+                        outputDir= switch (cableShape){
+                            case 4-> Direction.NORTH;//SE
+                            case 5-> Direction.SOUTH;//SW
+                            default -> Direction.EAST;//NS
+                        };
+                    }
+                    case EAST -> {
+                        outputDir= switch (cableShape){
+                            case 4-> Direction.NORTH;//SE
+                            case 7-> Direction.WEST;//SW
+                            default -> Direction.WEST;//NS
+                        };
+                    }
+                    case null -> {nullDirectionError();}
+                    default -> {
+                        outputDir= switch (cableShape){
+                            case 4-> Direction.EAST;//SE
+                            case 7-> Direction.WEST;//SW
+                            default -> Direction.SOUTH;//NS
+                        };
+                    }//north
 
+                }
+                setNodeType(directionIndexTranslation(outputDir,index),type);
             }
-            setNodeType(directionIndexTranslation(outputDir,index),type);
         }
     }
 
+    /**
+     *
+     * @param index
+     * @param type
+     */
     private void setNodeType(int index,WireType type){
         nodeType[index]=type;
     }
 
+    /**
+     *
+     * @param index
+     *          The index of the node to remove.
+     * @param dropWire
+     *          Whether to drop wires or not.
+     */
     @Override
     public void removeNode(int index, boolean dropWire) {
         this.localNodes[index] = null;
@@ -329,37 +373,70 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         this.setIsNodeUsed(index,false);
     }
 
+    /**
+     *
+     * @param index
+     * @return
+     */
     @Override
     public WireType getPortType(int index) {
         return nodeType[index];
     }
 
+    /**
+     *
+     * @param index
+     * @return
+     */
     @Override
     public boolean isNodeInUse(int index) {
         return isNodeUsed[index];
     }
 
+    /**
+     *
+     * @param index
+     * @param set
+     */
     @Override
     public void setIsNodeUsed(int index, boolean set) {
         isNodeUsed[index]=set;
     }
 
+    /**
+     *
+     * @param connectionIndex The index of the start of the connection on this device
+     * @return
+     */
     @Override
     public LocalNode getDestinationNode(int connectionIndex) {
         return null;
     }
 
+    /**
+     *
+     * @param connectionIndex The index of the connection node on the destination device that is reviving the data
+     * @param data The data to send to the other device
+     */
     @Override
     public void transmitData(int connectionIndex, WireDataPacket data) {
         Main.LOGGER.error("Function Called by a conduit at: "+pos.getX()+","+pos.getY()+","+pos.getZ());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getNodeCount() {
         return nodeCount;
     }//returns the number of nodes the device has
 
-
+    /**
+     *
+     * @param node
+     * @return
+     */
     private static Direction nodeDirection(int node){
         int direction = (node & 0b11000000) >>> 6;//take the direction bits and shift the bits to the right
         return switch(direction){
@@ -371,18 +448,40 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         };
     }
 
+    /**
+     *
+     * @param node
+     * @return
+     */
     private static int intNodeDirection(int node){
         return (node & 0b11000000) >>> 6;//take the direction bits and shift the bits to the right
     }
 
+    /**
+     *
+     * @param node
+     * @return
+     */
     private static int tubeNumber(int node){
         return (node & 0b00111100) >>> 2;//take the tube bits and shift them to the right
     }
 
+    /**
+     *
+     * @param node
+     * @return
+     */
     private static int wireNum(int node){
         return node & 0b00000011;
     }
 
+    /**
+     *
+     * @param tube
+     * @param wire
+     * @param notOrient
+     * @return
+     */
     private static double nodeOffsetHelp(int tube,int wire, boolean notOrient){
         double wireOffset = 0.03;
         double nodeOffset = 0.0;
@@ -396,10 +495,23 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         return nodeOffset;
     }
 
+    /**
+     *
+     * @param direction
+     * @param tube
+     * @param wire
+     * @return
+     */
     public static int assembleIndex(int direction,int tube,int wire){
         return (direction<<6)+(tube<<2)+wire;
     }
 
+    /**
+     *
+     * @param out
+     * @param inputIndex
+     * @return
+     */
     public static int directionIndexTranslation(Direction out,int inputIndex){
         int inputWire=wireNum(inputIndex);
         int inputTube=tubeNumber(inputIndex);
@@ -425,6 +537,11 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         return assembleIndex(outDirNum,outputTube,outputWire);
     }
 
+    /**
+     * translates the inbound index to it's corresponding outbound index
+     * @param inputIndex index of the entry point node
+     * @return index of the output node
+     */
     public int directionIndexTranslation(int inputIndex){
         BlockState state;
         if(world==null|| !(world.getBlockState(pos).getBlock() instanceof Conduit)) {
@@ -441,10 +558,19 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         }//Junction box logic
     }
 
+    /**
+     *
+     */
     private void nullDirectionError(){
         Main.LOGGER.error("Got Null Direction");
     }
 
+    /**
+     * Takes the direction the connection is coming from and translates it to the
+     * direction it is heading to.
+     * @param input Direction coming from
+     * @return Direction heading to
+     */
     public Direction outPutDirection(Direction input){
         BlockState state;
         if(world==null|| !(world.getBlockState(pos).getBlock() instanceof Conduit)) {
@@ -498,6 +624,12 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         return outputDir;
     }
 
+    /**
+     *
+     * @param startingBlock The starting conduit
+     * @param input Direction starting from
+     * @return the ConduitBlockEntity of the final block in the chain before an air block or a junction box
+     */
     public static OtherEnd otherConduitEnd(ConduitBlockEntity startingBlock,Direction input){
         ConduitBlockEntity outputBlock = startingBlock;
         Direction outputDirection = input;//if facing north the input is south
@@ -533,5 +665,10 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         return new OtherEnd(outputBlock,outputDirection);
     }
 
+    /**
+     *record for returning other end data
+     * @param blockEntity
+     * @param direction
+     */
     public record OtherEnd (ConduitBlockEntity blockEntity,Direction direction){}
 }
