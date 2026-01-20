@@ -6,7 +6,6 @@ import com.cbi.coollink.blocks.conduits.Conduit;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
-import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -518,23 +517,29 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
         int outputTube=Math.abs(12-inputTube);
         int outputWire=inputWire^0b10;
-        int outDirNum=0b00;
 
-        switch (out){
-            case SOUTH -> {
-                outDirNum=0b01;
-            }
-            case EAST -> {
-                outDirNum=0b11;
-            }
-            case WEST -> {
-                outDirNum=0b10;
-            }
-            default -> {}
-        }
+
+        int outDirNum = directionToDirectionNumber(out);
 
         //Main.LOGGER.info(Integer.toBinaryString(assembleIndex(outDirNum,outputTube,outputWire)));
         return assembleIndex(outDirNum,outputTube,outputWire);
+    }
+
+    private static int directionToDirectionNumber(Direction out) {
+        int outDirNum=0b00;
+        switch (out){
+            case SOUTH -> {
+                outDirNum =0b01;
+            }
+            case EAST -> {
+                outDirNum =0b11;
+            }
+            case WEST -> {
+                outDirNum =0b10;
+            }
+            default -> {}
+        }
+        return outDirNum;
     }
 
     /**
@@ -664,6 +669,42 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         }
         return new OtherEnd(outputBlock,outputDirection);
     }
+
+    public IWireNode.WireDescriptor getConnectedNode(int inputIndex){
+        int outputIndex = directionIndexTranslation(inputIndex);
+        LocalNode node = localNodes[outputIndex];//get the wire connection if one exsists
+        if(node!= null){//check if a wire is directly connected
+            return new WireDescriptor(node);//return the local node
+        }
+        outputIndex ^= 2;//directionIndexTranslation flips the 2 but witch is necessary for checking the local node but breaks things if we walk down the conduit so flip the bit back here
+        Direction nextConduitDirection = nodeDirection(outputIndex);
+        BlockPos nextConduitPos = pos.offset(nextConduitDirection);
+        if(world == null){
+//            Main.LOGGER.info("World null");
+            return null;
+        }
+        //get the neighbor block
+        BlockEntity nextBlockEntity = world.getBlockEntity(nextConduitPos);
+        if(nextBlockEntity instanceof ConduitBlockEntity nextConduitBlockEntity){//check the neibor block is a conduit
+            //get the index this wire connects to on the next block
+            assert nextConduitDirection != null;//should be impossible to be null
+            int otherConduitIndex = assembleIndex(directionToDirectionNumber(nextConduitDirection.getOpposite()),tubeNumber(outputIndex),wireNum(outputIndex));
+//            Main.LOGGER.info("Next place: "+otherConduitIndex+" "+outputIndex+" "+inputIndex);
+            //return the local node with that info
+            return new WireDescriptor(nextConduitPos,otherConduitIndex);
+        } else {
+//            Main.LOGGER.info("outputIndex: "+outputIndex);
+//            for(int i=0;i<localNodes.length;i++){
+//                if(localNodes[i] != null){
+//                    Main.LOGGER.info(i+") "+localNodes[i]);
+//                }
+//            }
+//            Main.LOGGER.info("Next block was not conduit "+nextConduitPos+" : "+nextBlockEntity);
+            return null;
+        }
+
+    }
+
 
     /**
      *record for returning other end data
