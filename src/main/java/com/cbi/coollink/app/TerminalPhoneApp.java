@@ -15,6 +15,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
+
 public class TerminalPhoneApp extends AbstractPhoneApp{
 
     public static final Identifier ID = Identifier.of(Main.namespace,"terminal_phone");
@@ -25,6 +27,9 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
     PhoneCommandLineContext commandLineContext;
     WLabel title;
     ProgramNetworkInterface networkInterface;
+    ArrayList<String> commandHistory = new ArrayList<>();
+
+    int histroyLocation=0;
     public TerminalPhoneApp(World ignoredWorld, BlockEntity ignoredClickedOnBlockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface) {
         super(ID);
         PhoneCommandLineContext commandRunner = new PhoneCommandLineContext(appData);
@@ -53,8 +58,22 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
 
     @Override
     public void keyPressed(int ch, int keyCode, int modifiers) {
-        if(ch == GLFW.GLFW_KEY_ENTER){
+        if(ch == GLFW.GLFW_KEY_ENTER){ // enter key => execute command
             executeCommand();
+        } else if(ch == GLFW.GLFW_KEY_UP){ //up key => previous command
+            if(histroyLocation > 0){
+                histroyLocation --;
+                inputBox.setText(commandHistory.get(histroyLocation));
+            }
+        } else if(ch == GLFW.GLFW_KEY_DOWN){ // down key => next command
+            if(histroyLocation < commandHistory.size()){
+                histroyLocation++;
+                if(histroyLocation == commandHistory.size()){
+                    inputBox.setText("");
+                } else {
+                    inputBox.setText(commandHistory.get(histroyLocation));
+                }
+            }
         }
     }
 
@@ -83,7 +102,14 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         String command = inputBox.getText().trim();
         if(!commandLineContext.commandExecuting() && !command.isEmpty()) {
             commandLineContext.executeCommand(command,networkInterface);
+            if(!command.equals(commandHistory.getLast())) {
+                commandHistory.add(command);
+            }
             inputBox.setText("");
+            if(commandHistory.size() > 500){
+                commandHistory.removeFirst();
+            }
+            histroyLocation = commandHistory.size();
         }
         inputBox.requestFocus();
     }
