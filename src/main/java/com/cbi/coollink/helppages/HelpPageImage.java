@@ -16,17 +16,17 @@ public class HelpPageImage extends HelpPageComponent{
         this.image = image;
     }
     @Override
-    int getHeight() {
+    public int getHeight() {
         return height;
     }
 
     @Override
-    int getWidth(int maxWidth) {
+    public int getWidth(int maxWidth) {
         return Math.min(width,maxWidth);
     }
 
     @Override
-    WWidget getItem() {
+    public WWidget getItem() {
         return new WSprite(image);
     }
 }

@@ -15,12 +15,12 @@ public class HelpPageText extends HelpPageComponent{
     }
 
     @Override
-    int getHeight() {
+    public int getHeight() {
         return height;
     }
 
     @Override
-    WWidget getItem() {
+    public WWidget getItem() {
         return new WText(item);
     }
 }
