@@ -4,10 +4,10 @@ import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.net.protocol.WireDataPacket;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,7 +62,7 @@ public interface IWireNode {
      *          The local to the block XYZ position the requested node is
      *          connected to.
      */
-    Vec3d getNodeOffset(int node);
+    Vec3 getNodeOffset(int node);
 
     /**
      * Get the {@link IWireNode} at the given index.
@@ -75,7 +75,7 @@ public interface IWireNode {
      */
     IWireNode getWireNode(int index);
 
-    static IWireNode getWireNode(World world, BlockPos pos) {
+    static IWireNode getWireNode(Level world, BlockPos pos) {
         if(pos == null)
             return null;
         BlockEntity te = world.getBlockEntity(pos);
@@ -171,14 +171,14 @@ public interface IWireNode {
         }
         return -1;
     }
-    default int getAvailableNode(Vec3d pos) {
+    default int getAvailableNode(Vec3 pos) {
         // before: return 0;
         // Might be a good idea to not return 0 if the method isn't implemented.
         return getAvailableNode();
     }
 
     @Nullable
-    static WireType getTypeOfConnection(World world, BlockPos pos1, BlockPos pos2) {
+    static WireType getTypeOfConnection(Level world, BlockPos pos1, BlockPos pos2) {
         BlockEntity te1 = world.getBlockEntity(pos1);
         if (te1 == null) return null;
         if (!(te1 instanceof IWireNode wn)) return null;
@@ -204,7 +204,7 @@ public interface IWireNode {
      */
     @Nullable
     static IWireNode getWireNodeFrom(int index, IWireNode obj, LocalNode[] localNodes, IWireNode[] nodeCache,
-                                     World level) {
+                                     Level level) {
         if (!obj.hasConnection(index)) return null;
         // Cache the node if it isn't already.
         if (nodeCache[index] == null)
@@ -242,7 +242,7 @@ public interface IWireNode {
     static LocalNode traverseWire(LocalNode start){
         WireType wireType = start.getType();
         LocalNode endLocation = null;
-        World blockWorld = start.getBlockEntity().getWorld();
+        Level blockWorld = start.getBlockEntity().getLevel();
         if(blockWorld == null){
             return null;
         }
