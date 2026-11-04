@@ -5,12 +5,12 @@ import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Encoder;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class LocalNode {
 
@@ -54,7 +54,7 @@ public class LocalNode {
         this.index = index;
         this.otherIndex = otherIndex;
         this.type = type;
-        this.relativePos = position.subtract(entity.getPos());
+        this.relativePos = position.subtract(entity.getBlockPos());
     }
 
     public LocalNode(BlockEntity entity, LocalNodeConnection read) {
@@ -65,12 +65,12 @@ public class LocalNode {
         this.relativePos = new Vec3i(read.x(), read.y(), read.z());
     }
 
-    public LocalNode(BlockEntity entity, ReadView read) {
+    public LocalNode(BlockEntity entity, ValueInput read) {
         this.entity = entity;
-        this.index = read.getInt(ID,-1);
-        this.otherIndex = read.getInt(OTHER,-1);
-        this.type = WireType.fromIndex(read.getInt(TYPE,-1));
-        this.relativePos = new Vec3i(read.getInt(X,0), read.getInt(Y,0), read.getInt(Z,0));
+        this.index = read.getIntOr(ID,-1);
+        this.otherIndex = read.getIntOr(OTHER,-1);
+        this.type = WireType.fromIndex(read.getIntOr(TYPE,-1));
+        this.relativePos = new Vec3i(read.getIntOr(X,0), read.getIntOr(Y,0), read.getIntOr(Z,0));
     }
 
 //    public void write(NbtCompound tag) {
@@ -86,7 +86,7 @@ public class LocalNode {
         return new LocalNodeConnection(index,otherIndex,type.getIndex(),relativePos.getX(),relativePos.getY(),relativePos.getZ());
     }
 
-    public void write(WriteView writer){
+    public void write(ValueOutput writer){
         writer.putInt(ID, this.index);
         writer.putInt(OTHER, this.otherIndex);
         writer.putInt(TYPE, this.type.getIndex());
@@ -116,7 +116,7 @@ public class LocalNode {
     }
 
     public BlockPos getTargetPos() {
-        return new BlockPos(entity.getPos().getX()+relativePos.getX(),entity.getPos().getY()+relativePos.getY(),entity.getPos().getZ()+relativePos.getZ());
+        return new BlockPos(entity.getBlockPos().getX()+relativePos.getX(),entity.getBlockPos().getY()+relativePos.getY(),entity.getBlockPos().getZ()+relativePos.getZ());
     }
 
     public boolean isInvalid() {

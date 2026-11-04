@@ -1,17 +1,17 @@
 package com.cbi.coollink.blocks.cables.createadditons;
 
 
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-import static net.minecraft.util.math.Direction.Axis.*;
-import static net.minecraft.util.BlockRotation.*;
+import static net.minecraft.core.Direction.Axis.*;
+import static net.minecraft.world.level.block.Rotation.*;
 
 /**
  * A hacky, messy, and probably not the best solution to a problem making my
@@ -19,7 +19,7 @@ import static net.minecraft.util.BlockRotation.*;
  *
  * Used to recalculate the relative positions of wires & nodes.
  */
-public enum NodeRotation implements StringIdentifiable {
+public enum NodeRotation implements StringRepresentable {
 
 	NONE(null, null),
 
@@ -35,13 +35,13 @@ public enum NodeRotation implements StringIdentifiable {
 	Z_CLOCKWISE_180(Z, CLOCKWISE_180),
 	Z_COUNTERCLOCKWISE_90(Z, COUNTERCLOCKWISE_90);
 
-	public static final EnumProperty<NodeRotation> ROTATION = EnumProperty.of("rotation", NodeRotation.class);
+	public static final EnumProperty<NodeRotation> ROTATION = EnumProperty.create("rotation", NodeRotation.class);
 	public static final NodeRotation[] VALUES = values();
 
 	final Direction.Axis axis;
-	final BlockRotation rotation;
+	final Rotation rotation;
 
-	NodeRotation(Direction.Axis axis, BlockRotation rotation) {
+	NodeRotation(Direction.Axis axis, Rotation rotation) {
 		this.axis = axis;
 		this.rotation = rotation;
 	}
@@ -49,8 +49,8 @@ public enum NodeRotation implements StringIdentifiable {
 	public Direction rotate(Direction current, boolean handleY) {
 		if (this == NONE) return current;
 		if (!handleY && this.axis == Y && current.getAxis() == Y) return current;
-		if (this.rotation == COUNTERCLOCKWISE_90) return current.rotateCounterclockwise(this.axis);
-		if (this.rotation == CLOCKWISE_90) return current.rotateClockwise(this.axis);
+		if (this.rotation == COUNTERCLOCKWISE_90) return current.getCounterClockWise(this.axis);
+		if (this.rotation == CLOCKWISE_90) return current.getClockWise(this.axis);
 		return current.getOpposite();
 	}
 
@@ -79,7 +79,7 @@ public enum NodeRotation implements StringIdentifiable {
 		return axis;
 	}
 
-	public BlockRotation getRotation() {
+	public Rotation getRotation() {
 		return rotation;
 	}
 
@@ -88,15 +88,15 @@ public enum NodeRotation implements StringIdentifiable {
 		return this.name().toLowerCase(Locale.ROOT);
 	}
 
-	public static NodeRotation get(Direction.Axis axis, BlockRotation rotation) {
-		if (rotation == BlockRotation.NONE) return NONE;
+	public static NodeRotation get(Direction.Axis axis, Rotation rotation) {
+		if (rotation == Rotation.NONE) return NONE;
 		for (NodeRotation wr : VALUES) {
 			if (wr.axis == axis && wr.rotation == rotation) return wr;
 		}
 		return NONE;
 	}
 
-	@Override
+
 	public String asString() {
 		return null;
 	}
