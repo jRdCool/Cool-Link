@@ -31,9 +31,11 @@ import static com.cbi.coollink.blocks.conduits.Conduit.cableShape;
 public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     private final LocalNode[] localNodes;
-    private static final int nodeCount = 0b11111111;
+    private static final int nodeCount = 0b101110100;
     private final boolean[] isNodeUsed = new boolean[nodeCount];
     private final WireType[] nodeType = new WireType[nodeCount];
+    private final int[] junctionBoxExitIndexID = new int[nodeCount];
+
 
     public static ConduitBlockEntity of(BlockPos pos, BlockState state, int type){
         return switch (type){
@@ -143,7 +145,14 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     /*
     *Wire nodes for conduits are complex. They will be initially passes as binary and be indexed as such;
-    * FFTTTTWW
+    * VFFTTTTWW
+    * 101110011
+    * V = Virticle 1=yes 0 = no
+    *   if virticle
+    *       F = up or down
+    *               00 = U, 01 = D
+    *               10 & 11 DNE and will index out of bounds
+    *
     * F = Facing direction
     *   00 = N, 01 = S
     *   10 = W, 11 = E
@@ -159,6 +168,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     *  00 10
     *  01 11
     *
+    * If wallport is used only tube 13 can be used
     *
     * small conduits automatically use tube 6
     *
@@ -537,23 +547,6 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         return assembleIndex(outDirNum,outputTube,outputWire);
     }
 
-    private static int directionToDirectionNumber(Direction out) {
-        int outDirNum=0b00;
-        switch (out){
-            case SOUTH -> {
-                outDirNum =0b01;
-            }
-            case EAST -> {
-                outDirNum =0b11;
-            }
-            case WEST -> {
-                outDirNum =0b10;
-            }
-            default -> {}
-        }
-        return outDirNum;
-    }
-
     /**
      * translates the inbound index to it's corresponding outbound index
      * @param inputIndex index of the entry point node
@@ -575,8 +568,25 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         }//Junction box logic
     }
 
+    private static int directionToDirectionNumber(Direction out) {
+        int outDirNum=0b00;
+        switch (out){
+            case SOUTH -> {
+                outDirNum =0b01;
+            }
+            case EAST -> {
+                outDirNum =0b11;
+            }
+            case WEST -> {
+                outDirNum =0b10;
+            }
+            default -> {}
+        }
+        return outDirNum;
+    }
+
     /**
-     *
+     * Logs a failed direction error
      */
     private void nullDirectionError(){
         Main.LOGGER.error("Got Null Direction");
@@ -724,4 +734,23 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
      * @param direction
      */
     public record OtherEnd (ConduitBlockEntity blockEntity,Direction direction){}
+
+
+    /**
+     * getting The outbound index for any given inbound index for a junction box
+     * @param inputIndex The index the connection has come in on
+     * @return The node index connected to internally
+     */
+    public int getJunctionBoxOutPutIndex(int inputIndex){
+        return junctionBoxExitIndexID[inputIndex];
+    }
+
+    /**
+     *
+     * @param inputIndex The index the node the connection would come in on
+     * @param outPutIndex The index of the node connected to internally
+     */
+    public void setJunctionBoxOutPutIndex(int inputIndex, int outPutIndex){
+        junctionBoxExitIndexID[inputIndex]=outPutIndex;
+    }
 }

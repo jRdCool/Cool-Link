@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "cableshape=0":{ "model": "cool-link:block/small_conduit_virticle", "uvlock": true },
+    "cableshape=1":{ "model": "cool-link:block/small_conduit_virticle", "uvlock": true },
+    "cableshape=2":{ "model": "cool-link:block/small_conduit_virticle", "uvlock": true },
+    "cableshape=3":{ "model": "cool-link:block/small_conduit_virticle", "uvlock": true },
+    "cableshape=4":{ "model": "cool-link:block/small_conduit_virticle", "uvlock": true },
+    "cableshape=5":{ "model": "cool-link:block/small_conduit_virticle", "uvlock": true },
+    "cableshape=6":{ "model": "cool-link:block/small_conduit_virticle", "uvlock": true },
+    "cableshape=7":{ "model": "cool-link:block/small_conduit_virticle", "uvlock": true }
+  }
+}
