@@ -2,35 +2,37 @@ package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.networkdevices.RSSenderWired;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.component.SwingAnimation;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.NonNull;
+
 
 public class WireTester extends Item {
 
-    public static final Identifier ID = Identifier.of(Main.namespace, "wire_tester");
-    public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace, "wire_tester");
+    public static final ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
 
-    public WireTester(Settings settings) {
+    public WireTester(Properties settings) {
         super(settings);
     }
 
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        BlockPos pos = context.getBlockPos();
-        World world = context.getWorld();
+    @Override
+    public @NonNull InteractionResult useOn(@NonNull UseOnContext context) {
+        BlockPos pos = context.getClickedPos();
+        Level world = context.getLevel();
         //ItemStack stack = context.getStack();
         BlockState state = world.getBlockState(pos);
         if(state.getBlock() instanceof RSSenderWired sender){
-            //Main.LOGGER.info("Clicked on sender");
-            //Main.LOGGER.info("Power = "+state.getWeakRedstonePower(world,pos, Direction.NORTH));
-            if(state.getWeakRedstonePower(world,pos, Direction.NORTH)==0){
+
+            if(state.getSignal(world,pos, Direction.NORTH)==0){
                 sender.setPower(world,state,15,pos,1);
                 //Main.LOGGER.info("Set to 15");
             }
@@ -38,10 +40,9 @@ public class WireTester extends Item {
                 sender.setPower(world,state,0,pos,1);
                 //Main.LOGGER.info("Set to 0");
             }
-            if (context.getPlayer() !=null) {context.getPlayer().swingHand(context.getHand());}
+            if (context.getPlayer() !=null) {context.getPlayer().swing(context.getHand(), SwingAnimation.DEFAULT, true);}
         }
-
-        return super.useOnBlock(context);
+        return super.useOn(context);
     }
 
 }

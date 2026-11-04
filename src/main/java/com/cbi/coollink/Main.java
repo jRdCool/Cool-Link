@@ -82,8 +82,8 @@ public class Main implements ModInitializer {
 
 
     //Cable Registries
-    public static final Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, Cat6Cable.ITEM_KEY, new Cat6Cable(new Item.Properties().registryKey(Cat6Cable.ITEM_KEY)));
-    public static final CoaxialCable coaxialCableEntry = Registry.register(Registries.ITEM, CoaxialCable.ITEM_KEY,new CoaxialCable(new Item.Settings().registryKey(CoaxialCable.ITEM_KEY)));
+    public static final Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, Cat6Cable.ITEM_KEY, new Cat6Cable(new Item.Properties()/*.registryKey(Cat6Cable.ITEM_KEY)*/));
+    public static final CoaxialCable coaxialCableEntry = Registry.register(Registries.ITEM, CoaxialCable.ITEM_KEY,new CoaxialCable(new Item.Properties()/*.registryKey(CoaxialCable.ITEM_KEY)*/));
 
 
     //creative mode tab group

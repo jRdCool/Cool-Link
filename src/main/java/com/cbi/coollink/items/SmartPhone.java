@@ -1,61 +1,47 @@
 package com.cbi.coollink.items;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
-import com.cbi.coollink.net.AioSyncMacPacket;
 import com.cbi.coollink.net.OpenPhoneGuiPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.NonNull;
 
 
 public class SmartPhone extends Item {
 
 
-    public static final Identifier ID = Identifier.of(Main.namespace,"smart_phone");
-    public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
-    public SmartPhone(Settings settings) {
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"smart_phone");
+    public static final ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+    public SmartPhone(Properties settings) {
         super(settings);
 
     }
     private static final int deviceID = 0x31;
 
 
-
     @Override
-    public ActionResult use(World world, PlayerEntity user, Hand hand){
-
+    public @NonNull InteractionResult use(@NonNull Level world, @NonNull Player user, @NonNull InteractionHand hand) {
         String currentThread = Thread.currentThread().getName();
         //check witch thread the code is being executed on the server
         if(currentThread.equals("Server thread")) {//if the code is being executed on the server thread
             //Main.LOGGER.info("normal");
             //open the phone GUI
-            ItemStack heldItem = user.getStackInHand(hand);
+            ItemStack heldItem = user.getItemInHand(hand);
 
-
-//            for (ItemStack itemStack : new ItemStack[]{user.getMainHandStack(),user.getOffHandStack()}) {
-//                if(itemStack.getItem().equals(this)){
-//                    heldItem=itemStack;
-//                    break;
-//                }
-//            }
-            if(heldItem==null){
-                Main.LOGGER.error("attempted to open phone GUI when no phone was held in hand");
-                return super.use(world, user, hand);
-            }
 //            BlockPos blockEntityPos;
 //            boolean noBLockEntity;
 //            if(usedBlockEntity!=null){
@@ -71,9 +57,9 @@ public class SmartPhone extends Item {
 //            }
 
             //open the phone screen
-            OpenPhoneGuiPacket packet = new OpenPhoneGuiPacket(world.getRegistryKey(),heldItem,user.getPos());
+            OpenPhoneGuiPacket packet = new OpenPhoneGuiPacket(world.dimension(),heldItem,user.position());
 
-            ServerPlayNetworking.send((ServerPlayerEntity) user,packet);
+            ServerPlayNetworking.send((ServerPlayer) user,packet);
 
 
         }
@@ -81,29 +67,28 @@ public class SmartPhone extends Item {
         return super.use(world, user, hand);
     }
 
-    public ActionResult useOnBlock(ItemUsageContext context) {//this gets called before use if used on a block
+    //use on block
+    @Override
+    public @NonNull InteractionResult useOn(@NonNull UseOnContext context) {
         if(Thread.currentThread().getName().equals("Server thread")) {
-            BlockPos pos = context.getBlockPos();
+            BlockPos pos = context.getClickedPos();
             //Main.LOGGER.info(pos.toShortString());
-            BlockEntity be = context.getWorld().getBlockEntity(pos);
+            BlockEntity be = context.getLevel().getBlockEntity(pos);
             if (be != null) {
-                //this is prbly a terrible way to do this
-                //usedBlockEntity=be;
-                NbtCompound nbt;//= phoneInstance.getOrCreateNbt();
-                var rawData = context.getStack().get(DataComponentTypes.CUSTOM_DATA);
+                CompoundTag nbt;
+                var rawData = context.getItemInHand().get(DataComponents.CUSTOM_DATA);
                 if(rawData!=null){
-                    nbt = rawData.copyNbt();
+                    nbt = rawData.copyTag();
                 }else{
-                    nbt = new NbtCompound();
+                    nbt = new CompoundTag();
                 }
-                nbt.putIntArray("BePos",new int[]{be.getPos().getX(),be.getPos().getY(),be.getPos().getZ()});
-                context.getStack().set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+                nbt.putIntArray("BePos",new int[]{be.getBlockPos().getX(),be.getBlockPos().getY(),be.getBlockPos().getZ()});
+                context.getItemInHand().set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
             }
 
 
 
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
-
 }
