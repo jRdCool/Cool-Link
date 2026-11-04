@@ -3,53 +3,58 @@ package com.cbi.coollink.blocks;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.explosion.Explosion;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Prediction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.BiConsumer;
 
 
-public class ServerRack extends BlockWithEntity implements BlockEntityProvider {
+public class ServerRack extends BaseEntityBlock/* implements BlockEntityProvider*/ {
     //All property definitions MUST be declared before the entry
-    public static final EnumProperty<ServerRack.Half> half = EnumProperty.of("half", ServerRack.Half.class);
-    public static final EnumProperty<ServerRack.Direction> direction = EnumProperty.of("direction", ServerRack.Direction.class);
+    public static final EnumProperty<Half> half = EnumProperty.create("half", ServerRack.Half.class);
+    public static final EnumProperty<ServerRack.Direction> direction = EnumProperty.create("direction", ServerRack.Direction.class);
 
-    public static final Identifier ID = Identifier.of(Main.namespace,"server_rack");
-    public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
-    public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
-    public static final ServerRack ENTRY = new ServerRack(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"server_rack");
+    public static final ResourceKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+    public static final ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+    public static final ServerRack ENTRY = new ServerRack(BlockBehaviour.Properties.of().strength(0.5f)/*.registryKey(BLOCK_KEY)*/);
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
         return new ServerRackBlockEntity(pos,state);
     }
 
-    @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return createCodec(ServerRack::new);
-    }
 
-    public enum Half implements StringIdentifiable{
+    public enum Half implements StringRepresentable {
         TOP("top"),
         BOTTOM("bottom");
 
@@ -60,12 +65,12 @@ public class ServerRack extends BlockWithEntity implements BlockEntityProvider {
         }
 
         @Override
-        public String asString() {
+        public @NonNull String getSerializedName() {
             return name;
         }
     }
 
-    public enum Direction implements  StringIdentifiable{
+    public enum Direction implements  StringRepresentable{
 
         NORTH_SOUTH("north_south"),
         EAST_WEST("east_west");
@@ -74,204 +79,221 @@ public class ServerRack extends BlockWithEntity implements BlockEntityProvider {
             this.name=name;
         }
 
-        public String asString(){
+        public @NonNull String getSerializedName(){
             return name;
         }
 
     }
 
 
-    public ServerRack(Settings settings) {
+    public ServerRack(BlockBehaviour.Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState()
-                .with(half,Half.BOTTOM)
-                .with(direction,Direction.NORTH_SOUTH)
+        registerDefaultState(defaultBlockState()
+                .setValue(half,Half.BOTTOM)
+                .setValue(direction,Direction.NORTH_SOUTH)
         );
 
     }
 
 
-
-    protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
-        //stateManager.add(half);
-        //stateManager.add(direction);
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateManager) {
         stateManager.add(half,direction);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
-        return switch (state.get(half)) {
-            case TOP -> switch (state.get(direction)) {
+    protected @NonNull VoxelShape getShape(BlockState state, @NonNull BlockGetter level, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+        return switch (state.getValue(half)) {
+            case TOP -> switch (state.getValue(direction)) {
                 case EAST_WEST -> voxelTEW();
                 case NORTH_SOUTH -> voxelTNS();
             };
-            case BOTTOM -> switch (state.get(direction)) {
+            case BOTTOM -> switch (state.getValue(direction)) {
                 case EAST_WEST -> voxelBEW();
                 case NORTH_SOUTH -> voxelBNS();
             };
         };
-
-
     }
-static boolean presented = false;
 
+    static boolean presented = false;
+
+    //hopefully this is the correct new funcion
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        if(world.getBlockState(pos.up()).isAir()) {
-            world.setBlockState(new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ()), state.with(half, Half.TOP));
+    public void setPlacedBy(Level world, BlockPos pos, @NonNull BlockState state, @org.jspecify.annotations.Nullable LivingEntity placer, @NonNull ItemStack itemStack) {
+        if(world.getBlockState(pos.above()).isAir()) {
+            world.setBlockAndUpdate(new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ()), state.setValue(half, Half.TOP));
         }else{
             if(placer!=null) {
-                if(placer instanceof PlayerEntity player){
+                if(placer instanceof Player player){
                     if(!player.isCreative()) {
-                        player.dropItem(new ItemStack(ServerRack.ENTRY),true);
+                        player.drop(new ItemStack(ServerRack.ENTRY),true, Prediction.PREDICTED);
                     }
                 }
 
             }
-            world.setBlockState(pos,Blocks.AIR.getDefaultState());
+            world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+        }
+    }
+
+//    @Override
+//    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+//        if(world.getBlockState(pos.up()).isAir()) {
+//            world.setBlockState(new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ()), state.with(half, Half.TOP));
+//        }else{
+//            if(placer!=null) {
+//                if(placer instanceof PlayerEntity player){
+//                    if(!player.isCreative()) {
+//                        player.dropItem(new ItemStack(ServerRack.ENTRY),true);
+//                    }
+//                }
+//
+//            }
+//            world.setBlockState(pos,Blocks.AIR.getDefaultState());
+//        }
+//    }
+
+
+    @Override
+    public void destroy(LevelAccessor world, BlockPos pos, BlockState state) {
+        switch (state.getValue(half)) {
+            case TOP -> world.setBlock(pos.below(), Blocks.AIR.defaultBlockState(), UPDATE_ALL);
+            case BOTTOM -> world.setBlock(pos.above(), Blocks.AIR.defaultBlockState(), UPDATE_ALL);
         }
     }
 
     @Override
-    public void onBroken(WorldAccess world, BlockPos pos, BlockState state) {
-        switch (state.get(half)) {
-            case TOP -> world.setBlockState(pos.down(), Blocks.AIR.getDefaultState(), NOTIFY_ALL);
-            case BOTTOM -> world.setBlockState(pos.up(), Blocks.AIR.getDefaultState(), NOTIFY_ALL);
-        }
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
+        super.onExplosionHit(state, level, pos, explosion, onHit);
+        destroy(level,pos,state);
     }
 
-    @Override
-    protected void onExploded(BlockState state, ServerWorld world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
-        super.onExploded(state, world, pos, explosion, stackMerger);
-        onBroken(world,pos,state);
-    }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        switch (ctx.getHorizontalPlayerFacing()){
+    public @org.jspecify.annotations.Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
+        switch (context.getHorizontalDirection()){
             case NORTH:
             case SOUTH:
-                return this.getDefaultState().with(direction, Direction.NORTH_SOUTH);
+                return this.defaultBlockState().setValue(direction, Direction.NORTH_SOUTH);
             case EAST:
             case WEST:
-                return this.getDefaultState().with(direction,Direction.EAST_WEST);
+                return this.defaultBlockState().setValue(direction,Direction.EAST_WEST);
             default:
-                Main.LOGGER.error("placement with non XZ direction: "+ctx.getHorizontalPlayerFacing());
+                Main.LOGGER.error("placement with non XZ direction: "+context.getHorizontalDirection());
         }
         return null;
     }
 
+
     public VoxelShape voxelBNS(){
-        VoxelShape shape = VoxelShapes.empty();
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.984375, 0, 0, 1, 1, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.015625, 0, 0, 0.984375, 0.015625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0, 0.015625, 1, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.015625, 0.875, 0, 0.046875, 0.9375, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.875, 0, 0.078125, 0.890625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.921875, 0, 0.078125, 0.9375, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.953125, 0.875, 0, 0.984375, 0.9375, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.875, 0, 0.953125, 0.890625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.921875, 0, 0.953125, 0.9375, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.015625, 0.5625, 0, 0.046875, 0.625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.5625, 0, 0.078125, 0.578125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.609375, 0, 0.078125, 0.625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.953125, 0.5625, 0, 0.984375, 0.625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.5625, 0, 0.953125, 0.578125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.609375, 0, 0.953125, 0.625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.015625, 0.1875, 0, 0.046875, 0.25, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.1875, 0, 0.078125, 0.203125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.234375, 0, 0.078125, 0.25, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.953125, 0.1875, 0, 0.984375, 0.25, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.1875, 0, 0.953125, 0.203125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.234375, 0, 0.953125, 0.25, 1));
+        VoxelShape shape = Shapes.empty();
+        shape = Shapes.join(shape, Shapes.box(0.984375, 0, 0, 1, 1, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.015625, 0, 0, 0.984375, 0.015625, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0, 0.015625, 1, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.015625, 0.875, 0, 0.046875, 0.9375, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.875, 0, 0.078125, 0.890625, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.921875, 0, 0.078125, 0.9375, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.953125, 0.875, 0, 0.984375, 0.9375, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.875, 0, 0.953125, 0.890625, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.921875, 0, 0.953125, 0.9375, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.015625, 0.5625, 0, 0.046875, 0.625, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.5625, 0, 0.078125, 0.578125, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.609375, 0, 0.078125, 0.625, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.953125, 0.5625, 0, 0.984375, 0.625, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.5625, 0, 0.953125, 0.578125, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.609375, 0, 0.953125, 0.625, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.015625, 0.1875, 0, 0.046875, 0.25, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.1875, 0, 0.078125, 0.203125, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.234375, 0, 0.078125, 0.25, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.953125, 0.1875, 0, 0.984375, 0.25, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.1875, 0, 0.953125, 0.203125, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.234375, 0, 0.953125, 0.25, 1), BooleanOp.OR);
 
         return shape;
     }
 
     public VoxelShape voxelBEW(){
-        VoxelShape shape = VoxelShapes.empty();
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.984375, 1, 1, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.015625, 1, 0.015625, 0.984375));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0, 1, 1, 0.015625));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.875, 0.015625, 1, 0.9375, 0.046875));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.875, 0.046875, 1, 0.890625, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.921875, 0.046875, 1, 0.9375, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.875, 0.953125, 1, 0.9375, 0.984375));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.875, 0.921875, 1, 0.890625, 0.953125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.921875, 0.921875, 1, 0.9375, 0.953125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.5625, 0.015625, 1, 0.625, 0.046875));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.5625, 0.046875, 1, 0.578125, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.609375, 0.046875, 1, 0.625, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.5625, 0.953125, 1, 0.625, 0.984375));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.5625, 0.921875, 1, 0.578125, 0.953125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.609375, 0.921875, 1, 0.625, 0.953125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.1875, 0.015625, 1, 0.25, 0.046875));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.1875, 0.046875, 1, 0.203125, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.234375, 0.046875, 1, 0.25, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.1875, 0.953125, 1, 0.25, 0.984375));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.1875, 0.921875, 1, 0.203125, 0.953125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.234375, 0.921875, 1, 0.25, 0.953125));
+        VoxelShape shape = Shapes.empty();
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0.984375, 1, 1, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0.015625, 1, 0.015625, 0.984375),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0, 1, 1, 0.015625),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.875, 0.015625, 1, 0.9375, 0.046875),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.875, 0.046875, 1, 0.890625, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.921875, 0.046875, 1, 0.9375, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.875, 0.953125, 1, 0.9375, 0.984375),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.875, 0.921875, 1, 0.890625, 0.953125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.921875, 0.921875, 1, 0.9375, 0.953125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.5625, 0.015625, 1, 0.625, 0.046875),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.5625, 0.046875, 1, 0.578125, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.609375, 0.046875, 1, 0.625, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.5625, 0.953125, 1, 0.625, 0.984375),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.5625, 0.921875, 1, 0.578125, 0.953125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.609375, 0.921875, 1, 0.625, 0.953125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.1875, 0.015625, 1, 0.25, 0.046875),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.1875, 0.046875, 1, 0.203125, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.234375, 0.046875, 1, 0.25, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.1875, 0.953125, 1, 0.25, 0.984375),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.1875, 0.921875, 1, 0.203125, 0.953125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.234375, 0.921875, 1, 0.25, 0.953125),BooleanOp.OR);
 
         return shape;
     }
 
     public VoxelShape voxelTNS(){
-        VoxelShape shape = VoxelShapes.empty();
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.015625, 0.984375, 0, 0.984375, 1, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.984375, 0, 0, 1, 1, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0, 0.015625, 1, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.015625, 0.8125, 0, 0.046875, 0.875, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.8125, 0, 0.078125, 0.828125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.859375, 0, 0.078125, 0.875, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.953125, 0.8125, 0, 0.984375, 0.875, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.8125, 0, 0.953125, 0.828125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.859375, 0, 0.953125, 0.875, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.015625, 0.5, 0, 0.046875, 0.5625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.5, 0, 0.078125, 0.515625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.546875, 0, 0.078125, 0.5625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.953125, 0.5, 0, 0.984375, 0.5625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.5, 0, 0.953125, 0.515625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.546875, 0, 0.953125, 0.5625, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.015625, 0.1875, 0, 0.046875, 0.25, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.1875, 0, 0.078125, 0.203125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.046875, 0.234375, 0, 0.078125, 0.25, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.953125, 0.1875, 0, 0.984375, 0.25, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.1875, 0, 0.953125, 0.203125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.921875, 0.234375, 0, 0.953125, 0.25, 1));
+        VoxelShape shape = Shapes.empty();
+        shape = Shapes.join(shape, Shapes.box(0.015625, 0.984375, 0, 0.984375, 1, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.984375, 0, 0, 1, 1, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0, 0.015625, 1, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.015625, 0.8125, 0, 0.046875, 0.875, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.8125, 0, 0.078125, 0.828125, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.859375, 0, 0.078125, 0.875, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.953125, 0.8125, 0, 0.984375, 0.875, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.8125, 0, 0.953125, 0.828125, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.859375, 0, 0.953125, 0.875, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.015625, 0.5, 0, 0.046875, 0.5625, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.5, 0, 0.078125, 0.515625, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.546875, 0, 0.078125, 0.5625, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.953125, 0.5, 0, 0.984375, 0.5625, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.5, 0, 0.953125, 0.515625, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.546875, 0, 0.953125, 0.5625, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.015625, 0.1875, 0, 0.046875, 0.25, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.1875, 0, 0.078125, 0.203125, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.046875, 0.234375, 0, 0.078125, 0.25, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.953125, 0.1875, 0, 0.984375, 0.25, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.1875, 0, 0.953125, 0.203125, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.921875, 0.234375, 0, 0.953125, 0.25, 1),BooleanOp.OR);
 
         return shape;
     }
 
     public VoxelShape voxelTEW(){
-        VoxelShape shape = VoxelShapes.empty();
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.984375, 0.015625, 1, 1, 0.984375));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.984375, 1, 1, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0, 1, 1, 0.015625));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.8125, 0.015625, 1, 0.875, 0.046875));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.8125, 0.046875, 1, 0.828125, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.859375, 0.046875, 1, 0.875, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.8125, 0.953125, 1, 0.875, 0.984375));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.8125, 0.921875, 1, 0.828125, 0.953125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.859375, 0.921875, 1, 0.875, 0.953125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.5, 0.015625, 1, 0.5625, 0.046875));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.5, 0.046875, 1, 0.515625, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.546875, 0.046875, 1, 0.5625, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.5, 0.953125, 1, 0.5625, 0.984375));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.5, 0.921875, 1, 0.515625, 0.953125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.546875, 0.921875, 1, 0.5625, 0.953125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.1875, 0.015625, 1, 0.25, 0.046875));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.1875, 0.046875, 1, 0.203125, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.234375, 0.046875, 1, 0.25, 0.078125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.1875, 0.953125, 1, 0.25, 0.984375));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.1875, 0.921875, 1, 0.203125, 0.953125));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.234375, 0.921875, 1, 0.25, 0.953125));
+        VoxelShape shape = Shapes.empty();
+        shape = Shapes.join(shape, Shapes.box(0, 0.984375, 0.015625, 1, 1, 0.984375),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0.984375, 1, 1, 1),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0, 1, 1, 0.015625),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.8125, 0.015625, 1, 0.875, 0.046875),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.8125, 0.046875, 1, 0.828125, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.859375, 0.046875, 1, 0.875, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.8125, 0.953125, 1, 0.875, 0.984375),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.8125, 0.921875, 1, 0.828125, 0.953125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.859375, 0.921875, 1, 0.875, 0.953125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.5, 0.015625, 1, 0.5625, 0.046875),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.5, 0.046875, 1, 0.515625, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.546875, 0.046875, 1, 0.5625, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.5, 0.953125, 1, 0.5625, 0.984375),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.5, 0.921875, 1, 0.515625, 0.953125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.546875, 0.921875, 1, 0.5625, 0.953125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.1875, 0.015625, 1, 0.25, 0.046875),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.1875, 0.046875, 1, 0.203125, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.234375, 0.046875, 1, 0.25, 0.078125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.1875, 0.953125, 1, 0.25, 0.984375),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.1875, 0.921875, 1, 0.203125, 0.953125),BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.234375, 0.921875, 1, 0.25, 0.953125),BooleanOp.OR);
 
         return shape;
     }
 
-    public BlockRenderType getRenderType(BlockState state) {
-        // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
-        return BlockRenderType.MODEL;
+    @Override
+    protected @NonNull RenderShape getRenderShape(@NonNull BlockState state) {
+        return RenderShape.MODEL;
     }
 }
