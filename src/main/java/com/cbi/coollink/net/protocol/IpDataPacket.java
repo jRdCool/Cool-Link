@@ -1,7 +1,7 @@
 package com.cbi.coollink.net.protocol;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 
@@ -18,7 +18,7 @@ public class IpDataPacket implements WireDataPacket{
             String sourceIp;
             String destIp;
 
-            NbtCompound data;
+            CompoundTag data;
             hasDestMac = byteBuf.readBoolean();
             if(hasDestMac){
                 int[] m1i = {0,0,0};
@@ -77,7 +77,7 @@ public class IpDataPacket implements WireDataPacket{
     private final String destinationIpAddress;
     private final String sourceIpAddress;
 
-    private final NbtCompound ipData;
+    private final CompoundTag ipData;
 
     /**Create a new Ip data packet when the destination mac is unknown
      * @param destinationIpAddress The ip address to send the packet to
@@ -85,7 +85,7 @@ public class IpDataPacket implements WireDataPacket{
      * @param sourceMacAddress The mac address of the device sending the packet
      * @param data The data to send
      */
-    public IpDataPacket(String destinationIpAddress, String sourceIpAddress, Mac sourceMacAddress, NbtCompound data){
+    public IpDataPacket(String destinationIpAddress, String sourceIpAddress, Mac sourceMacAddress, CompoundTag data){
         this.destinationIpAddress = destinationIpAddress;
         this.sourceIpAddress = sourceIpAddress;
         this.sourceMacAddress = sourceMacAddress;
@@ -99,7 +99,7 @@ public class IpDataPacket implements WireDataPacket{
      * @param destinationMacAddress The mac address of the device the packet is going to
      * @param data The data to send
      */
-    public IpDataPacket(String destinationIpAddress, String sourceIpAddress, Mac sourceMacAddress, Mac destinationMacAddress,NbtCompound data){
+    public IpDataPacket(String destinationIpAddress, String sourceIpAddress, Mac sourceMacAddress, Mac destinationMacAddress,CompoundTag data){
         this.destinationIpAddress = destinationIpAddress;
         this.sourceIpAddress = sourceIpAddress;
         this.sourceMacAddress = sourceMacAddress;
@@ -124,7 +124,7 @@ public class IpDataPacket implements WireDataPacket{
     /**Get the payload data this packet is transmitting
      * @return The data being transmitted
      */
-    public NbtCompound getData(){
+    public CompoundTag getData(){
         return ipData;
     }
 
@@ -160,7 +160,7 @@ public class IpDataPacket implements WireDataPacket{
      * @param responseData The data to respond with
      * @return A new data packet that can be sent back to whoever sent it
      */
-    public IpDataPacket createResponsePacket(NbtCompound responseData){
+    public IpDataPacket createResponsePacket(CompoundTag responseData){
         return new IpDataPacket(sourceIpAddress,destinationIpAddress,destinationMacAddress,sourceMacAddress,responseData);
     }
 

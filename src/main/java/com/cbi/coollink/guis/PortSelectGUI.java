@@ -9,9 +9,9 @@ import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WButton;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.ArrayList;
 
@@ -46,7 +46,7 @@ public class PortSelectGUI extends LightweightGuiDescription implements WantsScr
                 int finalI = i;
                 portButtons[i].setOnClick(()->{
                     //send packet to the server to set the ports
-                    ClientPlayNetworking.send(new WireInfoDataPacket(ofType.get(finalI),usedOnBlock.getPos(),heldItem,type,false));
+                    ClientPlayNetworking.send(new WireInfoDataPacket(ofType.get(finalI),usedOnBlock.getBlockPos(),heldItem,type,false));
                     //close the GUI
                     screen.close();
                 });

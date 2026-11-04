@@ -28,6 +28,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -83,28 +84,27 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 	// Serialize the BlockEntity
 	@Override
-	protected void writeData(WriteView view) {
-		super.writeData(view);
+	protected void saveAdditional(ValueOutput view) {
+		super.saveAdditional(view);
 		view.putInt("number", 89);
 		view.putString("password", Objects.requireNonNullElse(password, "password123456"));
 		view.putString("ssid", Objects.requireNonNullElse(ssid, "Unconfigured Network"));
 		view.putString("Wireless_Password", Objects.requireNonNullElse(netPass, ""));
 		view.putIntArray("MAC1",mac1.getMac());
 		view.putIntArray("MAC2",mac2.getMac());
-		WriteView.ListView connections = view.getList("connections");
-		//WriteView.ListAppender<LocalNodeConnection> listAppender = view.getListAppender("connections", LocalNodeConnection.CODEC);
+		ValueOutput.ValueOutputList connections = view.childrenList("connections");
 		for(int i=0;i<nodeCount;i++){
 			if(localNodes[i]==null){
-				connections.add();
+				connections.addChild();
 			}else{
-				WriteView connection = connections.add();
+				ValueOutput connection = connections.addChild();
 				localNodes[i].write(connection);
 			}
 		}
 
-		WriteView.ListView rememberedDevicesList = view.getList("rememberedDevices");
+		ValueOutput.ValueOutputList rememberedDevicesList = view.childrenList("rememberedDevices");
 		for(ConnectedDevice device: rememberedDevices){
-			device.writeToView(rememberedDevicesList.add());
+			device.writeToView(rememberedDevicesList.addChild());
 		}
 	}//Writing data
 
@@ -529,7 +529,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			ServerPlayer player = mobileClientRouting.get(packet.getDestinationMacAddress());
 			if(player != null){
 				//check if the player is in the same dimension
-				if(player.get().equals(getWorld())) {
+				if(player.get().equals(getLevel())) {
 					sendWifiClientPacket(packet, player);
 				}
 			}
@@ -555,9 +555,9 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 	}
 
-	void sendWifiClientPacket(IpDataPacket data, ServerPlayerEntity player){
+	void sendWifiClientPacket(IpDataPacket data, ServerPlayer player){
 		//Main.LOGGER.error("AIO Sending packet to client: "+data+" "+player.getName());
-		ServerPlayNetworking.send(player,new WIFIServerIpPacket(data, getPos()));
+		ServerPlayNetworking.send(player,new WIFIServerIpPacket(data, getBlockPos()));
 	}
 
 
@@ -599,14 +599,14 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 		if(device != null) {
 
-			String packetType = data.getData().getString("type","connect");
+			String packetType = data.getData().getStringOr("type","connect");
 			//if the device is requesting a service other than connection
 			if(!packetType.equals("connect")){
 				handleRouterPacket(data);
 				return;
 			}
 			//if so then send them the valid packet back
-			NbtCompound response = new NbtCompound();
+			CompoundTag response = new CompoundTag();
 			response.putString("type","connected");
 			response.putBoolean("online",online);
 			device.connectionTimer()[0]=0;
@@ -624,7 +624,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		ConnectedDevice remembered = getRememberedDevice(data.getSourceMacAddress());
 		if(remembered!=null){
 			connectedDevices.add(remembered);
-			NbtCompound response = new NbtCompound();
+			CompoundTag response = new CompoundTag();
 			response.putString("type","connected");
 			response.putBoolean("online",online);
 			remembered.connectionTimer()[0]=0;
@@ -632,11 +632,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}else {
 			//register this device on the network and send it its IP back
 			String deviceIp = generateNewIp();
-			String deviceName = data.getData().getString("deviceName", "Unnamed device");
+			String deviceName = data.getData().getStringOr("deviceName", "Unnamed device");
 			ConnectedDevice newDevice = new ConnectedDevice(deviceIp, data.getSourceMacAddress(), deviceName,new int[]{0});
 			connectedDevices.add(newDevice);
 			rememberDevice(newDevice);
-			NbtCompound response = new NbtCompound();
+			CompoundTag response = new CompoundTag();
 			response.putString("type", "connected");
 			response.putBoolean("online", online);
 			sendPacket(new IpDataPacket(deviceIp, "169.0.0.1", mac1, data.getSourceMacAddress(), response));
@@ -644,12 +644,12 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	public void handleRouterPacket(IpDataPacket data){
-		String type = data.getData().getString("type","unknown");
+		String type = data.getData().getStringOr("type","unknown");
 		switch (type) {
 			case "connect" -> setupNewEthDevice(data);
 			case "disconnect" -> processDisconnect(data.getSourceMacAddress());
 			case "ping" -> {
-				NbtCompound pongCompound = new NbtCompound();
+				CompoundTag pongCompound = new CompoundTag();
 				pongCompound.putString("type","pong");
 				sendPacket(data.createResponsePacket(pongCompound));
 			}
@@ -702,7 +702,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	private void sendPingPacket(ConnectedDevice device){
-		NbtCompound pingCompound =  new NbtCompound();
+		CompoundTag pingCompound =  new CompoundTag();
 		pingCompound.putString("type","ping");
 		sendPacket(new IpDataPacket(device.ipAddress(), "169.0.0.1", mac1,device.deviceMac() ,pingCompound));
 	}
@@ -727,11 +727,11 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 					'}';
 		}
 
-		public ConnectedDevice(ReadView view){
-			this(view.getString("ip","0.0.0.0"),new Mac(view.getOptionalIntArray("mac").orElse(new int[]{0,0,0})),view.getString("name","Forgotten device"),new int[]{0});
+		public ConnectedDevice(ValueInput view){
+			this(view.getStringOr("ip","0.0.0.0"),new Mac(view.getIntArray("mac").orElse(new int[]{0,0,0})),view.getStringOr("name","Forgotten device"),new int[]{0});
 		}
 
-		public void writeToView(WriteView output){
+		public void writeToView(ValueOutput output){
 			output.putString("ip",ipAddress);
 			output.putIntArray("mac",deviceMac.getMac());
 			output.putString("name",deviceName);

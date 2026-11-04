@@ -7,7 +7,7 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public record AccessPointLocationPacket(BlockPos[] aps, String ssid) implements CustomPayload {
     public static final Id<AccessPointLocationPacket> ID =new Id<>(Identifier.of(Main.namespace,"access-point-location-packet"));
