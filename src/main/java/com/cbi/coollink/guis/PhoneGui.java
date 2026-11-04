@@ -178,6 +178,7 @@ public class PhoneGui extends LightweightGuiDescription {
             phoneName="UnNamed phone";
             this.clickedOnBLockEntity = null;
             mac = new Mac(0x31);
+            installApp(HelpPagesApp.ID);
         }
 
         networkInterface = new PhoneNetworkInterface(mac);

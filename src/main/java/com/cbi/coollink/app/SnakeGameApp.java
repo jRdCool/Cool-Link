@@ -73,7 +73,7 @@ public class SnakeGameApp extends AbstractPhoneApp{
     @Override
     public void addPainters() {
         root.setBackgroundPainter((matrices, left, top, panel) ->{
-            ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_16A7FF);
+            ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_16A7FF);//draw the background
             int cellSize = (int)((phoneHeight-phoneHeight*0.1)/15);
             int start =phoneWidth/2-cellSize*15/2;
 

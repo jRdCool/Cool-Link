@@ -102,7 +102,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         String command = inputBox.getText().trim();
         if(!commandLineContext.commandExecuting() && !command.isEmpty()) {
             commandLineContext.executeCommand(command,networkInterface);
-            if(!command.equals(commandHistory.getLast())) {
+            if(commandHistory.isEmpty() || !command.equals(commandHistory.getLast())) {
                 commandHistory.add(command);
             }
             inputBox.setText("");

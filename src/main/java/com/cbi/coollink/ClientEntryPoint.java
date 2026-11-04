@@ -33,6 +33,7 @@ public class ClientEntryPoint implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         //register client things here
+        AppRegistry.registerApp(HelpPagesApp.ID,HelpPagesApp::new,null,Text.of("Documentation / reference for how to use the mod Cool Link"));
         AppRegistry.registerApp(ExampleApp.ID,ExampleApp::new,null, Text.of("this is a test app\nlets try 2 lines"));
         AppRegistry.registerApp(SnakeGameApp.appID, SnakeGameApp::new, SnakeGameApp.ICON,Text.of("Snake Game!"));
         AppRegistry.registerApp(TerminalPhoneApp.ID, TerminalPhoneApp::new, TerminalPhoneApp.ICON, Text.of("Terminal for your phone"));
