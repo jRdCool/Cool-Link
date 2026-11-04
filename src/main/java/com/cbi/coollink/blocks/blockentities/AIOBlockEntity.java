@@ -15,22 +15,24 @@ import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+//import net.minecraft.network.listener.ClientPlayPacketListener;
+//import net.minecraft.network.packet.Packet;
+//import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+//import net.minecraft.registry.RegistryWrapper;
+//import net.minecraft.server.network.ServerPlayerEntity;
+//import net.minecraft.storage.ReadView;
+//import net.minecraft.storage.WriteView;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.core.BlockPos;
 
 import java.util.*;
 
@@ -74,7 +76,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 	private final ArrayList<Mac> eth1SwitchingTable = new ArrayList<>();
 
-	private final HashMap<Mac, ServerPlayerEntity> mobileClientRouting = new HashMap<>();
+	private final HashMap<Mac, ServerPlayer> mobileClientRouting = new HashMap<>();
 
 	private final ArrayList<ConnectedDevice> rememberedDevices = new ArrayList<>();
 
@@ -109,22 +111,22 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 
 	@Override
-	protected void readData(ReadView view) {
-		super.readData(view);
-		password=view.getString("password","password123546");
-		ssid = view.getString("ssid","Unconfigured Network");
-		netPass = view.getString("Wireless_Password","");
-		int[] mac1Bytes = view.getOptionalIntArray("MAC1").get();
-		int[] mac2Bytes = view.getOptionalIntArray("MAC2").get();
+	protected void loadAdditional(ValueInput view) {
+		super.loadAdditional(view);
+		password=view.getStringOr("password","password123546");
+		ssid = view.getStringOr("ssid","Unconfigured Network");
+		netPass = view.getStringOr("Wireless_Password","");
+		int[] mac1Bytes = view.getIntArray("MAC1").get();
+		int[] mac2Bytes = view.getIntArray("MAC2").get();
 		setMacAddresses(mac1Bytes,mac2Bytes);
-		ReadView.ListReadView lrv = view.getListReadView("connections");
-		List<ReadView> connectionNodes = lrv.stream().toList();
+		ValueInput.ValueInputList lrv = view.childrenListOrEmpty("connections");
+		List<ValueInput> connectionNodes = lrv.stream().toList();
 
 		for (int i=0;i<nodeCount;i++){
 			if(i < connectionNodes.size()){
-				ReadView cn = connectionNodes.get(i);
+				ValueInput cn = connectionNodes.get(i);
 
-				if(cn.getOptionalInt(LocalNode.ID).isEmpty()){
+				if(cn.getInt(LocalNode.ID).isEmpty()){
 					isNodeUsed[i] = false;
 				}else{
 					localNodes[i]=new LocalNode(this , cn);
@@ -134,9 +136,9 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 				isNodeUsed[i] = false;
 			}
 		}
-		ReadView.ListReadView rememberedDevicesList = view.getListReadView("rememberedDevices");
+		ValueInput.ValueInputList rememberedDevicesList = view.childrenListOrEmpty("rememberedDevices");
 		rememberedDevices.clear();
-		for(ReadView device: rememberedDevicesList){
+		for(ValueInput device: rememberedDevicesList){
 			rememberedDevices.add(new ConnectedDevice(device));
 		}
 	}//reading data
@@ -149,14 +151,14 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	@Override
-	public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
+	public CompoundTag toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
 		return createNbt(registryLookup);
 	}//Rendering Crucial
 
 
-	public static void tick(World world, BlockPos pos, BlockState state, AIOBlockEntity be) {
+	public static void tick(Level world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//called from the AIONetwork block class
-		if(world.isClient){
+		if(world.isClientSide()){
 			return;
 		}
 		be.onlineCheckCounter ++;
@@ -197,7 +199,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 	}//run on tick
 	public void updateStates(){
-		if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+		if(level!=null) level.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
 	}//notifies the world of updates to the block state
 
 	public void setMacAddresses(int[] mac1,int[] mac2){
@@ -213,20 +215,20 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 
 	@Override
-	public Vec3d getNodeOffset(int node) {
+	public Vec3 getNodeOffset(int node) {
 		double node0XN = 0.275;
 		double node1XN = 0.475;
 		double node2XN = 0.75;
 		double nodeZN = 0.9;
 		double nodeY = .05;
-		Vec3d[][] nodes = {
-				{new Vec3d(node0XN,nodeY,nodeZN), new Vec3d(node1XN,nodeY,nodeZN), new Vec3d(node2XN,nodeY,nodeZN) },// - - - - - - - - - - - - - - NORTH
-				{new Vec3d(1-nodeZN,nodeY,node0XN), new Vec3d(1-nodeZN,nodeY,node1XN), new Vec3d(1-nodeZN,nodeY,node2XN) },// - - - - - - - EAST
-				{new Vec3d(1-node0XN,nodeY,1-nodeZN), new Vec3d(1-node1XN,nodeY,1-nodeZN), new Vec3d(1-node2XN,nodeY,1-nodeZN) },// SOUTH
-				{new Vec3d(nodeZN,nodeY,1-node0XN), new Vec3d(nodeZN,nodeY,1-node1XN), new Vec3d(nodeZN,nodeY,1-node2XN) } // - - - - - - - WEST
+		Vec3[][] nodes = {
+				{new Vec3(node0XN,nodeY,nodeZN), new Vec3(node1XN,nodeY,nodeZN), new Vec3(node2XN,nodeY,nodeZN) },// - - - - - - - - - - - - - - NORTH
+				{new Vec3(1-nodeZN,nodeY,node0XN), new Vec3(1-nodeZN,nodeY,node1XN), new Vec3(1-nodeZN,nodeY,node2XN) },// - - - - - - - EAST
+				{new Vec3(1-node0XN,nodeY,1-nodeZN), new Vec3(1-node1XN,nodeY,1-nodeZN), new Vec3(1-node2XN,nodeY,1-nodeZN) },// SOUTH
+				{new Vec3(nodeZN,nodeY,1-node0XN), new Vec3(nodeZN,nodeY,1-node1XN), new Vec3(nodeZN,nodeY,1-node2XN) } // - - - - - - - WEST
 		};
 		int dir = 0;
-		switch (getCachedState().get(Properties.HORIZONTAL_FACING)){
+		switch (getCachedState().get(BlockStateProperties.HORIZONTAL_FACING)){
 			case EAST -> dir=1;
 			case SOUTH -> dir=2;
 			case WEST -> dir=3;
@@ -416,7 +418,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	@Override
-	public void handleClientWifiConnectionRequest(String password, Mac deviceMacAddress, ServerPlayerEntity player, String deviceName) {
+	public void handleClientWifiConnectionRequest(String password, Mac deviceMacAddress, ServerPlayer player, String deviceName) {
 		//in this situation we are already at the rougher so we can just process this immediately, but if wer were not at the rougher then we would have to send a packet to the rougher with the info
 
 		//check if this is device is already connected
@@ -524,10 +526,10 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		if(port == -1){
 			//check for wifi routing
 			//checkPhoneRouting
-			ServerPlayerEntity player = mobileClientRouting.get(packet.getDestinationMacAddress());
+			ServerPlayer player = mobileClientRouting.get(packet.getDestinationMacAddress());
 			if(player != null){
 				//check if the player is in the same dimension
-				if(player.getWorld().equals(getWorld())) {
+				if(player.get().equals(getWorld())) {
 					sendWifiClientPacket(packet, player);
 				}
 			}

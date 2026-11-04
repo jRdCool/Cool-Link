@@ -1,11 +1,8 @@
 package com.cbi.coollink.app;
 
 import io.github.cottonmc.cotton.gui.widget.WPanel;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.resources.Identifier;
+import net.minecraft.nbt.CompoundTag;
 
 public abstract class AbstractPhoneApp {
     /**the panel all widgets of this are added too
@@ -16,7 +13,7 @@ public abstract class AbstractPhoneApp {
     public final int phoneWidth=400,phoneHeight=200,TIME_COLOR_WHITE=0xFFFFFF,TIME_COLOR_BLACK=0x0;
     public int timeColor=TIME_COLOR_WHITE;
     public boolean requestSave=false;
-    public Identifier icon = Identifier.of("minecraft","textures/misc/unknown_pack.png");
+    public Identifier icon = Identifier.fromNamespaceAndPath("minecraft","textures/misc/unknown_pack.png");
     public final Identifier appId;
 
     public AbstractPhoneApp(Identifier appId) {
@@ -64,7 +61,7 @@ public abstract class AbstractPhoneApp {
      * this method is called by the phone every time it attempts to save while an app is open
      * @return the data to save
      */
-    public NbtCompound saveData(){
+    public CompoundTag saveData(){
         return null;
     }
 

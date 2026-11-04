@@ -11,14 +11,14 @@ import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.text.PlainTextContent.Literal;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.function.BiConsumer;
 
@@ -27,8 +27,8 @@ public class AIOSettingApp extends AbstractPhoneApp{
     public Boolean uplinkStatus = false;
     WPasswordField adminPasswordField;
     WToggleButton passwordVisibleButton;
-    WLabel title=new WLabel(Text.of("AIO Link"));
-    WLabel errorMsg=new WLabel(Text.of(""));
+    WLabel title=new WLabel(Component.literal("AIO Link"));
+    WLabel errorMsg=new WLabel(Component.literal(""));
     Boolean passAccepted=false;
     WPlainPanel logInPanel=new WPlainPanel();
     WPlainPanel aioSettingsPanel=new WPlainPanel();
