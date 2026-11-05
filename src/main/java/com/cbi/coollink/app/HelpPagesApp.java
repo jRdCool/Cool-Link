@@ -7,32 +7,33 @@ import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+
 
 import java.util.ArrayList;
 
 public class HelpPagesApp extends AbstractPhoneApp{
-    public static final Identifier ID = Identifier.of(Main.namespace,"help-pages");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"help-pages");
 
     private final WPlainPanel plainRoot;
 
     private HelpPageScreenType currentScreen = new HelpPageStartScreen();
 
-    private final WButton backButton = new WButton(Text.of("Back"));
+    private final WButton backButton = new WButton(Component.literal("Back"));
 
     private static ArrayList<HelpPageTopic> topics = new ArrayList<>();
 
 
-    public HelpPagesApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface) {
+    public HelpPagesApp(Level world, BlockEntity clickedOnBlockEntity, CompoundTag appData, ProgramNetworkInterface networkInterface) {
         super(ID);
         root=new WPlainPanel();//create the panel witch all widget will sit on
         plainRoot = (WPlainPanel) root;
         timeColor=TIME_COLOR_BLACK;//set the color of the clock if necessary
-        WLabel title = new WLabel(Text.of("Help Pages"));
+        WLabel title = new WLabel(Component.literal("Help Pages"));
         plainRoot.add(title,phoneWidth/2-20,10);
         plainRoot.add(currentScreen.getPanel(),30,40,phoneWidth-30,phoneHeight-60);
         plainRoot.add(backButton,5,5,50,20);
@@ -91,7 +92,7 @@ public class HelpPagesApp extends AbstractPhoneApp{
         public HelpPageStartScreen(){
             panel = new WScrollPanel(innerPanel);
             panel.setScrollingHorizontally(TriState.FALSE);
-            innerPanel.add(new WText(Text.of("Select Topic")),phoneWidth/2-60,0,100,20);
+            innerPanel.add(new WText(Component.literal("Select Topic")),phoneWidth/2-60,0,100,20);
             for(int i=0;i< topics.size();i++){
                 HelpPageTopic topic = topics.get(i);
                 WButton button = new WButton(topic.getName());
@@ -177,29 +178,29 @@ public class HelpPagesApp extends AbstractPhoneApp{
 
     static {
         addHelpPageTopic(
-          new HelpPageTopic("Test topic 1",Text.of("The first testing topic of the help page system"),
-                  new HelpPage("Page 1", new HelpPageText(Text.of("Hello first page!"),20)),
-                  new HelpPage("Page 2", new HelpPageText(Text.of("Hello second page!"),20), new HelpPageText(Text.of("Another body of text!"),20)),
-                  new HelpPage("Page 3", new HelpPageText(Text.of("Hello third page!"),20),new HelpPageText(Text.of("Lets have a multi line segment!!!\nWOoooooo how coooooooooooooool"),40))
+          new HelpPageTopic("Test topic 1",Component.literal("The first testing topic of the help page system"),
+                  new HelpPage("Page 1", new HelpPageText(Component.literal("Hello first page!"),20)),
+                  new HelpPage("Page 2", new HelpPageText(Component.literal("Hello second page!"),20), new HelpPageText(Component.literal("Another body of text!"),20)),
+                  new HelpPage("Page 3", new HelpPageText(Component.literal("Hello third page!"),20),new HelpPageText(Component.literal("Lets have a multi line segment!!!\nWOoooooo how coooooooooooooool"),40))
                   )//end of topic
         );
 
         addHelpPageTopic(
-            new HelpPageTopic("Test topic 2", Text.of("This is the second Testing topic of the hepl page system. this one will include some images!!"),
+            new HelpPageTopic("Test topic 2", Component.literal("This is the second Testing topic of the hepl page system. this one will include some images!!"),
                 new HelpPage("Page 4",
-                    new HelpPageText(Text.of("This page includes an image!!"),20),
-                    new HelpPageImage(Identifier.of(Main.namespace,"textures/gui/phone_background_0.png"),300,200)
+                    new HelpPageText(Component.literal("This page includes an image!!"),20),
+                    new HelpPageImage(Identifier.fromNamespaceAndPath(Main.namespace,"textures/gui/phone_background_0.png"),300,200)
                 ),
                 new HelpPage("page 5",
-                    new HelpPageText(Text.of("This page includes 2 images!!!!"),20),
-                    new HelpPageImage(Identifier.of(Main.namespace,"textures/gui/phone_background_1.png"),300,200),
-                    new HelpPageImage(Identifier.of(Main.namespace,"textures/gui/phone_background_2.png"),300,200)
+                    new HelpPageText(Component.literal("This page includes 2 images!!!!"),20),
+                    new HelpPageImage(Identifier.fromNamespaceAndPath(Main.namespace,"textures/gui/phone_background_1.png"),300,200),
+                    new HelpPageImage(Identifier.fromNamespaceAndPath(Main.namespace,"textures/gui/phone_background_2.png"),300,200)
                 ),
                 new HelpPage("page 6",
-                    new HelpPageText(Text.of("This is the 6th help page, it inclides some text and images!!!"),20),
-                    new HelpPageImage(Identifier.of(Main.namespace,"textures/gui/phone_background_3.png"),300,200),
-                    new HelpPageText(Text.of("This is an image caption!!!"),20),
-                    new HelpPageImage(Identifier.of(Main.namespace,"textures/gui/terminal.png"),128,128)
+                    new HelpPageText(Component.literal("This is the 6th help page, it inclides some text and images!!!"),20),
+                    new HelpPageImage(Identifier.fromNamespaceAndPath(Main.namespace,"textures/gui/phone_background_3.png"),300,200),
+                    new HelpPageText(Component.literal("This is an image caption!!!"),20),
+                    new HelpPageImage(Identifier.fromNamespaceAndPath(Main.namespace,"textures/gui/terminal.png"),128,128)
                 )
             )//end of topic
         );
