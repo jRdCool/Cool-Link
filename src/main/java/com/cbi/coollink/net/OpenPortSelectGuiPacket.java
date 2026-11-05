@@ -15,12 +15,12 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 
-public record OpenPortSelectGuiPacket(ArrayList<Integer> ofType, WireType wType, ResourceKey<Level> world, BlockPos pos, ItemStack heldItem) implements CustomPacketPayload {
+public record OpenPortSelectGuiPacket(ArrayList<Integer> ofType, WireType wireType, ResourceKey<Level> world, BlockPos pos, ItemStack heldItem) implements CustomPacketPayload {
     public static final Type<OpenPortSelectGuiPacket> ID = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(Main.namespace, "open-port-select-gui"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, OpenPortSelectGuiPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.collection(ArrayList::new,ByteBufCodecs.INT), OpenPortSelectGuiPacket::ofType,
-        WireType.PACKET_CODEC, OpenPortSelectGuiPacket::wType,
+        WireType.PACKET_CODEC, OpenPortSelectGuiPacket::wireType,
         ByteBufCodecs.fromCodecWithRegistries(Level.RESOURCE_KEY_CODEC), OpenPortSelectGuiPacket::world,
         BlockPos.STREAM_CODEC, OpenPortSelectGuiPacket::pos,
         ItemStack.STREAM_CODEC, OpenPortSelectGuiPacket::heldItem,
