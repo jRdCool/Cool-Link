@@ -15,6 +15,7 @@ import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.nbt.CompoundTag;
 //import net.minecraft.network.listener.ClientPlayPacketListener;
 //import net.minecraft.network.packet.Packet;
@@ -23,6 +24,9 @@ import net.minecraft.nbt.CompoundTag;
 //import net.minecraft.server.network.ServerPlayerEntity;
 //import net.minecraft.storage.ReadView;
 //import net.minecraft.storage.WriteView;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -145,17 +149,18 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}//reading data
 
 	// Deserialize the BlockEntity
-	@Nullable
 	@Override
-	public Packet<ClientPlayPacketListener> toUpdatePacket() {
-		return BlockEntityUpdateS2CPacket.create(this);
+	public @org.jspecify.annotations.Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
+
+/*
 	@Override
 	public CompoundTag toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
 		return createNbt(registryLookup);
 	}//Rendering Crucial
-
+*/
 
 	public static void tick(Level world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//called from the AIONetwork block class
@@ -200,7 +205,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 	}//run on tick
 	public void updateStates(){
-		if(level!=null) level.updateListeners(this.getBlockPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+		if(level!=null) level.sendBlockUpdated(this.getBlockPos(),getBlockState(),getBlockState(), Block.UPDATE_CLIENTS);
 	}//notifies the world of updates to the block state
 
 	public void setMacAddresses(int[] mac1,int[] mac2){
@@ -229,7 +234,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 				{new Vec3(nodeZN,nodeY,1-node0XN), new Vec3(nodeZN,nodeY,1-node1XN), new Vec3(nodeZN,nodeY,1-node2XN) } // - - - - - - - WEST
 		};
 		int dir = 0;
-		switch (getCachedState().get(BlockStateProperties.HORIZONTAL_FACING)){
+		switch (getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)){
 			case EAST -> dir=1;
 			case SOUTH -> dir=2;
 			case WEST -> dir=3;
@@ -258,18 +263,18 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
 		this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
 		isNodeUsed[index]=true;
-		markDirty();
-        assert world != null;
-        world.updateListeners(this.getBlockPos(), getCachedState(), getCachedState(), 0);
+		setChanged();
+        assert level != null;
+		level.sendBlockUpdated(this.getBlockPos(), getBlockState(), getBlockState(), 0);
 	}//Sets the node connection
 
 	@Override
 	public void removeNode(int index, boolean dropWire) {
 		//LocalNode old = this.localNodes[index];
 		this.localNodes[index] = null;
-		markDirty();
-        assert world != null;
-        world.updateListeners(this.getBlockPos(), getCachedState(), getCachedState(), 0);
+		setChanged();
+        assert level != null;
+        level.sendBlockUpdated(this.getBlockPos(), getBlockState(), getBlockState(), 0);
 		this.setIsNodeUsed(index,false);
 	}//Breaks the wire
 
@@ -399,7 +404,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 * @param player The player that transmitted it
 	 */
 	@Override
-	public void processIncomingWifiPacket(WIFIClientIpPacket packet, ServerPlayerEntity player) {
+	public void processIncomingWifiPacket(WIFIClientIpPacket packet, ServerPlayer player) {
 		//Main.LOGGER.info("AIO received WIFI packet: "+packet);
 		//apply delay based on distance
 		mobileClientRouting.put(packet.payload().getSourceMacAddress(), player);
@@ -414,7 +419,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 * @param player The player sending the request
 	 */
 	@Override
-	public void getNetworkAccessPointLocations(ServerPlayerEntity player) {
+	public void getNetworkAccessPointLocations(ServerPlayer player) {
 		ServerPlayNetworking.send(player,new AccessPointLocationPacket(new BlockPos[]{this.getBlockPos()},getSsid()));
 	}
 
@@ -530,7 +535,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			ServerPlayer player = mobileClientRouting.get(packet.getDestinationMacAddress());
 			if(player != null){
 				//check if the player is in the same dimension
-				if(player.get().equals(getLevel())) {
+				if(player.level().equals(getLevel())) {
 					sendWifiClientPacket(packet, player);
 				}
 			}
@@ -699,7 +704,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		//add this new device
 		rememberedDevices.add(device);
 
-		markDirty();//save changes to the server
+		setChanged();//save changes to the server
 	}
 
 	private void sendPingPacket(ConnectedDevice device){
