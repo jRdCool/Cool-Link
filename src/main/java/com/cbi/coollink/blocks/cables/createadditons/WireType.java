@@ -4,8 +4,8 @@ package com.cbi.coollink.blocks.cables.createadditons;
 import com.cbi.coollink.items.Cat6Cable;
 import com.cbi.coollink.items.CoaxialCable;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.item.Item;
-import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.Item;
 
 //Modified from the create additions wireType class
 
@@ -123,7 +123,7 @@ public enum WireType {//IRON(4, 256, 87, 87, 87, CAItems.IRON_WIRE.asStack(4), C
 		}
 	}
 
-	public static final PacketCodec<ByteBuf, WireType> PACKET_CODEC = new PacketCodec<>() {
+	public static final StreamCodec<ByteBuf, WireType> PACKET_CODEC = new StreamCodec<>() {
 
         @Override
         public void encode(ByteBuf buf, WireType value) {
