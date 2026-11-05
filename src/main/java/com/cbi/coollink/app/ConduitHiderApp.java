@@ -11,19 +11,19 @@ import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import io.github.cottonmc.cotton.gui.widget.WTextField;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ConduitHiderApp extends AbstractPhoneApp{
 
-    public static final Identifier ID = Identifier.of(Main.namespace,"hide_those_conduits");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"hide_those_conduits");
 
-    public ConduitHiderApp(World world, BlockEntity blockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface) {
+    public ConduitHiderApp(Level world, BlockEntity blockEntity, CompoundTag appData, ProgramNetworkInterface networkInterface) {
         super(ID);
         root = new WPlainPanel();
         root.setSize(phoneWidth,phoneHeight);
@@ -34,29 +34,29 @@ public class ConduitHiderApp extends AbstractPhoneApp{
             WTextField input = new WTextField();
             input.setMaxLength(50);
             panel.add(input, 50,50,200,20);
-            WButton submit = new WButton(Text.of("Submit"));
+            WButton submit = new WButton(Component.literal("Submit"));
             panel.add(submit,50,100,200,20);
             submit.setOnClick(() -> {
                 try {
                     String inputText = input.getText();
                     BlockState outState;
                     if (!inputText.isEmpty()) {
-                        Identifier blockId = Identifier.of(inputText);
-                        outState = Registries.BLOCK.get(blockId).getDefaultState();
+                        Identifier blockId = Identifier.parse(inputText);
+                        outState = BuiltInRegistries.BLOCK.getValue(blockId).defaultBlockState();
                     } else {
                         outState = null;
                     }
 
                     if(outState == null){
-                        outState = Registries.BLOCK.get(Identifier.of("air")).getDefaultState();
+                        outState = BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace("air")).defaultBlockState();
                     }
-                    ClientPlayNetworking.send(new UpdateConduitBlockCover(blockEntity.getPos(),outState,world.getRegistryKey()));
+                    ClientPlayNetworking.send(new UpdateConduitBlockCover(blockEntity.getBlockPos(),outState,world.dimension()));
                 }catch (Exception e){
                     Main.LOGGER.error("error trying to set block state ",e);
                 }
             });
         }else {
-            WLabel ohNo = new WLabel(Text.of("Oh no you did no click on a conduit!"));
+            WLabel ohNo = new WLabel(Component.literal("Oh no you did no click on a conduit!"));
             panel.add(ohNo,phoneWidth/4,phoneHeight/2);
         }
     }
