@@ -7,43 +7,45 @@ import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.net.OpenPortSelectGuiPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 
 public abstract class ACableItem extends Item {
-    public ACableItem(Settings settings) {
+    public ACableItem(Properties settings) {
         super(settings);
     }
 
     public WireType TYPE = WireType.COAX;
 
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        BlockPos pos=context.getBlockPos();
-        World world=context.getWorld();
-        ItemStack stack = context.getStack();
+    @Override
+    public @NonNull InteractionResult useOn(UseOnContext context) {
+        BlockPos pos=context.getClickedPos();
+        Level world=context.getLevel();
+        ItemStack stack = context.getItemInHand();
 
 
         if(world.getBlockEntity(pos) instanceof IWireNode node) {
             //Main.LOGGER.info("Clicked on an IWire node");
-            if (stack.contains(Main.WIRE_INFO_COMPONENT)) {
+            if (stack.has(Main.WIRE_INFO_COMPONENT)) {
                 WireInfoComponent comp = stack.get(Main.WIRE_INFO_COMPONENT);
-
-                if (comp != null && (!comp.originBlock().isWithinDistance(pos, 16))) {
-                    if (context.getPlayer() instanceof ServerPlayerEntity player) {
+                if (comp != null && (!comp.originBlock().closerToCenterThan(pos, 16))) {
+                    if (context.getPlayer() instanceof ServerPlayer player) {
                         //player.sendMessageToClient(Text.of("!!Nodes are too far apart. Aborting!!"), false);
-                        player.networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.of("!!Nodes are too far apart. Aborting!!")));
+                        player.connection.send(new ClientboundSystemChatPacket(Component.literal("!!Nodes are too far apart. Aborting!!"),true));
                     }
                     stack.remove(Main.WIRE_INFO_COMPONENT);
-                    return super.useOnBlock(context);
+                    return super.useOn(context);
                 }
             }
             int index = 0;
@@ -56,25 +58,25 @@ public abstract class ACableItem extends Item {
                 }
             }
             if (ofType.isEmpty()) {
-                if (context.getPlayer() instanceof ServerPlayerEntity player) {
+                if (context.getPlayer() instanceof ServerPlayer player) {
                     //player.sendMessageToClient(Text.of("No " + TYPE.toString() + " ports on this device"), false);
-                    player.networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.of("No " + TYPE.toString() + " ports on this device")));
+                    player.connection.send(new ClientboundSystemChatPacket(Component.literal("No " + TYPE.toString() + " ports on this device"),true));
                 }
-                return super.useOnBlock(context);
+                return super.useOn(context);
             }
             if (ofType.size() > 1) {
-                if (context.getPlayer() instanceof ServerPlayerEntity sp) {
-                    ServerPlayNetworking.send(sp, new OpenPortSelectGuiPacket(ofType, TYPE, context.getWorld().getRegistryKey(), context.getBlockPos(), context.getStack()));
+                if (context.getPlayer() instanceof ServerPlayer sp) {
+                    ServerPlayNetworking.send(sp, new OpenPortSelectGuiPacket(ofType, TYPE, context.getLevel().dimension(), context.getClickedPos(), context.getItemInHand()));
                 }
-                return super.useOnBlock(context);
+                return super.useOn(context);
             } else if (nodeCount > 1) {
                 index = ofType.get(0);
             }
             if (world.getBlockEntity(pos) instanceof IWireNode tb && tb.isNodeInUse(index)) {
-                return super.useOnBlock(context);
+                return super.useOn(context);
             }
 
-            if (stack.contains(Main.WIRE_INFO_COMPONENT)) {
+            if (stack.has(Main.WIRE_INFO_COMPONENT)) {
                 Main.LOGGER.info("Info component present");
                 WireInfoComponent comp = stack.get(Main.WIRE_INFO_COMPONENT);
                 //Main.LOGGER.info(comp.originBlock().toString());
@@ -94,19 +96,17 @@ public abstract class ACableItem extends Item {
             } else {
                 stack.set(Main.WIRE_INFO_COMPONENT, new WireInfoComponent(index, pos));
 
-                if (context.getPlayer() instanceof ServerPlayerEntity player) {
-                    player.networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.of("Starting "+ TYPE.toString()+" Connection at: "+ pos.getX()+", "+pos.getY()+", "+pos.getZ())));
+                if (context.getPlayer() instanceof ServerPlayer player) {
+                    player.connection.send(new ClientboundSystemChatPacket(Component.literal("Starting "+ TYPE.toString()+" Connection at: "+ pos.getX()+", "+pos.getY()+", "+pos.getZ()),true));
                 }
-                //Main.LOGGER.info("Stack Component Set");
-                //Main.LOGGER.info(stack.get(Main.WIRE_INFO_COMPONENT).toString());
             }
-            if (context.getPlayer() !=null) {context.getPlayer().swingHand(context.getHand());}
+            if (context.getPlayer() !=null) {context.getPlayer().swing(context.getHand(), SwingAnimation.DEFAULT,true);}
         }
 
 
 
         //CoaxCable.ENTRY.onPlaced(world,placedPos,CoaxCable.ENTRY.getDefaultState(),context.getPlayer(), context.getStack());
-        return super.useOnBlock(context);
+        return super.useOn(context);
     }
 
 }
