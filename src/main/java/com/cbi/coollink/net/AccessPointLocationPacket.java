@@ -2,22 +2,23 @@ package com.cbi.coollink.net;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.Util;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public record AccessPointLocationPacket(BlockPos[] aps, String ssid) implements CustomPayload {
-    public static final Id<AccessPointLocationPacket> ID =new Id<>(Identifier.of(Main.namespace,"access-point-location-packet"));
-    public static final PacketCodec<RegistryByteBuf, AccessPointLocationPacket> CODEC = PacketCodec.tuple(
-            Util.arrayPacketCodec(BlockPos.PACKET_CODEC, BlockPos[]::new), AccessPointLocationPacket::aps,
-            PacketCodecs.STRING, AccessPointLocationPacket::ssid,
+public record AccessPointLocationPacket(BlockPos[] aps, String ssid) implements CustomPacketPayload {
+    public static final Type<AccessPointLocationPacket> ID =new Type<>(Identifier.fromNamespaceAndPath(Main.namespace,"access-point-location-packet"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, AccessPointLocationPacket> CODEC = StreamCodec.composite(
+            Util.arrayPacketCodec(BlockPos.STREAM_CODEC, BlockPos[]::new), AccessPointLocationPacket::aps,
+            ByteBufCodecs.STRING_UTF8, AccessPointLocationPacket::ssid,
             AccessPointLocationPacket::new
     );
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public Type<? extends CustomPacketPayload> getId() {
         return ID;
     }
 }
