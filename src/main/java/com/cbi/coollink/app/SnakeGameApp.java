@@ -1,24 +1,28 @@
 package com.cbi.coollink.app;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.*;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class SnakeGameApp extends AbstractPhoneApp{
-    public static final Identifier appID = Identifier.of("cool-link","snake-app");
-    public static final Identifier ICON = Identifier.of("cool-link","textures/gui/app_snake_game.png");
+    public static final Identifier appID = Identifier.fromNamespaceAndPath(Main.namespace,"snake-app");
+    public static final Identifier ICON = Identifier.fromNamespaceAndPath(Main.namespace,"textures/gui/app_snake_game.png");
 
     ArrayList<SnakePart> snake = new ArrayList<>();
     ArrayList<int[]> apples = new ArrayList<>();
@@ -26,10 +30,10 @@ public class SnakeGameApp extends AbstractPhoneApp{
     int tickNum;
     Random r = new Random();
 
-    WLabel gameOverText = new WLabel(MutableText.of(new PlainTextContent.Literal("Game OVER")).setStyle(Style.EMPTY.withBold(true).withUnderline(true).withColor(0xFFFF0000)));
+    WLabel gameOverText = new WLabel(MutableComponent.create(new PlainTextContents.LiteralContents("Game OVER")).setStyle(Style.EMPTY.withBold(true).withUnderlined(true).withColor(0xFFFF0000)));
     boolean gameOver =false,gameOverShown=false;
 
-    public SnakeGameApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface){
+    public SnakeGameApp(Level world, BlockEntity clickedOnBlockEntity, CompoundTag appData, ProgramNetworkInterface networkInterface){
         super(appID);//the id of the app
         icon = ICON;
         root=new WPlainPanel();//create the panel witch all widget will sit on
@@ -40,8 +44,8 @@ public class SnakeGameApp extends AbstractPhoneApp{
         apples.add(new int[]{r.nextInt(0,14),r.nextInt(0,14)});
         gameOverText.setHorizontalAlignment(HorizontalAlignment.CENTER);
         gameOverText.setVerticalAlignment(VerticalAlignment.CENTER);
-        WLabel howToPlay  = new WLabel(Text.of("Play with the"));
-        WLabel howToPlay2 = new WLabel(Text.of("arrow keys"));
+        WLabel howToPlay  = new WLabel(Component.literal("Play with the"));
+        WLabel howToPlay2 = new WLabel(Component.literal("arrow keys"));
         ((WPlainPanel) root).add(howToPlay,300,phoneHeight / 2);
         ((WPlainPanel) root).add(howToPlay2,300,phoneHeight / 2+12);
 
@@ -116,7 +120,7 @@ public class SnakeGameApp extends AbstractPhoneApp{
                 }
             }
 
-            Identifier apple = Identifier.of("minecraft","textures/item/apple.png");
+            Identifier apple = Identifier.withDefaultNamespace("textures/item/apple.png");
             for(int[] pos:apples){
                 ScreenDrawing.texturedRect(matrices,left+pos[0]*cellSize+start,top+pos[1]*cellSize,cellSize,cellSize,apple,0,0,1,1,0xFF_FFFFFF);
             }
@@ -231,7 +235,7 @@ public class SnakeGameApp extends AbstractPhoneApp{
             data = new int[]{x,y,in,out};
         }
 
-        public void draw(DrawContext matrices,int left,int top,int celWidth){
+        public void draw(GuiGraphicsExtractor matrices, int left, int top, int celWidth){
             ScreenDrawing.coloredRect(matrices,(int)Math.round(left+celWidth*0.1+celWidth*data[0]),(int)Math.round(top+celWidth*0.1+celWidth*data[1]),(int)Math.round(celWidth*0.8),(int)Math.round(celWidth*0.8),0xFF_00A0FF);
             if(data[2]==0||data[3]==0){//up
                 ScreenDrawing.coloredRect(matrices,(int)Math.round(left+celWidth*0.1+celWidth*data[0]),top+celWidth*data[1],(int)Math.round(celWidth*0.8),(int)(celWidth*0.1),0xFF_00A0FF);
