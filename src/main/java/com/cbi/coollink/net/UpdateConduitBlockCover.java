@@ -1,27 +1,27 @@
 package com.cbi.coollink.net;
 
 import com.cbi.coollink.Main;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jspecify.annotations.NonNull;
 
-public record UpdateConduitBlockCover(BlockPos position, BlockState state, RegistryKey<World> world) implements CustomPayload {
-    public static final Id<UpdateConduitBlockCover> ID =new Id<>(Identifier.of(Main.namespace,"update-conduit-cover"));
-    public static final PacketCodec<RegistryByteBuf, UpdateConduitBlockCover> CODEC = PacketCodec.tuple(
-            BlockPos.PACKET_CODEC, UpdateConduitBlockCover::position,
-            PacketCodecs.codec(BlockState.CODEC), UpdateConduitBlockCover::state,
-            PacketCodecs.registryCodec(World.CODEC), UpdateConduitBlockCover::world,
+public record UpdateConduitBlockCover(BlockPos position, BlockState state, ResourceKey<Level> world) implements CustomPacketPayload {
+    public static final Type<UpdateConduitBlockCover> ID =new Type<>(Identifier.fromNamespaceAndPath(Main.namespace,"update-conduit-cover"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, UpdateConduitBlockCover> CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC, UpdateConduitBlockCover::position,
+            ByteBufCodecs.fromCodecWithRegistries(BlockState.CODEC), UpdateConduitBlockCover::state,
+            ByteBufCodecs.fromCodecWithRegistries(Level.RESOURCE_KEY_CODEC), UpdateConduitBlockCover::world,
             UpdateConduitBlockCover::new
     );
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public @NonNull Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 }
