@@ -1,17 +1,18 @@
 package com.cbi.coollink.app;
 
+import com.cbi.coollink.Main;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class ExampleApp extends AbstractPhoneApp{
-    public static Identifier ID = Identifier.of("cool-link","example-app");
+    public static Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"example-app");
 
-    public ExampleApp(World world, BlockEntity clickedOnBlockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface){
+    public ExampleApp(Level world, BlockEntity clickedOnBlockEntity, CompoundTag appData, ProgramNetworkInterface networkInterface){
         super(ID);//the id of the app
         root=new WPlainPanel();//create the panel witch all widget will sit on
         timeColor=TIME_COLOR_BLACK;//set the color of the clock if necessary
@@ -31,8 +32,8 @@ public class ExampleApp extends AbstractPhoneApp{
     }
 
     @Override
-    public NbtCompound saveData(){//NEVER CALL THIS METHOD YOUR SELF. this method is called by the phone whenever this app is open and the phone attempts to save
-        NbtCompound nb=new NbtCompound();
+    public CompoundTag saveData(){//NEVER CALL THIS METHOD YOUR SELF. this method is called by the phone whenever this app is open and the phone attempts to save
+        CompoundTag nb=new CompoundTag();
         nb.putString("im the key","im the data");
         return nb;
     }
