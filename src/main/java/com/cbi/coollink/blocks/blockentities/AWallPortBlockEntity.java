@@ -3,18 +3,16 @@ package com.cbi.coollink.blocks.blockentities;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -31,10 +29,10 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
     private final LocalNode[] localNodes;
 
     @Override
-    protected void writeData(WriteView view) {
-        WriteView.ListView nodeIDS = view.getList("connections");
+    protected void saveAdditional(ValueOutput view) {
+        ValueOutput.ValueOutputList nodeIDS = view.childrenList("connections");
         for(int i=0;i<nodeCount;i++){
-            WriteView compound = nodeIDS.add();
+            ValueOutput compound = nodeIDS.addChild();
             if(localNodes[i]==null){
                 continue;
             }
@@ -43,17 +41,17 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
         }
 
 
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    protected void readData(ReadView view) {
+    protected void loadAdditional(@NonNull ValueInput view) {
 
-        List<ReadView> nodeIDS = view.getListReadView("connections").stream().toList();
+        List<ValueInput> nodeIDS = view.childrenListOrEmpty("connections").stream().toList();
 
         for (int i=0;i<nodeCount;i++){
-            ReadView compound = nodeIDS.get(i);
-            if(compound == null || compound.getOptionalInt(LocalNode.ID).isEmpty()){
+            ValueInput compound = nodeIDS.get(i);
+            if(compound == null || compound.childrenListOrEmpty(LocalNode.ID).isEmpty()){
                 isNodeUsed[i] = false;
                 continue;
             }
@@ -61,25 +59,25 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
             isNodeUsed[i] = true;
         }
 
-        super.readData(view);
+        super.loadAdditional(view);
     }
 
     @Override
-    public Vec3d getNodeOffset(int node) {
-        Vec3d[][] nodes = {
-                {new Vec3d(0,0,0)},//NORTH
-                {new Vec3d(0,0,0)},//EAST
-                {new Vec3d(0,0,0)},//SOUTH
-                {new Vec3d(0,0,0)},//WEST
-                {new Vec3d(0,0,0)},//UP
-                {new Vec3d(0,0,0)}//DOWN
+    public Vec3 getNodeOffset(int node) {
+        Vec3[][] nodes = {
+                {new Vec3(0,0,0)},//NORTH
+                {new Vec3(0,0,0)},//EAST
+                {new Vec3(0,0,0)},//SOUTH
+                {new Vec3(0,0,0)},//WEST
+                {new Vec3(0,0,0)},//UP
+                {new Vec3(0,0,0)}//DOWN
         };
         return getNodeOffset(node,nodes);
     }
 
-    public Vec3d getNodeOffset(int node,Vec3d[][] nodes) {
+    public Vec3 getNodeOffset(int node,Vec3[][] nodes) {
         int dir = 0;
-        switch (getCachedState().get(Properties.FACING)){
+        switch (getBlockState().getValue(BlockStateProperties.FACING)){
             case EAST -> dir=1;
             case SOUTH -> dir=2;
             case WEST -> dir=3;
@@ -112,9 +110,9 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
     public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
         this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
         isNodeUsed[index]=true;
-        markDirty();
-        assert world != null;
-        world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
+        setChanged();
+        assert level != null;
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
     }
 
     @Override
@@ -122,9 +120,9 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
         //LocalNode old = this.localNodes[index];
         this.localNodes[index] = null;
         //this.nodeCache[index] = null;
-        markDirty();
-        assert world != null;
-        world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
+        setChanged();
+        assert level != null;
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
         this.setIsNodeUsed(index,false);
     }
 
