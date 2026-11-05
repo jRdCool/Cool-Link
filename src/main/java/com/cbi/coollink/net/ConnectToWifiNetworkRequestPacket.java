@@ -2,29 +2,27 @@ package com.cbi.coollink.net;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.net.protocol.Mac;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
-public record ConnectToWifiNetworkRequestPacket(RegistryKey<World> world, BlockPos accessPointPosition, String password, Mac deviceMacAddress, String deviceName) implements CustomPayload {
-    public static final Id<ConnectToWifiNetworkRequestPacket> ID = new Id<>(Identifier.of(Main.namespace,"client-connect-to-wifi-packet"));
+public record ConnectToWifiNetworkRequestPacket(ResourceKey<Level> world, BlockPos accessPointPosition, String password, Mac deviceMacAddress, String deviceName) implements CustomPacketPayload {
+    public static final Type<ConnectToWifiNetworkRequestPacket> ID = new Type<>(Identifier.fromNamespaceAndPath(Main.namespace,"client-connect-to-wifi-packet"));
 
-    public static final PacketCodec<RegistryByteBuf, ConnectToWifiNetworkRequestPacket> CODEC = PacketCodec.tuple(
-            PacketCodecs.registryCodec(World.CODEC), ConnectToWifiNetworkRequestPacket::world,
-            BlockPos.PACKET_CODEC, ConnectToWifiNetworkRequestPacket::accessPointPosition,
-            PacketCodecs.STRING, ConnectToWifiNetworkRequestPacket::password,
+    public static final StreamCodec<RegistryFriendlyByteBuf, ConnectToWifiNetworkRequestPacket> CODEC = StreamCodec.composite(
+            ByteBufCodecs.fromCodecWithRegistries(Level.RESOURCE_KEY_CODEC), ConnectToWifiNetworkRequestPacket::world,
+            BlockPos.STREAM_CODEC, ConnectToWifiNetworkRequestPacket::accessPointPosition,
+            ByteBufCodecs.STRING_UTF8, ConnectToWifiNetworkRequestPacket::password,
             Mac.PACKET_CODEC, ConnectToWifiNetworkRequestPacket::deviceMacAddress,
-            PacketCodecs.STRING, ConnectToWifiNetworkRequestPacket::deviceName,
+            ByteBufCodecs.STRING_UTF8, ConnectToWifiNetworkRequestPacket::deviceName,
             ConnectToWifiNetworkRequestPacket::new
     );
 
     @Override
-    public Id<? extends CustomPayload> getId() {
-        return ID;
-    }
+    public Type<? extends CustomPacketPayload> type() {return ID;}
 }
