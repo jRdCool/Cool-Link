@@ -1,16 +1,16 @@
 package com.cbi.coollink;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.StreamCodec;
 
 import java.util.ArrayList;
 import java.util.function.IntFunction;
 
 public class Util {
 
-    public static <T> PacketCodec<ByteBuf, T[]> arrayPacketCodec(PacketCodec<ByteBuf,T> codec, IntFunction<T[]> arrayFactory){
-        return new PacketCodec<ByteBuf, T[]>() {
+    public static <T> StreamCodec<ByteBuf, T[]> arrayPacketCodec(StreamCodec<ByteBuf,T> codec, IntFunction<T[]> arrayFactory){
+        return new StreamCodec<ByteBuf, T[]>() {
             @Override
             public T[] decode(ByteBuf buf) {
                 int arrSize = buf.readInt();
@@ -41,7 +41,7 @@ public class Util {
         return outer - inner;
     }
 
-    public static BlockPos getCubePos(int index,BlockPos center){
+    public static BlockPos getCubePos(int index, BlockPos center){
         //vibe coding, i am so ashamed
         if (index < 0) throw new IllegalArgumentException("Index must be non-negative.");
 
