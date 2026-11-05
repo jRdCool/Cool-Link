@@ -3,7 +3,8 @@ package com.cbi.coollink.net.mic;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.impl.client.TextAlignment;
 import io.github.cottonmc.cotton.gui.widget.WDynamicLabel;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Supplier;
 
@@ -13,7 +14,7 @@ public class WDynamicLabelMultyLine extends WDynamicLabel {
     }
 
     @Override
-    public void paint(DrawContext context, int x, int y, int mouseX, int mouseY) {
+    public void paint(@NonNull GuiGraphicsExtractor context, int x, int y, int mouseX, int mouseY) {
         int yOffset = TextAlignment.getTextOffsetY(this.verticalAlignment, this.height, 1);
         String tr = this.text.get();
         String[] lines = tr.split("\n");
