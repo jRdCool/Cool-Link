@@ -5,7 +5,7 @@ import com.cbi.coollink.Util;
 import com.cbi.coollink.cli.CliProgram;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import com.cbi.coollink.terminal.CommandTextOutputArea;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.HashMap;
 
@@ -30,11 +30,11 @@ public class PingProgram implements CliProgram {
             return;
         }
         String ip = args[0];
-        NbtCompound pingCompound = new NbtCompound();
+        CompoundTag pingCompound = new CompoundTag();
         pingCompound.putString("type","ping");
         Main.LOGGER.info(pingCompound+"");
         networkInterface.sendRawData(ip,pingCompound,context -> {
-            if(!context.getData().getData().getString("type","notPong").equals("pong")){
+            if(!context.getData().getData().getStringOr("type","notPong").equals("pong")){
                 stdout.addLine("Received invalid response");
                 pingged = true;
                 return;

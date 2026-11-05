@@ -1,7 +1,7 @@
 package com.cbi.coollink.cli.repo;
 
 import com.cbi.coollink.Main;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;

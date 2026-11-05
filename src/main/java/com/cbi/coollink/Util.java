@@ -4,6 +4,10 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.StreamCodec;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.function.IntFunction;
 
@@ -105,5 +109,10 @@ public class Util {
             }
         }
         return true;
+    }
+
+    public static DataInput stringDataInput(String stringData){
+        byte[] binaryData = stringData.getBytes(StandardCharsets.UTF_8);
+        return new DataInputStream(new ByteArrayInputStream(binaryData));
     }
 }
