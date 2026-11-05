@@ -114,7 +114,7 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
         isNodeUsed[index]=true;
         markDirty();
         assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
     }
 
     @Override
@@ -124,7 +124,7 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
         //this.nodeCache[index] = null;
         markDirty();
         assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
         this.setIsNodeUsed(index,false);
     }
 

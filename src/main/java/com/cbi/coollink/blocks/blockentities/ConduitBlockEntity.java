@@ -6,20 +6,17 @@ import com.cbi.coollink.blocks.conduits.Conduit;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -55,18 +52,18 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     private final BlockState initialBlockState;
 
     @Override
-    public void writeData(WriteView view){
-        super.writeData(view);
+    public void saveAdditional(ValueOutput view){
+        super.saveAdditional(view);
         if(coverBlock != null){
-            view.put("cover",BlockState.CODEC,coverBlock);
+            view.store("cover",BlockState.CODEC,coverBlock);
         }
 
-        WriteView.ListView connections = view.getList("connections");
+        ValueOutput.ValueOutputList connections = view.childrenList("connections");
         for(int i=0;i<nodeCount;i++){
             if(localNodes[i]==null){
-                connections.add();
+                connections.addChild();
             }else{
-                WriteView connection = connections.add();
+                ValueOutput connection = connections.addChild();
                 localNodes[i].write(connection);
             }
         }
@@ -74,18 +71,18 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
         coverBlock = view.read("cover",BlockState.CODEC).orElse(null);
 
-        ReadView.ListReadView lrv = view.getListReadView("connections");
-        List<ReadView> connectionNodes = lrv.stream().toList();
+        ValueInput.ValueInputList lrv = view.childrenListOrEmpty("connections");
+        List<ValueInput> connectionNodes = lrv.stream().toList();
 
         for (int i=0;i<nodeCount;i++){
             if(i < connectionNodes.size()){
-                ReadView cn = connectionNodes.get(i);
+                ValueInput cn = connectionNodes.get(i);
 
-                if(cn.getOptionalInt(LocalNode.ID).isEmpty()){
+                if(cn.getInt(LocalNode.ID).isEmpty()){
                     isNodeUsed[i] = false;
                 }else{
                     localNodes[i]=new LocalNode(this , cn);
@@ -108,14 +105,14 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     }
 
 
-    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
+    public CompoundTag toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
         return createNbt(registryLookup);
     }
 
 
     public void updateStates(){
-        assert world != null;
-        world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+        assert level != null;
+        level.updateListeners(this.getBlockPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
     }
 
     public boolean isCovered(){
@@ -129,12 +126,12 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     public void setCoverBlock(BlockState newCover){
         coverBlock = newCover;
 
-        if(world != null) {//stop the regular model from rendering if it is being hidden
-            world.setBlockState(getPos(), world.getBlockState(getPos()).with(Conduit.HIDDEN, coverBlock != null));
+        if(level != null) {//stop the regular model from rendering if it is being hidden
+            level.setBlockState(this.getBlockPos(), level.getBlockState(this.getBlockPos()).with(Conduit.HIDDEN, coverBlock != null));
         }
         markDirty();
-        assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);//CRITICAL FOR RENDER UPDATE, MAKE SURE FLAGS IS 0
+        assert level != null;
+        level.updateListeners(this.getBlockPos(), getCachedState(), getCachedState(), 0);//CRITICAL FOR RENDER UPDATE, MAKE SURE FLAGS IS 0
     }
 
 
@@ -184,7 +181,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
      *          connected to.
      */
     @Override
-    public Vec3d getNodeOffset(int node) {
+    public Vec3 getNodeOffset(int node) {
         Direction direction = nodeDirection(node);
         int tube = tubeNumber(node);
         int wire = wireNum(node);
@@ -194,7 +191,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         double z ;
         if(direction==null){
             Main.LOGGER.error("!!Node Index Too Large!! Setting Offset to block origin.");
-            return new Vec3d(0,0,0);
+            return new Vec3(0,0,0);
         }//Handles the case of a null direction
         if(tube == 13){
             boolean coax = (this.getPortType(node) == WireType.COAX);
@@ -247,7 +244,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
                 else{y13-=0.05;}
             }
             //Main.LOGGER.info("X:"+ x+" Y:"+y13+" Z:"+z);
-            return new Vec3d(x,y13,z);
+            return new Vec3(x,y13,z);
         }//Handles the wall ports
         switch (direction){
             case SOUTH -> {
@@ -268,7 +265,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
             }
         }//handles the direct conduit ends.
         //Main.LOGGER.info("X:"+ x+" Y:"+y[yOffset]+" Z:"+z);
-        return new Vec3d(x,y[yOffset],z);
+        return new Vec3(x,y[yOffset],z);
     }
 
 
@@ -320,10 +317,10 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
         isNodeUsed[index]=true;
         markDirty();
-        assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
-        if(world.getBlockState(pos).getBlock() instanceof Conduit){
-            int cableShape=world.getBlockState(pos).get(Conduit.cableShape);
+        assert level != null;
+        level.updateListeners(this.getBlockPos(), getCachedState(), getCachedState(), 0);
+        if(level.getBlockState(pos).getBlock() instanceof Conduit){
+            int cableShape=level.getBlockState(pos).getValue(Conduit.cableShape);
             if(cableShape!=2){
                 Direction inputDir = nodeDirection(index);
                 Direction outputDir=Direction.NORTH;
@@ -384,8 +381,8 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     public void removeNode(int index, boolean dropWire) {
         this.localNodes[index] = null;
         markDirty();
-        assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        assert level != null;
+        level.updateListeners(this.getBlockPos(), getCachedState(), getCachedState(), 0);
         this.setIsNodeUsed(index,false);
     }
 
@@ -440,7 +437,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
      */
     @Override
     public void transmitData(int connectionIndex, WireDataPacket data) {
-        Main.LOGGER.error("Function Called by a conduit at: "+pos.getX()+","+pos.getY()+","+pos.getZ());
+        Main.LOGGER.error("Function Called by a conduit at: "+getBlockPos().getX()+","+getBlockPos().getY()+","+getBlockPos().getZ());
     }
 
     /**
@@ -553,12 +550,12 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
      */
     public int directionIndexTranslation(int inputIndex){
         BlockState state;
-        if(world==null|| !(world.getBlockState(pos).getBlock() instanceof Conduit)) {
+        if(level==null|| !(level.getBlockState(getBlockPos()).getBlock() instanceof Conduit)) {
             state=initialBlockState;
         }else{
-            state=world.getBlockState(pos);
+            state=level.getBlockState(getBlockPos());
         }
-        int cableShape = state.get(Conduit.cableShape);
+        int cableShape = state.getValue(Conduit.cableShape);
         if (cableShape != 2) {
             return directionIndexTranslation(outPutDirection(nodeDirection(inputIndex)), inputIndex);
         } else {
@@ -599,12 +596,12 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
      */
     public Direction outPutDirection(Direction input){
         BlockState state;
-        if(world==null|| !(world.getBlockState(pos).getBlock() instanceof Conduit)) {
+        if(level==null|| !(level.getBlockState(getBlockPos()).getBlock() instanceof Conduit)) {
             state=initialBlockState;
         }else{
-            state=world.getBlockState(pos);
+            state=level.getBlockState(getBlockPos());
         }
-        int cableShape=state.get(Conduit.cableShape);
+        int cableShape=state.getValue(Conduit.cableShape);
         Direction outputDir=Direction.NORTH;
 
         //  0 = NS
@@ -659,16 +656,16 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     public static OtherEnd otherConduitEnd(ConduitBlockEntity startingBlock,Direction input){
         ConduitBlockEntity outputBlock = startingBlock;
         Direction outputDirection = input;//if facing north the input is south
-        World world = startingBlock.getWorld();
+        Level world = startingBlock.getLevel();
         for(int i=0;i<300;i++){
             outputDirection=outputBlock.outPutDirection(input);
             //Main.LOGGER.info("Step "+i+" direction:"+outputDirection.asString());
             assert world != null;
-            BlockPos neighbor = outputBlock.getPos().offset(outputDirection);
+            BlockPos neighbor = outputBlock.getBlockPos().relative(outputDirection);
             //Main.LOGGER.info(neighbor.toString());
             BlockState neighborBS =world.getBlockState(neighbor);
             if(neighborBS.getBlock() instanceof Conduit){
-                int shape =neighborBS.get(cableShape);
+                int shape =neighborBS.getValue(cableShape);
                 if(shape!=2){
                     BlockEntity tempOutputBlock= world.getBlockEntity(neighbor);
                     input=outputDirection.getOpposite();
@@ -699,16 +696,17 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         }
         outputIndex ^= 2;//directionIndexTranslation flips the 2 but witch is necessary for checking the local node but breaks things if we walk down the conduit so flip the bit back here
         Direction nextConduitDirection = nodeDirection(outputIndex);
-        BlockPos nextConduitPos = pos.offset(nextConduitDirection);
-        if(world == null){
+        assert nextConduitDirection != null;//should be impossible to be null
+        BlockPos nextConduitPos = getBlockPos().relative(nextConduitDirection);
+        if(level == null){
 //            Main.LOGGER.info("World null");
             return null;
         }
         //get the neighbor block
-        BlockEntity nextBlockEntity = world.getBlockEntity(nextConduitPos);
+        BlockEntity nextBlockEntity = level.getBlockEntity(nextConduitPos);
         if(nextBlockEntity instanceof ConduitBlockEntity nextConduitBlockEntity){//check the neibor block is a conduit
             //get the index this wire connects to on the next block
-            assert nextConduitDirection != null;//should be impossible to be null
+
             int otherConduitIndex = assembleIndex(directionToDirectionNumber(nextConduitDirection.getOpposite()),tubeNumber(outputIndex),wireNum(outputIndex));
 //            Main.LOGGER.info("Next place: "+otherConduitIndex+" "+outputIndex+" "+inputIndex);
             //return the local node with that info

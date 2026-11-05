@@ -54,7 +54,7 @@ public class CoaxWallPortSingleBE extends AWallPortBlockEntity {
      */
     @Override
     public void transmitData(int connectionIndex, WireDataPacket data) {
-        Main.LOGGER.error("Tried to send data to a mid cable block "+data+" "+getPos());
+        Main.LOGGER.error("Tried to send data to a mid cable block "+data+" "+ getBlockPos());
     }
 
 

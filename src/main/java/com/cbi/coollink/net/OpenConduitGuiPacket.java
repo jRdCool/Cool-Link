@@ -1,25 +1,25 @@
 package com.cbi.coollink.net;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public record OpenConduitGuiPacket(NbtCompound conduitNBT, BlockPos pos) implements CustomPayload {
+public record OpenConduitGuiPacket(CompoundTag conduitNBT, BlockPos pos) implements CustomPacketPayload {
 
-    public static final Id<OpenConduitGuiPacket> ID = new CustomPayload.Id<>(Identifier.of("cool-link", "open-conduit-gui"));
-    public static final PacketCodec<RegistryByteBuf, OpenConduitGuiPacket> CODEC = PacketCodec.tuple(
-            PacketCodecs.NBT_COMPOUND, OpenConduitGuiPacket::conduitNBT,
-            BlockPos.PACKET_CODEC, OpenConduitGuiPacket::pos,
+    public static final Type<OpenConduitGuiPacket> ID = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath("cool-link", "open-conduit-gui"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, OpenConduitGuiPacket> CODEC = StreamCodec.composite(
+            ByteBufCodecs.COMPOUND_TAG, OpenConduitGuiPacket::conduitNBT,
+            BlockPos.STREAM_CODEC, OpenConduitGuiPacket::pos,
             OpenConduitGuiPacket::new
     );
 
     @Override
-    public Id<? extends CustomPayload> getId() {
-        return ID;
+    public Type<? extends CustomPacketPayload> type() {
+        return null;
     }
 }
 

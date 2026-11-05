@@ -64,7 +64,7 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
     }
 
     public void updateStates(){
-        if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+        if(world!=null) world.updateListeners(getBlockPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
             connection = new LocalNode(this, index, otherNode, type, pos);
             markDirty();
             if(world != null)
-                world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+                world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
         }
     }
 
@@ -135,7 +135,7 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
             connection = null;
             markDirty();
             if(world != null)
-                world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+                world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
         }
     }
 
@@ -189,10 +189,10 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
             if(coaxData.isRequestOnline()){
                 boolean online = false;
                 //check assembled
-                boolean assembled = Objects.requireNonNull(getWorld()).getBlockState(getPos()).get(Main.ASSEMBLED_BOOLEAN_PROPERTY);
+                boolean assembled = Objects.requireNonNull(getWorld()).getBlockState(getBlockPos()).get(Main.ASSEMBLED_BOOLEAN_PROPERTY);
                 if(assembled){
                     //check if there is sky axis
-                    BlockPos thisBlockPos = getPos();
+                    BlockPos thisBlockPos = getBlockPos();
                     BlockPos thisBlockPos2 = thisBlockPos.south();
                     BlockPos thisBlockPos3 = thisBlockPos.east();
                     BlockPos thisBlockPos4 = thisBlockPos2.east();
@@ -200,7 +200,7 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
                     int topBlock2 = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos2.getX(),thisBlockPos2.getZ());
                     int topBlock3 = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos3.getX(),thisBlockPos3.getZ());
                     int topBlock4 = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos4.getX(),thisBlockPos4.getZ());
-                    int aboveThisBlock = getPos().getY()+2;
+                    int aboveThisBlock = getBlockPos().getY()+2;
                     if(topBlock == aboveThisBlock && topBlock2 == aboveThisBlock && topBlock3 == aboveThisBlock && topBlock4 == aboveThisBlock){
                         //sky axis
                         online = true;

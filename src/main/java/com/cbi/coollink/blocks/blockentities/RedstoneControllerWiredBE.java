@@ -127,7 +127,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
         isNodeUsed[index]=true;
         markDirty();
         assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
     }//Sets the node connection
 
     @Override
@@ -136,7 +136,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
         this.localNodes[index] = null;
         markDirty();
         assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
         this.setIsNodeUsed(index,false);
     }//Breaks the wire
 
@@ -207,7 +207,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
                         powerLevel = Math.min(15, Math.max(0, powerLevel));
                         World world = getWorld();
                         if (world != null) {
-                            world.setBlockState(getPos(), getCachedState().with(RedstoneControllerWired.POWER, powerLevel));
+                            world.setBlockState(getBlockPos(), getCachedState().with(RedstoneControllerWired.POWER, powerLevel));
                             //Main.LOGGER.info("RSS set power to: "+powerLevel);
                         }
                     }
@@ -332,7 +332,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
     }//reading data
 
     public void updateStates(){
-        if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+        if(world!=null) world.updateListeners(getBlockPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
     }//notifies the world of updates to the block state
 
     public boolean hasConnection(int index) {

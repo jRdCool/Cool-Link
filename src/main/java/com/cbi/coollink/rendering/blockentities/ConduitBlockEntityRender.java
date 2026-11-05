@@ -36,10 +36,10 @@ public class ConduitBlockEntityRender extends WireNodeRenderer<ConduitBlockEntit
             //get the random just necessary to render as a block
             RenderLayer blockRenderingLayer = RenderLayers.getMovingBlockLayer(coverState);
             VertexConsumer vertexConsumer = bufferIn.getBuffer(blockRenderingLayer);
-            random.setSeed((long) conduit.getPos().getX() *3L*conduit.getPos().getY()*17L+conduit.getPos().getZ()* 23L);//make the texture rotation constant based on location
+            random.setSeed((long) conduit.getBlockPos().getX() *3L*conduit.getBlockPos().getY()*17L+conduit.getBlockPos().getZ()* 23L);//make the texture rotation constant based on location
             List<BlockModelPart> parts = blockRenderManager.getModel(coverState).getParts(random);
             //render the cover block
-            blockRenderManager.renderBlock(conduit.getCoverBlock(),conduit.getPos(),conduit.getWorld(),matrixStackIn, vertexConsumer, true, parts);
+            blockRenderManager.renderBlock(conduit.getCoverBlock(),conduit.getBlockPos(),conduit.getWorld(),matrixStackIn, vertexConsumer, true, parts);
         }
         super.render(conduit,partialTicks,matrixStackIn,bufferIn,combinedLightIn,combinedOverlayIn,cameraPos);
     }

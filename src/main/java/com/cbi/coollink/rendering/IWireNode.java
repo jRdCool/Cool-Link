@@ -1,6 +1,5 @@
 package com.cbi.coollink.rendering;
 
-import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.net.protocol.WireDataPacket;
@@ -94,7 +93,7 @@ public interface IWireNode {
         return node.getTargetPos();
     }
 
-    BlockPos getPos();
+    BlockPos getBlockPos();
 
     default WireType getNodeType(int index){
         LocalNode node = getLocalNode(index);

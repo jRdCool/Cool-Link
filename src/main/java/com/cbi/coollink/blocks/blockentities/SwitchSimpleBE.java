@@ -137,7 +137,7 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
         isNodeUsed[index]=true;
         markDirty();
         assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
     }//setting the node status
 
     @Override
@@ -145,7 +145,7 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
         this.localNodes[index] = null;
         markDirty();
         assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
         this.setIsNodeUsed(index,false);
     }//Removing the wire
 
@@ -182,7 +182,7 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
         LocalNode outputNode = IWireNode.traverseWire(localNodes[connectionIndex]);
         if(outputNode == null || outputNode.getType() != localNodes[connectionIndex].getType()){
             if(Main.NULL_PACKET_DESK_DEBUG) {
-                Main.LOGGER.error("Null destination or incorrect output wire type (from Simple switch port: " + connectionIndex + ") " + getPos());
+                Main.LOGGER.error("Null destination or incorrect output wire type (from Simple switch port: " + connectionIndex + ") " + getBlockPos());
             }
             return null;
         }
@@ -228,7 +228,7 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
 
     @SuppressWarnings("unused")
     public void updateStates(){
-        if(world!=null) world.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+        if(world!=null) world.updateListeners(getBlockPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
     }//notifies the world of updates to the block state
 
     @Nullable

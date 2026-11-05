@@ -51,7 +51,7 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 			IWireNode wn = otherBlock.getWireNode(i); //get the wire node of a given node index
 			if (wn == null) {//if that returned null then stop rendering further
 				//TODO make this logging toggleable
-				Main.LOGGER.warn("getWireNode("+i+") returned null when attempting to render wire for "+otherBlock.getPos());
+				Main.LOGGER.warn("getWireNode("+i+") returned null when attempting to render wire for "+otherBlock.getBlockPos());
 				continue;
 			}
 
@@ -61,9 +61,9 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 			float oz2 = ((float) d2.z);
 			BlockPos other = te.getNodePos(i);
 
-			float tx = other.getX() - te.getPos().getX();
-			float ty = other.getY() - te.getPos().getY();
-			float tz = other.getZ() - te.getPos().getZ();
+			float tx = other.getX() - te.getBlockPos().getX();
+			float ty = other.getY() - te.getBlockPos().getY();
+			float tz = other.getZ() - te.getBlockPos().getZ();
 			matrixStackIn.push();
 
 			float dis = distanceFromZero(tx, ty, tz);

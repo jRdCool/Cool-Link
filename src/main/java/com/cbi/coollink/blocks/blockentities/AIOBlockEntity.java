@@ -82,6 +82,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	private final ArrayList<ConnectedDevice> rememberedDevices = new ArrayList<>();
 
 
+	//write
 	// Serialize the BlockEntity
 	@Override
 	protected void saveAdditional(ValueOutput view) {
@@ -109,7 +110,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}//Writing data
 
 
-
+	//read
 	@Override
 	protected void loadAdditional(ValueInput view) {
 		super.loadAdditional(view);
@@ -199,7 +200,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 	}//run on tick
 	public void updateStates(){
-		if(level!=null) level.updateListeners(getPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+		if(level!=null) level.updateListeners(this.getBlockPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
 	}//notifies the world of updates to the block state
 
 	public void setMacAddresses(int[] mac1,int[] mac2){
@@ -259,7 +260,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		isNodeUsed[index]=true;
 		markDirty();
         assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        world.updateListeners(this.getBlockPos(), getCachedState(), getCachedState(), 0);
 	}//Sets the node connection
 
 	@Override
@@ -268,7 +269,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		this.localNodes[index] = null;
 		markDirty();
         assert world != null;
-        world.updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+        world.updateListeners(this.getBlockPos(), getCachedState(), getCachedState(), 0);
 		this.setIsNodeUsed(index,false);
 	}//Breaks the wire
 
@@ -304,7 +305,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		LocalNode outputNode = IWireNode.traverseWire(localNodes[connectionIndex]);
 		if(outputNode == null || outputNode.getType() != localNodes[connectionIndex].getType()){
 			if(Main.NULL_PACKET_DESK_DEBUG) {
-				Main.LOGGER.error("Null destination or incorrect output wire type (from AIO_BLOCK_ENTITY port: " + connectionIndex + ") " + getPos());
+				Main.LOGGER.error("Null destination or incorrect output wire type (from AIO_BLOCK_ENTITY port: " + connectionIndex + ") " + this.getBlockPos());
 			}
 			return null;
 		}
@@ -414,7 +415,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	 */
 	@Override
 	public void getNetworkAccessPointLocations(ServerPlayerEntity player) {
-		ServerPlayNetworking.send(player,new AccessPointLocationPacket(new BlockPos[]{getPos()},getSsid()));
+		ServerPlayNetworking.send(player,new AccessPointLocationPacket(new BlockPos[]{this.getBlockPos()},getSsid()));
 	}
 
 	@Override

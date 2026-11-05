@@ -11,7 +11,6 @@ import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.text.PlainTextContent.Literal;
 import net.minecraft.text.MutableText;
@@ -233,7 +232,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
             //    buf.writeRegistryKey(world.getRegistryKey());
             //
             //Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
-                ClientPlayNetworking.send(new AioSetSSIDPacket(blockA.getPos(),sSIDName.getText(),world.getRegistryKey()));
+                ClientPlayNetworking.send(new AioSetSSIDPacket(blockA.getBlockPos(),sSIDName.getText(),world.getRegistryKey()));
         });
         setNetPass.setOnClick(() -> {
             netPassL=netPassField.getText();
@@ -243,7 +242,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
                 return;
             }
             Main.LOGGER.info("Setting AIO password to: "+netPassL);
-            ClientPlayNetworking.send(new AioSetNetPasswordPacket(blockA.getPos(),netPassL,world.getRegistryKey()));
+            ClientPlayNetworking.send(new AioSetNetPasswordPacket(blockA.getBlockPos(),netPassL,world.getRegistryKey()));
         });
 
         changeAdminPass.setOnClick(() -> {
@@ -284,7 +283,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
                 blockA.password = adminPasswordField.getText();
                 Main.LOGGER.info("setting password to: " + blockA.password);
 
-                ClientPlayNetworking.send(new AioSetAdminPasswordPacket(blockA.getPos(),adminPasswordField.getText(),world.getRegistryKey()));
+                ClientPlayNetworking.send(new AioSetAdminPasswordPacket(blockA.getBlockPos(),adminPasswordField.getText(),world.getRegistryKey()));
 
                 root.remove(changeAdminPassPanel);
                 aioSettingsScreen(blockA);
