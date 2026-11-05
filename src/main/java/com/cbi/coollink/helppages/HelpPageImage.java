@@ -2,7 +2,7 @@ package com.cbi.coollink.helppages;
 
 import io.github.cottonmc.cotton.gui.widget.WSprite;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class HelpPageImage extends HelpPageComponent{
 

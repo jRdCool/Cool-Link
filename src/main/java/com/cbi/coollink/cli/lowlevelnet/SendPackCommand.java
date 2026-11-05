@@ -5,8 +5,8 @@ import com.cbi.coollink.cli.CliProgram;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import com.cbi.coollink.terminal.CommandTextOutputArea;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 
 import java.util.HashMap;
 
@@ -30,10 +30,10 @@ public class SendPackCommand implements CliProgram {
         String[] nbtArgs = new String[args.length-1];
         System.arraycopy(args,1,nbtArgs,0,nbtArgs.length);
         String rawStringNbt = String.join(" ",nbtArgs);
-        NbtCompound packetNbt;
+        CompoundTag packetNbt;
         try {
-            packetNbt = StringNbtReader.readCompound(rawStringNbt);
-        } catch (CommandSyntaxException e) {
+            packetNbt = NbtIo.read(Util.stringDataInput(rawStringNbt));
+        } catch (java.io.IOException e) {
             stdout.addLine("§cError parsing NBT:§r "+e.getMessage());
             return;
         }

@@ -1,13 +1,13 @@
 package com.cbi.coollink.cli.repo;
 
 import com.cbi.coollink.cli.CliProgramInit;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class CliCommandPackage {
 
 
 
-    public CliCommandPackage(Identifier packageID,String packageDescription,CommandInfo... commands){
+    public CliCommandPackage(Identifier packageID, String packageDescription, CommandInfo... commands){
         this.id = packageID;
         this.commands = commands;
         this.description = packageDescription;

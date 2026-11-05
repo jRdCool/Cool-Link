@@ -2,14 +2,14 @@ package com.cbi.coollink.helppages;
 
 import io.github.cottonmc.cotton.gui.widget.WText;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public class HelpPageText extends HelpPageComponent{
 
-    private final Text item;
+    private final Component item;
     private final int height;
 
-    public HelpPageText(Text text, int height){
+    public HelpPageText(Component text, int height){
         item = text;
         this.height = height;
     }

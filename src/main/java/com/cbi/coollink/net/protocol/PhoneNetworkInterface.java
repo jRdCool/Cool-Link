@@ -3,8 +3,8 @@ package com.cbi.coollink.net.protocol;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.net.WIFIClientIpPacket;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
 
@@ -12,7 +12,7 @@ public class PhoneNetworkInterface extends ProgramNetworkInterface{
 
     private boolean connectedToNetwork = false;
     private boolean deviceOnline = false;
-    private World playerWorld = null;
+    private Level playerWorld = null;
     private BlockPos accessPointPos = null;
 
     private final HashMap<String, Mac> ipMacCash = new HashMap<>();
@@ -21,7 +21,7 @@ public class PhoneNetworkInterface extends ProgramNetworkInterface{
         super(deviceMacAddress, "127.0.0.1");
     }
 
-    public PhoneNetworkInterface(Mac deviceMacAddress, String deviceIpAddress, World playerWorld, BlockPos accessPointPos, boolean deviceOnline) {
+    public PhoneNetworkInterface(Mac deviceMacAddress, String deviceIpAddress, Level playerWorld, BlockPos accessPointPos, boolean deviceOnline) {
         super(deviceMacAddress, deviceIpAddress);
         connectedToNetwork = true;
         this.playerWorld = playerWorld;
@@ -45,7 +45,7 @@ public class PhoneNetworkInterface extends ProgramNetworkInterface{
             }
         }
         //Main.LOGGER.info("Sending packet: "+data);
-        ClientPlayNetworking.send(new WIFIClientIpPacket(playerWorld.getRegistryKey(),accessPointPos,data));
+        ClientPlayNetworking.send(new WIFIClientIpPacket(playerWorld.dimension(),accessPointPos,data));
 
     }
 

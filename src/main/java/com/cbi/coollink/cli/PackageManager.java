@@ -5,7 +5,7 @@ import com.cbi.coollink.cli.repo.CliPackageRepository;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import com.cbi.coollink.terminal.CommandLineContext;
 import com.cbi.coollink.terminal.CommandTextOutputArea;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashMap;
 
@@ -68,7 +68,7 @@ public class PackageManager implements CliProgram{
         }
         Identifier packageId;
         try{
-            packageId = Identifier.of(args[1]);
+            packageId = Identifier.parse(args[1]);
         }catch (RuntimeException e){
             stdOut.addLine("Invalid Id: "+args[1]);
             running = false;
@@ -117,7 +117,7 @@ public class PackageManager implements CliProgram{
         }
         Identifier packageId;
         try{
-            packageId = Identifier.of(args[1]);
+            packageId = Identifier.parse(args[1]);
         }catch (RuntimeException e){
             stdOut.addLine("Invalid Id: "+args[1]);
             running = false;
