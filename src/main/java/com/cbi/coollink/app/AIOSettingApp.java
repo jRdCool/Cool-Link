@@ -12,11 +12,11 @@ import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.network.chat.Component;
-import net.minecraft.text.PlainTextContent.Literal;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.function.BiConsumer;
@@ -33,7 +33,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
     WPlainPanel aioSettingsPanel=new WPlainPanel();
     WPasswordField netPassField;
     String netName;
-    World world;
+    Level world;
     WTextField sSIDName;
     String netPassL;
     Boolean passVisible = false,settingsScreen=false;
@@ -41,10 +41,10 @@ public class AIOSettingApp extends AbstractPhoneApp{
     WPlainPanel changeAdminPassPanel=new WPlainPanel();
 
 
-    public static final Identifier ID = Identifier.of("cool-link","aio-app");
-    public static final Identifier ICON = Identifier.of("cool-link","textures/gui/aio_app_icon.png");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath("cool-link","aio-app");
+    public static final Identifier ICON = Identifier.fromNamespaceAndPath("cool-link","textures/gui/aio_app_icon.png");
 
-    public AIOSettingApp(World world, BlockEntity clickedOnBlockEntity){
+    public AIOSettingApp(Level world, BlockEntity clickedOnBlockEntity){
         super(ID);
         this.world=world;
         icon = ICON;
@@ -58,17 +58,17 @@ public class AIOSettingApp extends AbstractPhoneApp{
         if(clickedOnBlockEntity instanceof AIOBlockEntity aio) {
             logInScreen(aio,false);
         }else{
-            panel.add(new WLabel(MutableText.of(new Literal("AIO not detected"))), 100, 100);
+            panel.add(new WLabel(MutableComponent.create(new PlainTextContents.LiteralContents("AIO not detected"))), 100, 100);
         }
     }
 
-    /**do not use this constructor to initialize the app
-     * only use to get an instance of this app
-     */
-    private AIOSettingApp(){
-        super(Identifier.of("cool-link","aio-app"));
-        icon=Identifier.of("cool-link","textures/gui/aio_app_icon.png");
-    }
+//    /**do not use this constructor to initialize the app
+//     * only use to get an instance of this app
+//     */
+//    private AIOSettingApp(){
+//        super(Identifier.fromNamespaceAndPath("cool-link","aio-app"));
+//        icon=Identifier.of("cool-link","textures/gui/aio_app_icon.png");
+//    }
     @Override
     public void tick() {
 
@@ -80,12 +80,9 @@ public class AIOSettingApp extends AbstractPhoneApp{
             ScreenDrawing.coloredRect(matrices,left,top,phoneWidth,phoneHeight,0xFF_FFFFFF);
             if(settingsScreen) {
                 ScreenDrawing.coloredRect(matrices, left + 95, top + 161, 26, 26, 0xFF_333333);
-                if(uplinkStatus)
-                {
+                if(uplinkStatus) {
                     ScreenDrawing.coloredRect(matrices, left + 98, top + 164, 20, 20, 0xFF_00FF00);
-                }
-                else
-                {
+                } else {
                     ScreenDrawing.coloredRect(matrices, left + 98, top + 164, 20, 20, 0xFF_FF0000);
                 }
             }
@@ -101,12 +98,12 @@ public class AIOSettingApp extends AbstractPhoneApp{
     {
         //Main.LOGGER.info("LOGIN SCREEEN: "+blockA+" change pass: "+changePass);
         ((WPlainPanel)root).add(logInPanel,0,0);
-        adminPasswordField = new WPasswordField(MutableText.of(new Literal("admins may be able to see text entered here")));
+        adminPasswordField = new WPasswordField(MutableComponent.create(new PlainTextContents.LiteralContents("admins may be able to see text entered here")));
         adminPasswordField.setMaxLength(96);
         passwordVisibleButton = new WToggleButton();
-        WButton checkPassB = new WButton(MutableText.of(new Literal("Submit")).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
+        WButton checkPassB = new WButton(MutableComponent.create(new PlainTextContents.LiteralContents("Submit")).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
 
-        logInPanel.add(new WLabel(MutableText.of(new Literal("enter admin password for this AIO"))), 100, 50);
+        logInPanel.add(new WLabel(MutableComponent.create(new PlainTextContents.LiteralContents("enter admin password for this AIO"))), 100, 50);
         logInPanel.add(adminPasswordField, 50, 85);
         adminPasswordField.setSize(300, 20);
         logInPanel.add(passwordVisibleButton, 355, 85);
@@ -128,7 +125,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
                     aioSettingsScreen(blockA);
                 }
             } else {
-                errorMsg.setText(Text.of("Invalid password"));
+                errorMsg.setText(Component.literal("Invalid password"));
             }
             //how about we do not do this here
             //ClientPlayNetworking.send(new AioSetAdminPasswordPacket(blockA.getPos(),adminPasswordField.getText(),world.getRegistryKey()));
@@ -141,7 +138,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
     private void aioSettingsScreen(AIOBlockEntity blockA)
     {
         BiConsumer<AIOBlockEntity.ConnectedDevice, AIODeviceList> configurator = (device, destination) -> {
-            destination.device.setLabel(Text.literal(device.deviceName()));
+            destination.device.setLabel(Component.literal(device.deviceName()));
             //destination.sprite.setImage(new Identifier("libgui-test:portal1.png"));
         };
         settingsScreen=true;
@@ -163,18 +160,18 @@ public class AIOSettingApp extends AbstractPhoneApp{
         }
 
         ((WPlainPanel)root).add(aioSettingsPanel,0,0);
-        WButton changeAdminPass=new WButton(Text.of("Change Admin Password"));
-        WLabel connectedDevices=new WLabel(Text.of("Connected Devices"));
-        WLabel uLStatus=new WLabel(Text.of("Uplink Status:"));
-        WLabel sSID=new WLabel(Text.of("SSID:"));
-        WLabel wifiPass=new WLabel(Text.of("WIFI Password:"));
-        netPassField=new WPasswordField(MutableText.of(new Literal(netPassL)));
-        WButton setNetPass=new WButton(Text.of("set"));
+        WButton changeAdminPass=new WButton(Component.literal("Change Admin Password"));
+        WLabel connectedDevices=new WLabel(Component.literal("Connected Devices"));
+        WLabel uLStatus=new WLabel(Component.literal("Uplink Status:"));
+        WLabel sSID=new WLabel(Component.literal("SSID:"));
+        WLabel wifiPass=new WLabel(Component.literal("WIFI Password:"));
+        netPassField=new WPasswordField(MutableComponent.create(new PlainTextContents.LiteralContents(netPassL)));
+        WButton setNetPass=new WButton(Component.literal("set"));
         passwordVisibleButton = new WToggleButton();
-        sSIDName=new WTextField(MutableText.of(new Literal(netName)));
-        WButton setSSID=new WButton(Text.of("set"));
-        WLabel mAC1=new WLabel(Text.of("MAC1: "+blockA.mac1.toString()));
-        WLabel mAC2=new WLabel(Text.of("MAC2: "+blockA.mac2.toString()));
+        sSIDName=new WTextField(MutableComponent.create(new PlainTextContents.LiteralContents(netName)));
+        WButton setSSID=new WButton(Component.literal("set"));
+        WLabel mAC1=new WLabel(Component.literal("MAC1: "+blockA.mac1.toString()));
+        WLabel mAC2=new WLabel(Component.literal("MAC2: "+blockA.mac2.toString()));
 
 
 
@@ -219,20 +216,13 @@ public class AIOSettingApp extends AbstractPhoneApp{
             passVisible=on;
             if(on) {netPassL=blockA.netPass;}
             else {netPassL=hiddenText;}
-            netPassField.setSuggestion(Text.of(netPassL));
+            netPassField.setSuggestion(Component.literal(netPassL));
         });
 
         setSSID.setOnClick(() -> {
             netName=sSIDName.getText();
             blockA.ssid=sSIDName.getText();
-            //Main.LOGGER.info("setting SSID to: "+blockA.ssid);
-            //    PacketByteBuf buf = PacketByteBufs.create();
-            //    buf.writeBlockPos(blockA.getPos());
-            //    buf.writeString(sSIDName.getText());
-            //    buf.writeRegistryKey(world.getRegistryKey());
-            //
-            //Main.LOGGER.error("NETWORKING NOT COMPLETED WIP");
-                ClientPlayNetworking.send(new AioSetSSIDPacket(blockA.getBlockPos(),sSIDName.getText(),world.getRegistryKey()));
+            ClientPlayNetworking.send(new AioSetSSIDPacket(blockA.getBlockPos(),sSIDName.getText(),world.dimension()));
         });
         setNetPass.setOnClick(() -> {
             netPassL=netPassField.getText();
@@ -242,7 +232,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
                 return;
             }
             Main.LOGGER.info("Setting AIO password to: "+netPassL);
-            ClientPlayNetworking.send(new AioSetNetPasswordPacket(blockA.getBlockPos(),netPassL,world.getRegistryKey()));
+            ClientPlayNetworking.send(new AioSetNetPasswordPacket(blockA.getBlockPos(),netPassL,world.dimension()));
         });
 
         changeAdminPass.setOnClick(() -> {
@@ -264,13 +254,13 @@ public class AIOSettingApp extends AbstractPhoneApp{
     private void adminPassChangeScreen(AIOBlockEntity blockA)
     {
         ((WPlainPanel)root).add(changeAdminPassPanel,0,0);
-        adminPasswordField = new WPasswordField(MutableText.of(new Literal("admins may be able to see text entered here")));
+        adminPasswordField = new WPasswordField(MutableComponent.create(new PlainTextContents.LiteralContents("admins may be able to see text entered here")));
         adminPasswordField.setMaxLength(96);
         changeAdminPassPanel.add(adminPasswordField, 50, 85);
         adminPasswordField.setSize(300, 20);
         changeAdminPassPanel.add(passwordVisibleButton, 355, 85);
-        changeAdminPassPanel.add(new WLabel(MutableText.of(new Literal("set admin password for this AIO"))), 100, 50);
-        WButton setAdminPass=new WButton(Text.of("set"));
+        changeAdminPassPanel.add(new WLabel(MutableComponent.create(new PlainTextContents.LiteralContents("set admin password for this AIO"))), 100, 50);
+        WButton setAdminPass=new WButton(Component.literal("set"));
         changeAdminPassPanel.add(setAdminPass,180, 120,40,1);
 
         passwordVisibleButton.setOnToggle(on -> {
@@ -283,7 +273,7 @@ public class AIOSettingApp extends AbstractPhoneApp{
                 blockA.password = adminPasswordField.getText();
                 Main.LOGGER.info("setting password to: " + blockA.password);
 
-                ClientPlayNetworking.send(new AioSetAdminPasswordPacket(blockA.getBlockPos(),adminPasswordField.getText(),world.getRegistryKey()));
+                ClientPlayNetworking.send(new AioSetAdminPasswordPacket(blockA.getBlockPos(),adminPasswordField.getText(),world.dimension()));
 
                 root.remove(changeAdminPassPanel);
                 aioSettingsScreen(blockA);
