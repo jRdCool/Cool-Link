@@ -1,23 +1,24 @@
 package com.cbi.coollink.net;
 
 import com.cbi.coollink.Main;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.NonNull;
 
-public record SavePhoneDataPacket(NbtCompound nbt, ItemStack phone) implements CustomPayload {
-    public static final Id<SavePhoneDataPacket> ID =new Id<>(Identifier.of(Main.namespace,"save-phone-data"));
-    public static final PacketCodec<RegistryByteBuf, SavePhoneDataPacket> CODEC = PacketCodec.tuple(
-            PacketCodecs.NBT_COMPOUND, SavePhoneDataPacket::nbt,
-            ItemStack.PACKET_CODEC, SavePhoneDataPacket::phone,
+public record SavePhoneDataPacket(CompoundTag nbt, ItemStack phone) implements CustomPacketPayload {
+    public static final Type<SavePhoneDataPacket> ID =new Type<>(Identifier.fromNamespaceAndPath(Main.namespace,"save-phone-data"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, SavePhoneDataPacket> CODEC = StreamCodec.composite(
+            ByteBufCodecs.COMPOUND_TAG, SavePhoneDataPacket::nbt,
+            ItemStack.STREAM_CODEC, SavePhoneDataPacket::phone,
             SavePhoneDataPacket::new
     );
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public @NonNull Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 }
