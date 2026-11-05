@@ -2,7 +2,7 @@ package com.cbi.coollink;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public record WireInfoComponent(int index, BlockPos originBlock){
     public static final Codec<WireInfoComponent> CODEC = RecordCodecBuilder.create(builder -> {
