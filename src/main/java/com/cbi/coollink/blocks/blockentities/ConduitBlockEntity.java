@@ -6,10 +6,12 @@ import com.cbi.coollink.blocks.conduits.Conduit;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -18,6 +20,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +55,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     private final BlockState initialBlockState;
 
     @Override
-    public void saveAdditional(ValueOutput view){
+    public void saveAdditional(@NonNull ValueOutput view){
         super.saveAdditional(view);
         if(coverBlock != null){
             view.store("cover",BlockState.CODEC,coverBlock);
@@ -71,7 +74,7 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
 
     @Override
-    public void loadAdditional(ValueInput view) {
+    public void loadAdditional(@NonNull ValueInput view) {
         super.loadAdditional(view);
         coverBlock = view.read("cover",BlockState.CODEC).orElse(null);
 
@@ -100,19 +103,19 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
 
     @Nullable
     @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
+    public @org.jspecify.annotations.Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
-
+/*
     public CompoundTag toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
         return createNbt(registryLookup);
     }
-
+*/
 
     public void updateStates(){
         assert level != null;
-        level.updateListeners(this.getBlockPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+        level.sendBlockUpdated(this.getBlockPos(),getBlockState(),getBlockState(), Block.UPDATE_CLIENTS);
     }
 
     public boolean isCovered(){
@@ -127,11 +130,11 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
         coverBlock = newCover;
 
         if(level != null) {//stop the regular model from rendering if it is being hidden
-            level.setBlockState(this.getBlockPos(), level.getBlockState(this.getBlockPos()).with(Conduit.HIDDEN, coverBlock != null));
+            level.setBlock(this.getBlockPos(), level.getBlockState(this.getBlockPos()).setValue(Conduit.HIDDEN, coverBlock != null),0);
         }
-        markDirty();
+        setChanged();
         assert level != null;
-        level.updateListeners(this.getBlockPos(), getCachedState(), getCachedState(), 0);//CRITICAL FOR RENDER UPDATE, MAKE SURE FLAGS IS 0
+        level.sendBlockUpdated(this.getBlockPos(), getBlockState(), getBlockState(), 0);//CRITICAL FOR RENDER UPDATE, MAKE SURE FLAGS IS 0
     }
 
 
@@ -316,9 +319,9 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
         this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
         isNodeUsed[index]=true;
-        markDirty();
+        setChanged();
         assert level != null;
-        level.updateListeners(this.getBlockPos(), getCachedState(), getCachedState(), 0);
+        level.sendBlockUpdated(this.getBlockPos(), getBlockState(), getBlockState(), 0);
         if(level.getBlockState(pos).getBlock() instanceof Conduit){
             int cableShape=level.getBlockState(pos).getValue(Conduit.cableShape);
             if(cableShape!=2){
@@ -380,9 +383,9 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
     @Override
     public void removeNode(int index, boolean dropWire) {
         this.localNodes[index] = null;
-        markDirty();
+        setChanged();
         assert level != null;
-        level.updateListeners(this.getBlockPos(), getCachedState(), getCachedState(), 0);
+        level.sendBlockUpdated(this.getBlockPos(), getBlockState(), getBlockState(), 0);
         this.setIsNodeUsed(index,false);
     }
 

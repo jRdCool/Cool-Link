@@ -15,7 +15,6 @@ import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.nbt.CompoundTag;
 //import net.minecraft.network.listener.ClientPlayPacketListener;
 //import net.minecraft.network.packet.Packet;
@@ -38,6 +37,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.core.BlockPos;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -116,7 +116,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 	//read
 	@Override
-	protected void loadAdditional(ValueInput view) {
+	protected void loadAdditional(@NonNull ValueInput view) {
 		super.loadAdditional(view);
 		password=view.getStringOr("password","password123546");
 		ssid = view.getStringOr("ssid","Unconfigured Network");
