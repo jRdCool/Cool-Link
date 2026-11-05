@@ -8,19 +8,19 @@ import io.github.cottonmc.cotton.gui.widget.WButton;
 import io.github.cottonmc.cotton.gui.widget.WLabel;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import io.github.cottonmc.cotton.gui.widget.WTextField;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.lwjgl.sdl.SDLKeycode;
 
 import java.util.ArrayList;
 
 public class TerminalPhoneApp extends AbstractPhoneApp{
 
-    public static final Identifier ID = Identifier.of(Main.namespace,"terminal_phone");
-    public static final Identifier ICON = Identifier.of(Main.namespace,"textures/gui/terminal.png");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"terminal_phone");
+    public static final Identifier ICON = Identifier.fromNamespaceAndPath(Main.namespace,"textures/gui/terminal.png");
 
     WTextField inputBox;
     WButton executeButton, terminateButton;
@@ -30,7 +30,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
     ArrayList<String> commandHistory = new ArrayList<>();
 
     int histroyLocation=0;
-    public TerminalPhoneApp(World ignoredWorld, BlockEntity ignoredClickedOnBlockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface) {
+    public TerminalPhoneApp(Level ignoredWorld, BlockEntity ignoredClickedOnBlockEntity, CompoundTag appData, ProgramNetworkInterface networkInterface) {
         super(ID);
         PhoneCommandLineContext commandRunner = new PhoneCommandLineContext(appData);
         root=new WPlainPanel();//create the panel witch all widget will sit on
@@ -41,15 +41,15 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
         panel.add(inputBox,40,155,350,20);
         inputBox.setMaxLength(1024);
         this.commandLineContext = commandRunner;
-        executeButton = new WButton(Text.of("Execute"));
+        executeButton = new WButton(Component.literal("Execute"));
         panel.add(executeButton,250,180,80,20);
         executeButton.setOnClick(this::executeCommand);
         panel.add(commandLineContext.getTextOutput(),20,15,370,135);
-        title = new WLabel(Text.of("Terminal"));
+        title = new WLabel(Component.literal("Terminal"));
         title.setColor(0xFF_FFFFFF);
         title.setDarkmodeColor(0xFF_FFFFFF);
         panel.add(title,180,3);
-        terminateButton = new WButton(Text.of("Terminate"));
+        terminateButton = new WButton(Component.literal("Terminate"));
         panel.add(terminateButton,70,180,80,20);
         terminateButton.setOnClick(() -> commandLineContext.terminateRunningProgram());
         this.networkInterface = networkInterface;
@@ -58,14 +58,15 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
 
     @Override
     public void keyPressed(int ch, int keyCode, int modifiers) {
-        if(ch == GLFW.GLFW_KEY_ENTER){ // enter key => execute command
+
+        if(ch == SDLKeycode.SDLK_RETURN || ch == SDLKeycode.SDLK_KP_ENTER){ // enter key => execute command
             executeCommand();
-        } else if(ch == GLFW.GLFW_KEY_UP){ //up key => previous command
+        } else if(ch == SDLKeycode.SDLK_UP){ //up key => previous command
             if(histroyLocation > 0){
                 histroyLocation --;
                 inputBox.setText(commandHistory.get(histroyLocation));
             }
-        } else if(ch == GLFW.GLFW_KEY_DOWN){ // down key => next command
+        } else if(ch == SDLKeycode.SDLK_DOWN){ // down key => next command
             if(histroyLocation < commandHistory.size()){
                 histroyLocation++;
                 if(histroyLocation == commandHistory.size()){
@@ -115,7 +116,7 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
     }
 
     @Override
-    public NbtCompound saveData() {
+    public CompoundTag saveData() {
         return commandLineContext.getSaveData();
     }
 }
