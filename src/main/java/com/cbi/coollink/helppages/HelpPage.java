@@ -1,6 +1,7 @@
 package com.cbi.coollink.helppages;
 
-import net.minecraft.text.Text;
+
+import net.minecraft.network.chat.Component;
 
 public class HelpPage {
     private final String pageTitle;
@@ -12,8 +13,8 @@ public class HelpPage {
         this.content = content;
     }
 
-    public Text getTitle() {
-        return Text.of(pageTitle);
+    public Component getTitle() {
+        return Component.literal(pageTitle);
     }
 
     public int getAmountOfContent(){
