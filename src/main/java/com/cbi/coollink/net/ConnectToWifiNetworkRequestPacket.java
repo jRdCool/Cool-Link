@@ -10,6 +10,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
 
 public record ConnectToWifiNetworkRequestPacket(ResourceKey<Level> world, BlockPos accessPointPosition, String password, Mac deviceMacAddress, String deviceName) implements CustomPacketPayload {
     public static final Type<ConnectToWifiNetworkRequestPacket> ID = new Type<>(Identifier.fromNamespaceAndPath(Main.namespace,"client-connect-to-wifi-packet"));
@@ -24,5 +25,5 @@ public record ConnectToWifiNetworkRequestPacket(ResourceKey<Level> world, BlockP
     );
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {return ID;}
+    public @NonNull Type<? extends CustomPacketPayload> type() {return ID;}
 }
