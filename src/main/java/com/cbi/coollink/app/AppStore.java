@@ -6,8 +6,8 @@ import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 public final class AppStore extends AbstractRootApp{
     WScrollBar scrollBar;
@@ -15,8 +15,8 @@ public final class AppStore extends AbstractRootApp{
     WButton[] installButtons =new WButton[4];
     PhoneGui phone;
 
-    public static final Identifier ID = Identifier.of("cool-link","app-store");
-    public static final Identifier ICON = Identifier.of("cool-link","textures/gui/app_shop_icon.png");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath("cool-link","app-store");
+    public static final Identifier ICON = Identifier.fromNamespaceAndPath("cool-link","textures/gui/app_shop_icon.png");
 
     public AppStore(PhoneGui phone, ProgramNetworkInterface networkInterface) {
         super(ID);
@@ -24,7 +24,7 @@ public final class AppStore extends AbstractRootApp{
         icon = ICON;
         root = new WPlainPanel();
         WPlainPanel panel = (WPlainPanel)root;
-        WLabel title = new WLabel(Text.of("App Shop"));
+        WLabel title = new WLabel(Component.literal("App Shop"));
         title.setHorizontalAlignment(HorizontalAlignment.CENTER);
         panel.add(title,phoneWidth/2,3);
         timeColor=TIME_COLOR_BLACK;
@@ -35,9 +35,9 @@ public final class AppStore extends AbstractRootApp{
             scrollBar.setMaxValue(AppRegistry.getAppIds().length + 12);
             panel.add(scrollBar, 380, 15, 20, 170);
             for (int i = 0; i < 4; i++) {
-                descriptions[i] = new WText(Text.empty());
+                descriptions[i] = new WText(Component.empty());
                 panel.add(descriptions[i], 70, 12 + 50 * i, phoneWidth - 150, 40);
-                installButtons[i] = new WButton(Text.of("Install"));
+                installButtons[i] = new WButton(Component.literal("Install"));
                 panel.add(installButtons[i], 318, 13 + 50 * i, 60, 20);
                 int n = i;
                 installButtons[i].setOnClick(() -> {
@@ -45,7 +45,7 @@ public final class AppStore extends AbstractRootApp{
                 });
             }
         }else{
-            WLabel offline = new WLabel(Text.of("§4Device offline! Connect to the internet to install apps"));
+            WLabel offline = new WLabel(Component.literal("§4Device offline! Connect to the internet to install apps"));
             offline.setHorizontalAlignment(HorizontalAlignment.CENTER);
             panel.add(offline,phoneWidth/2,20);
         }
@@ -59,13 +59,13 @@ public final class AppStore extends AbstractRootApp{
                 if (AppRegistry.getDescription(i + scrollBar.getValue()) != null) {
                     descriptions[i].setText(AppRegistry.getDescription(i + scrollBar.getValue()));
                 } else {
-                    descriptions[i].setText(Text.empty());
+                    descriptions[i].setText(Component.empty());
                 }
             }
             for (int i = 0; i < 4; i++) {
                 installButtons[i].setEnabled(i + scrollBar.getValue() < AppRegistry.size() && (phone.getNumInstalledApps() < 105 || phone.isAppInstalled(AppRegistry.getId(i + scrollBar.getValue()))));
                 if (installButtons[i].isEnabled()) {
-                    installButtons[i].setLabel(phone.isAppInstalled(AppRegistry.getId(i + scrollBar.getValue())) ? Text.of("Uninstall") : Text.of("Install"));
+                    installButtons[i].setLabel(phone.isAppInstalled(AppRegistry.getId(i + scrollBar.getValue())) ? Component.literal("Uninstall") : Component.literal("Install"));
                 }
             }
         }
