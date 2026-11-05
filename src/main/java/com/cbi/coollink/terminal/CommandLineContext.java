@@ -3,7 +3,7 @@ package com.cbi.coollink.terminal;
 import com.cbi.coollink.cli.repo.CliCommandPackage;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public abstract class CommandLineContext {
 

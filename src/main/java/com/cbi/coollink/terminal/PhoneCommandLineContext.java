@@ -9,12 +9,12 @@ import com.cbi.coollink.cli.repo.CliCommandPackage;
 import com.cbi.coollink.cli.repo.CliPackageRepository;
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,26 +28,26 @@ public class PhoneCommandLineContext extends CommandLineContext {
     private final HashMap<String, String> environmentVariables = new HashMap<>();
     private CliProgram currentExecutingProgram;
 
-    private final NbtCompound terminalData;
+    private final CompoundTag terminalData;
     private boolean requestSave = false;
     private final ArrayList<Identifier> installedPackages = new ArrayList<>();
 
 
-    public PhoneCommandLineContext(NbtCompound terminalData){
+    public PhoneCommandLineContext(CompoundTag terminalData){
         this.terminalData = terminalData;
         textOut = new CommandTextOutputArea(370,130,100,"CBi Phone OS 1.0 (C) CBi-games 2025, All rights reserved");
         //set the initial environment variables
         environmentVariables.put("PWD","/");
         environmentVariables.put("ECHO","true");
         environmentVariables.put("PLATFORM","phone");
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        LocalPlayer player = Minecraft.getInstance().player;
         String playerUUID;
         String username;
         if(player == null){
             playerUUID = "";
             username = "";
         }else{
-            playerUUID = player.getUuidAsString();
+            playerUUID = player.getStringUUID();
             username = player.getName().getString();
         }
         environmentVariables.put("USER", playerUUID);
@@ -61,13 +61,13 @@ public class PhoneCommandLineContext extends CommandLineContext {
         programRepository.put("help", InternalCommands.initOf((args, env, stdOut, networkInterface) -> printHelpText(args),"Usage: help <command>\nGet the help text for a given command"));
         programRepository.put("package", InternalCommands.initOf((args, env, stdOut, networkInterface) -> new PackageManager(args,env,stdOut,this, networkInterface),"Usage: package <install | uninstall | search | list>\nInstall and manage packages of command line programs\n\ninstall <packageId> - install new packages\nuninstall <packageId> - uninstall a package\nsearch <searchString> - search for available packages\nlist - list installed packages"));
         //load commands from packages here
-        NbtList installedPackages = terminalData.getListOrEmpty("installed_packages");
+        ListTag installedPackages = terminalData.getListOrEmpty("installed_packages");
         if(installedPackages.isEmpty()){
             terminalData.put("installed_packages",installedPackages);
         }
         for(int i=0;i<installedPackages.size();i++){
             try {
-                Identifier packageId = Identifier.of(installedPackages.getString(i, ""));
+                Identifier packageId = Identifier.parse(installedPackages.getStringOr(i, ""));
                 installPackage(CliPackageRepository.getPackage(packageId, CliPackageRepository.PHONE_ENVIRONMENT), false);
                 this.installedPackages.add(packageId);
             }catch (Exception e){
@@ -156,7 +156,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
             }
             installedPackages.add(commands.getId());
             requestSave = true;
-            terminalData.getListOrEmpty("installed_packages").add(NbtString.of(commands.getId().toString()));
+            terminalData.getListOrEmpty("installed_packages").add(StringTag.valueOf(commands.getId().toString()));
             textOut.addLine("Installed package: "+commands.getId());
         }
     }
@@ -166,9 +166,9 @@ public class PhoneCommandLineContext extends CommandLineContext {
         requestSave = true;
         installedPackages.remove(packageId);
         //this is not confusing at all
-        NbtList installedPackages = terminalData.getListOrEmpty("installed_packages");
+        ListTag installedPackages = terminalData.getListOrEmpty("installed_packages");
         for(int i=0;i<installedPackages.size();i++){
-            if(installedPackages.getString(i,"").equals(packageId.toString())){
+            if(installedPackages.getStringOr(i,"").equals(packageId.toString())){
                 installedPackages.remove(i);
                 textOut.addLine("Removed package: "+packageId+" Restart your terminal to apply changes");
                 break;
@@ -215,7 +215,7 @@ public class PhoneCommandLineContext extends CommandLineContext {
         }
     }
 
-    public NbtCompound getSaveData(){
+    public CompoundTag getSaveData(){
         requestSave = false;
         return terminalData;
     }

@@ -4,7 +4,7 @@ import com.cbi.coollink.net.mic.WDynamicLabelMultyLine;
 import io.github.cottonmc.cotton.gui.widget.WScrollPanel;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
 
@@ -41,15 +41,15 @@ public class CommandTextOutputArea {
 
     public void addLine(String line){
 
-        int initalLineWidth = MinecraftClient.getInstance().textRenderer.getWidth(line);
+        int initalLineWidth = Minecraft.getInstance().font.width(line);
 
         if(initalLineWidth < maxTextWidth) {//if the whole thing fits on a single line then just add it to the list
             textContent.add(line);
         }else {
 
             //otherwise, we need to cur it down to size
-            while (MinecraftClient.getInstance().textRenderer.getWidth(line) > maxTextWidth) {
-                String cutLine = MinecraftClient.getInstance().textRenderer.trimToWidth(line, maxTextWidth);//get a string cut to the exact max length
+            while (Minecraft.getInstance().font.width(line) > maxTextWidth) {
+                String cutLine = Minecraft.getInstance().font.plainSubstrByWidth(line, maxTextWidth);//get a string cut to the exact max length
                 line = line.substring(cutLine.length());//remove that part from the remaining string
                 textContent.add(cutLine);//add the section we cut to the displayed lines
             }
