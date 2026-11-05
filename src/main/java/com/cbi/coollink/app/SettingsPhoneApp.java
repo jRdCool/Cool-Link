@@ -11,14 +11,14 @@ import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.VerticalAlignment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.PlainTextContent;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,18 +26,18 @@ import java.util.function.BiConsumer;
 
 public class SettingsPhoneApp extends AbstractRootApp{
 
-    WLabel title=new WLabel(Text.of("Settings"));
+    WLabel title=new WLabel(Component.literal("Settings"));
     PhoneGui phoneInstance;
     WButton prevBackground,nextBackground, amPmClock,hour24Clock,setPhoneName,aPSearch;
-    WLabel currentBackground,backgroundLabel,clockSetting=new WLabel(Text.of("Clock")),phoneName,mac,connectingStatus;
+    WLabel currentBackground,backgroundLabel,clockSetting=new WLabel(Component.literal("Clock")),phoneName,mac,connectingStatus;
     WTextField phoneNameField;
-    WLabel networks= new WLabel(Text.of("Networks"));
+    WLabel networks= new WLabel(Component.literal("Networks"));
 
     WListPanel<DiscoveredNetwork,AIODeviceList> accessPoints;
 
     WPlainPanel connectToNetworkPanel, primaryPanel = new WPlainPanel(), connectingPanel;
 
-    World world;
+    Level world;
 
     private DiscoveredNetwork connectingToNetwork;
 
@@ -47,12 +47,12 @@ public class SettingsPhoneApp extends AbstractRootApp{
     boolean searchingForWifi = false;
     int wifiSearchProgress = 0;
 
-    public static final Identifier ID = Identifier.of("cool-link","settings");
-    public static final Identifier ICON = Identifier.of("cool-link","textures/gui/setting_app_icon.png");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"settings");
+    public static final Identifier ICON = Identifier.fromNamespaceAndPath(Main.namespace,"textures/gui/setting_app_icon.png");
 
-    public SettingsPhoneApp(World world, BlockEntity clickedOnBlockEntity,PhoneGui phone){
-        super(Identifier.of("cool-link","settings"));
-        icon=Identifier.of("cool-link","textures/gui/setting_app_icon.png");
+    public SettingsPhoneApp(Level world, BlockEntity clickedOnBlockEntity, PhoneGui phone){
+        super(Identifier.fromNamespaceAndPath("cool-link","settings"));
+        icon=Identifier.fromNamespaceAndPath("cool-link","textures/gui/setting_app_icon.png");
         root=new WPlainPanel();
         root.setSize(phoneWidth,phoneHeight);
         timeColor=TIME_COLOR_BLACK;
@@ -61,30 +61,30 @@ public class SettingsPhoneApp extends AbstractRootApp{
         panel.add(primaryPanel,0,0);
         panel.add(title,phoneWidth/2,5);
         phoneInstance=phone;
-        prevBackground=new WButton(Text.of("<"));
-        nextBackground=new WButton(Text.of(">"));
-        currentBackground=new WLabel(Text.of(phone.backgroundNumber+""));
+        prevBackground=new WButton(Component.literal("<"));
+        nextBackground=new WButton(Component.literal(">"));
+        currentBackground=new WLabel(Component.literal(phone.backgroundNumber+""));
         primaryPanel.add(prevBackground,25,20);
         primaryPanel.add(nextBackground,65,20);
         currentBackground.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.CENTER);
         primaryPanel.add(currentBackground,45,22);
-        backgroundLabel=new WLabel(Text.of("Background"));
+        backgroundLabel=new WLabel(Component.literal("Background"));
         primaryPanel.add(backgroundLabel,88,26);
 
         prevBackground.setOnClick(()->{
            if(phone.backgroundNumber>0){
                phone.backgroundNumber--;
-               currentBackground.setText(Text.of(phone.backgroundNumber+""));
+               currentBackground.setText(Component.literal(phone.backgroundNumber+""));
            }
         });
         nextBackground.setOnClick(()->{
             if(phone.backgroundNumber<3){
                 phone.backgroundNumber++;
-                currentBackground.setText(Text.of(phone.backgroundNumber+""));
+                currentBackground.setText(Component.literal(phone.backgroundNumber+""));
             }
         });
-        amPmClock =new WButton(Text.of("AM/PM"));
-        hour24Clock=new WButton(Text.of("24 Hour"));
+        amPmClock =new WButton(Component.literal("AM/PM"));
+        hour24Clock=new WButton(Component.literal("24 Hour"));
         primaryPanel.add(amPmClock,25,60,60,20);
         primaryPanel.add(hour24Clock,90,60,60,20);
         if(phone.clockTimeType== PhoneGui.ClockTimeType.AMPM){
@@ -107,8 +107,8 @@ public class SettingsPhoneApp extends AbstractRootApp{
         });
         primaryPanel.add(clockSetting,25,50);
 
-        phoneName=new WLabel(Text.of(phone.phoneName));
-        setPhoneName=new WButton(Text.of("Set Phone Name"));
+        phoneName=new WLabel(Component.literal(phone.phoneName));
+        setPhoneName=new WButton(Component.literal("Set Phone Name"));
         phoneNameField=new WTextField();
         phoneNameField.setText(phone.phoneName);
 
@@ -121,7 +121,7 @@ public class SettingsPhoneApp extends AbstractRootApp{
                primaryPanel.add(phoneName,29,96);
                if(!phoneNameField.getText().isEmpty()){
                    phone.phoneName=phoneNameField.getText();
-                   phoneName.setText(Text.of(phone.phoneName));
+                   phoneName.setText(Component.literal(phone.phoneName));
                }
            }else{
                settingPhoneName=true;
@@ -131,8 +131,8 @@ public class SettingsPhoneApp extends AbstractRootApp{
 
            }
         });
-        mac=new WLabel(Text.of("Mac:   "+phone.getMac()));
-        aPSearch=new WButton(Text.of("Search For Networks"));
+        mac=new WLabel(Component.literal("Mac:   "+phone.getMac()));
+        aPSearch=new WButton(Component.literal("Search For Networks"));
         primaryPanel.add(mac,29, 111);
         primaryPanel.add(aPSearch,80,126,150,20);
 
@@ -140,9 +140,9 @@ public class SettingsPhoneApp extends AbstractRootApp{
 
         BiConsumer<DiscoveredNetwork, AIODeviceList> configurator = (DiscoveredNetwork network, AIODeviceList destination) -> {
             if(network.ssid.equals(phone.getWifiSsid())){//the currently connected network is displayed as green
-                destination.device.setLabel(Text.literal("§a"+network.ssid));
+                destination.device.setLabel(Component.literal("§a"+network.ssid));
             }else {
-                destination.device.setLabel(Text.literal(network.ssid));
+                destination.device.setLabel(Component.literal(network.ssid));
             }
 
             destination.device.setOnClick(() -> {
@@ -214,7 +214,7 @@ public class SettingsPhoneApp extends AbstractRootApp{
                         }
                         case 2->{
                             //network full, display error
-                            connectingStatus.setText(Text.of("§cNetwork Full!"));
+                            connectingStatus.setText(Component.literal("§cNetwork Full!"));
                         }
                         //error, display the error if the network is full
                         //or go back to the password page if invalid password
@@ -238,9 +238,9 @@ public class SettingsPhoneApp extends AbstractRootApp{
         root.remove(primaryPanel);
         connectToNetworkPanel = new WPlainPanel();
         ((WPlainPanel)root).add(connectToNetworkPanel,0,0);
-        WLabel instruction = new WLabel(Text.of("Enter password for §1§l"+network.ssid()));
+        WLabel instruction = new WLabel(Component.literal("Enter password for §1§l"+network.ssid()));
         connectToNetworkPanel.add(instruction,100,50);
-        WPasswordField passwordField = new WPasswordField(Text.of("admins may be able to see text entered here"));
+        WPasswordField passwordField = new WPasswordField(Component.literal("admins may be able to see text entered here"));
         passwordField.setMaxLength(96);
         connectToNetworkPanel.add(passwordField,50,85);
         passwordField.setSize(300, 20);
@@ -256,30 +256,30 @@ public class SettingsPhoneApp extends AbstractRootApp{
             }
         }
 
-        WButton connectButton = new WButton(MutableText.of(new PlainTextContent.Literal("Connect")).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
+        WButton connectButton = new WButton(MutableComponent.create(new PlainTextContents.LiteralContents("Connect")).setStyle(Style.EMPTY.withColor(0xFFFFFF)));
         phoneInstance.setWifiConnectFinished(false);
         connectToNetworkPanel.add(connectButton, 180, 120,60,20);
 
         connectButton.setOnClick(() -> {
            if(passwordField.getText() != null){
                //store the network info assuming the password is correct
-                phoneInstance.updateSavedNetwork(new PhoneGui.WifiNetworkInfo(network.ssid(), passwordField.getText(),world.getRegistryKey().getValue(),network.accessPoint().getX(),network.accessPoint().getY(),network.accessPoint().getZ()));
+                phoneInstance.updateSavedNetwork(new PhoneGui.WifiNetworkInfo(network.ssid(), passwordField.getText(),world.dimension().identifier(),network.accessPoint().getX(),network.accessPoint().getY(),network.accessPoint().getZ()));
                 phoneInstance.apBlockPos = network.accessPoint();
 
                //send the request to try and connect to the network
-               ClientPlayNetworking.send(new ConnectToWifiNetworkRequestPacket(world.getRegistryKey(),network.accessPoint(),passwordField.getText(),phoneInstance.getMac(),phoneInstance.phoneName));
+               ClientPlayNetworking.send(new ConnectToWifiNetworkRequestPacket(world.dimension(),network.accessPoint(),passwordField.getText(),phoneInstance.getMac(),phoneInstance.phoneName));
                connectingToNetwork = network;
                connectingToNetworkScreen();
            }
         });
 
         if(!error.isEmpty()){
-            WLabel errorText = new WLabel(Text.of("§c"+error));
+            WLabel errorText = new WLabel(Component.literal("§c"+error));
             connectToNetworkPanel.add(errorText,192,30);
             errorText.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.CENTER);
         }
 
-        WButton forgetNetwork = new WButton(Text.of("Forget network"));
+        WButton forgetNetwork = new WButton(Component.literal("Forget network"));
         connectToNetworkPanel.add(forgetNetwork,170,150,90,20);
         boolean hasNetwork = false;
         for(PhoneGui.WifiNetworkInfo wifi:phoneInstance.getSavedNetworks()){
@@ -290,7 +290,7 @@ public class SettingsPhoneApp extends AbstractRootApp{
         }
         forgetNetwork.setEnabled(hasNetwork);
         forgetNetwork.setOnClick(() -> {
-            phoneInstance.updateSavedNetwork(new PhoneGui.WifiNetworkInfo(network.ssid(),"",Identifier.of("delete-this"),Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE));
+            phoneInstance.updateSavedNetwork(new PhoneGui.WifiNetworkInfo(network.ssid(),"",Identifier.withDefaultNamespace("delete-this"),Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE));
             root.remove(connectToNetworkPanel);
             ((WPlainPanel)root).add(primaryPanel,0,0);
             primaryPanel.layout();
@@ -303,7 +303,7 @@ public class SettingsPhoneApp extends AbstractRootApp{
         root.remove(connectToNetworkPanel);
         connectingPanel = new WPlainPanel();
         ((WPlainPanel)root).add(connectingPanel,0,0);
-        connectingStatus = new WLabel(Text.of("Connecting..."));
+        connectingStatus = new WLabel(Component.literal("Connecting..."));
         connectingPanel.add(connectingStatus,192,85);
         connectingStatus.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.CENTER);
         connectingToWifi=true;
