@@ -3,8 +3,9 @@ package com.cbi.coollink.net.mic;
 import io.github.cottonmc.cotton.gui.widget.WTextField;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.MutableComponent;
+import org.jspecify.annotations.NonNull;
 
 public class WPasswordField extends WTextField {
     boolean textVisible =false;
@@ -12,13 +13,14 @@ public class WPasswordField extends WTextField {
         super();
     }
 
-    public WPasswordField(Text suggestion) {
+    public WPasswordField(MutableComponent suggestion) {
         super(suggestion);
     }
 
+
     @Override
     @Environment(EnvType.CLIENT)
-    protected void renderText(DrawContext context, int x, int y, String visibleText) {
+    protected void renderText(@NonNull GuiGraphicsExtractor context, int x, int y, @NonNull String visibleText) {
         if(!textVisible) {
             String hiddenText = "";
             for (int i = 0; i < visibleText.length(); i++) {
@@ -33,7 +35,7 @@ public class WPasswordField extends WTextField {
 
     @Override
     @Environment(EnvType.CLIENT)
-    protected void renderCursor(DrawContext context, int x, int y, String visibleText) {
+    protected void renderCursor(@NonNull GuiGraphicsExtractor context, int x, int y, @NonNull String visibleText) {
         if(!textVisible) {
             String hiddenText="";
             for(int i=0;i<visibleText.length();i++){
@@ -48,7 +50,7 @@ public class WPasswordField extends WTextField {
 
     @Override
     @Environment(EnvType.CLIENT)
-    protected void renderSelection(DrawContext context, int x, int y, String visibleText) {
+    protected void renderSelection(@NonNull GuiGraphicsExtractor context, int x, int y, @NonNull String visibleText) {
         if(!textVisible) {
             String hiddenText = "";
             for (int i = 0; i < visibleText.length(); i++) {
