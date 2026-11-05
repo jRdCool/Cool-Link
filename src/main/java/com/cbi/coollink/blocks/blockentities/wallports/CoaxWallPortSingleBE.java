@@ -6,9 +6,9 @@ import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.LocalNode;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class CoaxWallPortSingleBE extends AWallPortBlockEntity {
 
@@ -17,7 +17,7 @@ public class CoaxWallPortSingleBE extends AWallPortBlockEntity {
     public static FabricBlockEntityTypeBuilder.Factory<CoaxWallPortSingleBE> of(String woodType){
         return ((pos1, state) -> new CoaxWallPortSingleBE(woodType,pos1,state));
     }
-    public CoaxWallPortSingleBE(String woodType,BlockPos pos, BlockState state) {
+    public CoaxWallPortSingleBE(String woodType, BlockPos pos, BlockState state) {
         //resolve type here!!!!
         super(Main.coaxWallPortSingleBlockEntities.get(woodType), pos, state);
         nodeCount = 1;
@@ -59,14 +59,14 @@ public class CoaxWallPortSingleBE extends AWallPortBlockEntity {
 
 
     @Override
-    public Vec3d getNodeOffset(int node) {
-        Vec3d[][] nodes = {
-                {new Vec3d(0.5,0.5,0)},//NORTH
-                {new Vec3d(1,0.5,0.5)},//EAST
-                {new Vec3d(0.5,0.5,1)},//SOUTH
-                {new Vec3d(0,0.5,0.5)},//WEST
-                {new Vec3d(0.5,1,0.5)},//UP
-                {new Vec3d(0.5,0,0.5)}//DOWN
+    public Vec3 getNodeOffset(int node) {
+        Vec3[][] nodes = {
+                {new Vec3(0.5,0.5,0)},//NORTH
+                {new Vec3(1,0.5,0.5)},//EAST
+                {new Vec3(0.5,0.5,1)},//SOUTH
+                {new Vec3(0,0.5,0.5)},//WEST
+                {new Vec3(0.5,1,0.5)},//UP
+                {new Vec3(0.5,0,0.5)}//DOWN
         };
         return getNodeOffset(node,nodes);
     }
