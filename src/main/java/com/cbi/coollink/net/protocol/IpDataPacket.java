@@ -2,15 +2,16 @@ package com.cbi.coollink.net.protocol;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.charset.Charset;
 
 public class IpDataPacket implements WireDataPacket{
 
-    public static final PacketCodec<ByteBuf, IpDataPacket> PACKET_CODEC = new PacketCodec<ByteBuf, IpDataPacket>() {
-        public IpDataPacket decode(ByteBuf byteBuf) {
+    public static final StreamCodec<ByteBuf, IpDataPacket> PACKET_CODEC = new StreamCodec<ByteBuf, IpDataPacket>() {
+        public @NonNull IpDataPacket decode(ByteBuf byteBuf) {
             boolean hasDestMac;
             Mac mac1 = null;
             Mac mac2;
@@ -38,7 +39,7 @@ public class IpDataPacket implements WireDataPacket{
             strLength = byteBuf.readInt();
             sourceIp = byteBuf.readCharSequence(strLength,Charset.defaultCharset()).toString();
 
-            data = PacketCodecs.NBT_COMPOUND.decode(byteBuf);
+            data = ByteBufCodecs.COMPOUND_TAG.decode(byteBuf);
             if(hasDestMac){
                 return new IpDataPacket(destIp,sourceIp,mac2,mac1,data);
             }else{
@@ -66,7 +67,7 @@ public class IpDataPacket implements WireDataPacket{
             byteBuf.writeInt(byteLength);
             byteBuf.writeCharSequence(data.sourceIpAddress, Charset.defaultCharset());
 
-            PacketCodecs.NBT_COMPOUND.encode(byteBuf,data.ipData);
+            ByteBufCodecs.COMPOUND_TAG.encode(byteBuf,data.ipData);
 
         }
     };;
