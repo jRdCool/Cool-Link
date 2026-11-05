@@ -104,9 +104,9 @@ public class PhoneGui extends LightweightGuiDescription {
 
         //load data from the phone instance
         CompoundTag nbt;//= phoneInstance.getOrCreateNbt();
-        var rawData = phoneInstance.get(DataComponentTypes.CUSTOM_DATA);
+        var rawData = phoneInstance.get(DataComponents.CUSTOM_DATA);
         if(rawData!=null){
-            nbt = rawData.copyNbt();
+            nbt = rawData.copyTag();
         }else{
             nbt = new CompoundTag();
         }
