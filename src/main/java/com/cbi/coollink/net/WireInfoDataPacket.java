@@ -2,26 +2,27 @@ package com.cbi.coollink.net;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.NonNull;
 
-public record WireInfoDataPacket(int index, BlockPos originBlock, ItemStack heldItem, WireType wireType, boolean clear) implements CustomPayload {
-    public static final Id<WireInfoDataPacket> ID = new CustomPayload.Id<>(Identifier.of(Main.namespace, "wire-info-data"));
-    public static final PacketCodec<RegistryByteBuf, WireInfoDataPacket> CODEC = PacketCodec.tuple(
-            PacketCodecs.INTEGER, WireInfoDataPacket::index,
-            BlockPos.PACKET_CODEC, WireInfoDataPacket::originBlock,
-            ItemStack.PACKET_CODEC, WireInfoDataPacket::heldItem,
+public record WireInfoDataPacket(int index, BlockPos originBlock, ItemStack heldItem, WireType wireType, boolean clear) implements CustomPacketPayload {
+    public static final Type<WireInfoDataPacket> ID = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(Main.namespace, "wire-info-data"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, WireInfoDataPacket> CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT, WireInfoDataPacket::index,
+            BlockPos.STREAM_CODEC, WireInfoDataPacket::originBlock,
+            ItemStack.STREAM_CODEC, WireInfoDataPacket::heldItem,
             WireType.PACKET_CODEC, WireInfoDataPacket::wireType,
-            PacketCodecs.BOOLEAN, WireInfoDataPacket::clear,
+            ByteBufCodecs.BOOL, WireInfoDataPacket::clear,
             WireInfoDataPacket::new
     );
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public @NonNull Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 }
