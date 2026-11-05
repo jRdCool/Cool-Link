@@ -1,7 +1,7 @@
 package com.cbi.coollink.net.protocol;
 
 import com.cbi.coollink.Util;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.HashMap;
 
@@ -23,7 +23,7 @@ abstract public class ProgramNetworkInterface {
      * @param ipAddress The Ip to send the data to
      * @param sendData The data to send to the other device
      */
-    public void sendRawData(String ipAddress, NbtCompound sendData){
+    public void sendRawData(String ipAddress, CompoundTag sendData){
         IpDataPacket data = new IpDataPacket(ipAddress,deviceIp,deviceMac,sendData);
         sendIpPacketOverNetwork(data);
     }
@@ -33,7 +33,7 @@ abstract public class ProgramNetworkInterface {
      * @param sendData The data to send to the other device
      * @param responseCallback The code to run when a response is received, note this call balk is single use
      */
-    public void sendRawData(String ipAddress, NbtCompound sendData,PackerResponse responseCallback){
+    public void sendRawData(String ipAddress, CompoundTag sendData,PackerResponse responseCallback){
         //check if a port was included
         int port = -1;
         while(port == -1){
@@ -118,7 +118,7 @@ abstract public class ProgramNetworkInterface {
         /**Respond to the incoming data and do not listen for another response
          * @param data The data to respond with
          */
-        public void respond(NbtCompound data){
+        public void respond(CompoundTag data){
             sendIpPacketOverNetwork(responseData.createResponsePacket(data));
         }
 
@@ -126,7 +126,7 @@ abstract public class ProgramNetworkInterface {
          * @param data The data to respond with
          * @param callback The code to run  when the next response is received, note this call back is single use
          */
-        public void respond(NbtCompound data, PackerResponse callback){
+        public void respond(CompoundTag data, PackerResponse callback){
             responseMap.put(port,callback);
             sendIpPacketOverNetwork(responseData.createResponsePacket(data));
         }
