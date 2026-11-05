@@ -3,16 +3,17 @@ package com.cbi.coollink.net.protocol;
 
 import com.cbi.coollink.Main;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.StreamCodec;
+import org.jspecify.annotations.NonNull;
 
 import java.beans.ConstructorProperties;
 import java.util.Arrays;
 
 public class Mac {
 
-    public static final PacketCodec<ByteBuf, Mac> PACKET_CODEC = new PacketCodec<>() {
+    public static final StreamCodec<ByteBuf, Mac> PACKET_CODEC = new StreamCodec<>() {
         @Override
-        public Mac decode(ByteBuf buf) {
+        public @NonNull Mac decode(ByteBuf buf) {
             return new Mac(new int[]{buf.readInt(),buf.readInt(),buf.readInt()});
         }
 
