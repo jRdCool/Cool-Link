@@ -82,8 +82,8 @@ public class Main implements ModInitializer {
 
 
     //Cable Registries
-    public static final Cat6Cable cat6CableEntry = Registry.register(Registries.ITEM, Cat6Cable.ITEM_KEY, new Cat6Cable(new Item.Properties()/*.registryKey(Cat6Cable.ITEM_KEY)*/));
-    public static final CoaxialCable coaxialCableEntry = Registry.register(Registries.ITEM, CoaxialCable.ITEM_KEY,new CoaxialCable(new Item.Properties()/*.registryKey(CoaxialCable.ITEM_KEY)*/));
+    public static final Cat6Cable cat6CableEntry = Registry.register(BuiltInRegistries.ITEM, Cat6Cable.ITEM_KEY, new Cat6Cable(new Item.Properties()/*.registryKey(Cat6Cable.ITEM_KEY)*/));
+    public static final CoaxialCable coaxialCableEntry = Registry.register(BuiltInRegistries.ITEM, CoaxialCable.ITEM_KEY,new CoaxialCable(new Item.Properties()/*.registryKey(CoaxialCable.ITEM_KEY)*/));
 
 
     //creative mode tab group
@@ -134,8 +134,8 @@ public class Main implements ModInitializer {
         Registry.register(BuiltInRegistries.ITEM, RSSenderWired.ITEM_KEY,new BlockItem(RSSenderWired.ENTRY, new Item.Properties()/*.registryKey(RSSenderWired.ITEM_KEY)*/));
 
         //wire tester
-        WireTester wireTesterEntry = Registry.register(Registries.ITEM, WireTester.ITEM_KEY,new WireTester(new Item.Properties()/*.registryKey(WireTester.ITEM_KEY)*/));
-        ProgramingCable programingCableEntry = Registry.register(Registries.ITEM, ProgramingCable.ITEM_KEY,new ProgramingCable(new Item.Properties()/*.registryKey(ProgramingCable.ITEM_KEY)*/));
+        WireTester wireTesterEntry = Registry.register(BuiltInRegistries.ITEM, WireTester.ITEM_KEY,new WireTester(new Item.Properties()/*.registryKey(WireTester.ITEM_KEY)*/));
+        ProgramingCable programingCableEntry = Registry.register(BuiltInRegistries.ITEM, ProgramingCable.ITEM_KEY,new ProgramingCable(new Item.Properties()/*.registryKey(ProgramingCable.ITEM_KEY)*/));
 
         //server Rack
         Registry.register(BuiltInRegistries.BLOCK, ServerRack.BLOCK_KEY, ServerRack.ENTRY);
