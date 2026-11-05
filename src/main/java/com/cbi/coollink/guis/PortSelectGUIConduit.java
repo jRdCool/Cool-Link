@@ -10,11 +10,11 @@ import io.github.cottonmc.cotton.gui.client.CottonClientScreen;
 import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.PlainTextContent;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -31,10 +31,10 @@ public class PortSelectGUIConduit extends LightweightGuiDescription implements W
             //Main.LOGGER.info(usedOnBlock.toString());
             Main.blank();
             root = new WPlainPanel();//.setBackgroundPainter(new BackgroundPainter());
-            int size = usedOnBlock.getCachedState().get(Conduit.cableLevel);
-            int shape = usedOnBlock.getCachedState().get(Conduit.cableShape);
+            int size = usedOnBlock.getBlockState().getValue(Conduit.cableLevel);
+            int shape = usedOnBlock.getBlockState().getValue(Conduit.cableShape);
             //NSWE
-            boolean[] connectedDirection = {usedOnBlock.getCachedState().get(Conduit.north),usedOnBlock.getCachedState().get(Conduit.south),usedOnBlock.getCachedState().get(Conduit.west),usedOnBlock.getCachedState().get(Conduit.east)};
+            boolean[] connectedDirection = {usedOnBlock.getBlockState().getValue(Conduit.north),usedOnBlock.getBlockState().getValue(Conduit.south),usedOnBlock.getBlockState().getValue(Conduit.west),usedOnBlock.getBlockState().getValue(Conduit.east)};
 
             //figure out the total number of possible ports that can be connected to
             ArrayList<WButton> portButtons = new ArrayList<>();
@@ -268,28 +268,28 @@ public class PortSelectGUIConduit extends LightweightGuiDescription implements W
             }
             switch (shape){
                 case 1 -> {
-                    if(!connectedDirection[2])root.add(new WLabel(Text.of("West")), x, y1);
-                    if(!connectedDirection[3])root.add(new WLabel(Text.of("East")), x, y2);
+                    if(!connectedDirection[2])root.add(new WLabel(Component.literal("West")), x, y1);
+                    if(!connectedDirection[3])root.add(new WLabel(Component.literal("East")), x, y2);
                 }//EW
                 case 4-> {
-                    if(!connectedDirection[0])root.add(new WLabel(Text.of("North")), x, y1);
-                    if(!connectedDirection[3])root.add(new WLabel(Text.of("East")), x, y2);
+                    if(!connectedDirection[0])root.add(new WLabel(Component.literal("North")), x, y1);
+                    if(!connectedDirection[3])root.add(new WLabel(Component.literal("East")), x, y2);
                 }//NS
                 case 5 ->{
-                    if(!connectedDirection[1])root.add(new WLabel(Text.of("South")), x, y1);
-                    if(!connectedDirection[3])root.add(new WLabel(Text.of("East")), x, y2);
+                    if(!connectedDirection[1])root.add(new WLabel(Component.literal("South")), x, y1);
+                    if(!connectedDirection[3])root.add(new WLabel(Component.literal("East")), x, y2);
                 }//SE
                 case 6 ->{
-                    if(!connectedDirection[1])root.add(new WLabel(Text.of("South")), x, y1);
-                    if(!connectedDirection[2])root.add(new WLabel(Text.of("West")), x, y2);
+                    if(!connectedDirection[1])root.add(new WLabel(Component.literal("South")), x, y1);
+                    if(!connectedDirection[2])root.add(new WLabel(Component.literal("West")), x, y2);
                 }//SW
                 case 7 ->{
-                    if(!connectedDirection[0])root.add(new WLabel(Text.of("North")), x, y1);
-                    if(!connectedDirection[2])root.add(new WLabel(Text.of("West")), x, y2);
+                    if(!connectedDirection[0])root.add(new WLabel(Component.literal("North")), x, y1);
+                    if(!connectedDirection[2])root.add(new WLabel(Component.literal("West")), x, y2);
                 }//NW
                 default -> {
-                    if(!connectedDirection[0])root.add(new WLabel(Text.of("North")), x, y1);
-                    if(!connectedDirection[1])root.add(new WLabel(Text.of("South")), x, y2);
+                    if(!connectedDirection[0])root.add(new WLabel(Component.literal("North")), x, y1);
+                    if(!connectedDirection[1])root.add(new WLabel(Component.literal("South")), x, y2);
                 }//NS
             }
 
@@ -333,10 +333,10 @@ public class PortSelectGUIConduit extends LightweightGuiDescription implements W
                 int finalI = portButtonIndex.get(i);
                 portButtons.get(i).setOnClick(()->{
                     //send packet to the server to set the ports
-                    ClientPlayNetworking.send(new WireInfoDataPacket(ofType.get(finalI),usedOnBlock.getPos(),heldItem,type,false));
+                    ClientPlayNetworking.send(new WireInfoDataPacket(ofType.get(finalI),usedOnBlock.getBlockPos(),heldItem,type,false));
                     //Main.LOGGER.info("Index: "+Integer.toBinaryString(finalI)+" Dec:"+finalI);
                     //close the GUI
-                    screen.close();
+                    screen.onClose();
                 });
             }
 
@@ -348,7 +348,7 @@ public class PortSelectGUIConduit extends LightweightGuiDescription implements W
     @Override
     public void setScreen(CottonClientScreen screen) {
         if(shouldClose){
-            screen.close();
+            screen.onClose();
         }
         this.screen = screen;
     }
@@ -376,7 +376,7 @@ public class PortSelectGUIConduit extends LightweightGuiDescription implements W
         return (node & 0b00000011);
     }
 
-    private MutableText coloredText(int index, int tube, int wire, BlockEntity blockEntity){
+    private MutableComponent coloredText(int index, int tube, int wire, BlockEntity blockEntity){
         Style textstyle = Style.EMPTY.withColor(0x0000FF);
         if(blockEntity instanceof IWireNode node){
             if(node.getPortType(index)!= null){
@@ -386,6 +386,6 @@ public class PortSelectGUIConduit extends LightweightGuiDescription implements W
             }
             //Main.LOGGER.info("button"+tube+","+wire +"Wire type: "+node.getPortType(index).toString()+" RGB:"+Integer.toHexString(node.getPortType(index).rgb()));
         }
-        return MutableText.of(new PlainTextContent.Literal(tube+","+wire)).setStyle(textstyle);
+        return MutableComponent.create(new PlainTextContents.LiteralContents(tube+","+wire)).setStyle(textstyle);
     }
 }

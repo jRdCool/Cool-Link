@@ -3,6 +3,9 @@ package com.cbi.coollink.guis;
 import com.cbi.coollink.Main;
 import io.github.cottonmc.cotton.gui.GuiDescription;
 import io.github.cottonmc.cotton.gui.client.CottonClientScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import org.jspecify.annotations.NonNull;
 
 public class PhoneScreen extends CottonClientScreen {
     public PhoneScreen(GuiDescription description) {
@@ -10,7 +13,7 @@ public class PhoneScreen extends CottonClientScreen {
     }
 
     @Override
-    public boolean shouldPause(){
+    public boolean isPauseScreen(){
         return false;
     }
 
@@ -23,22 +26,22 @@ public class PhoneScreen extends CottonClientScreen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        super.mouseClicked(mouseX,mouseY,mouseButton);
+    public boolean mouseClicked(@NonNull MouseButtonEvent click, boolean doubled) {
+        super.mouseClicked(click,doubled);
         if(description instanceof PhoneGui phoneGui){
-            phoneGui.mouseClicked(mouseX,mouseY);
+            phoneGui.mouseClicked(click.x(),click.y());
         }
         return true;
     }
 
     @Override
-    public boolean keyPressed(int ch,int keyCode,int modifiers){
+    public boolean keyPressed(@NonNull KeyEvent input){
         //Main.LOGGER.info(ch+" "+keyCode+" "+modifiers);
         if(description instanceof PhoneGui phoneGui){
-            phoneGui.keyPressed(ch,keyCode,modifiers);
+            phoneGui.keyPressed(input.key(),input.keycode(),input.modifiers());
         }
         try {
-            return super.keyPressed(ch, keyCode, modifiers);
+            return super.keyPressed(input);
         } catch (Exception e){
             Main.LOGGER.error("Error processing keyboard in phone GUI: ",e);
         }
@@ -46,11 +49,11 @@ public class PhoneScreen extends CottonClientScreen {
     }
 
     @Override
-    public boolean keyReleased(int ch,int keyCode,int modifiers){
+    public boolean keyReleased(@NonNull KeyEvent input){
         if(description instanceof PhoneGui phoneGui){
-            phoneGui.keyReleased(ch,keyCode,modifiers);
+            phoneGui.keyReleased(input.key(),input.keycode(),input.modifiers());
         }
-        return super.keyReleased(ch,keyCode,modifiers);
+        return super.keyReleased(input);
     }
 
     /*KEY MAPPINGS
