@@ -2,7 +2,6 @@ package com.cbi.coollink.guis;
 
 import com.cbi.coollink.app.SnakeGameApp;
 import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
-import net.minecraft.util.Identifier;
 
 public class JunctionBoxGui extends ConduitGUI {
 

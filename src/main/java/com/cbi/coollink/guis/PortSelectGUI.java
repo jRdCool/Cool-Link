@@ -9,7 +9,7 @@ import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WButton;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -28,7 +28,7 @@ public class PortSelectGUI extends LightweightGuiDescription implements WantsScr
             WButton[] portButtons = new WButton[ofType.size()];
             //create a button for each of them
             for (int i = 0; i < ofType.size(); i++) {
-                portButtons[i] = new WButton(Text.of(""+ofType.get(i)));
+                portButtons[i] = new WButton(Component.literal(""+ofType.get(i)));
                 //disable the ones that already have been connected
                 if(node.isNodeInUse(ofType.get(i))){
                     portButtons[i].setEnabled(false);
@@ -48,7 +48,7 @@ public class PortSelectGUI extends LightweightGuiDescription implements WantsScr
                     //send packet to the server to set the ports
                     ClientPlayNetworking.send(new WireInfoDataPacket(ofType.get(finalI),usedOnBlock.getBlockPos(),heldItem,type,false));
                     //close the GUI
-                    screen.close();
+                    screen.onClose();
                 });
             }
 
@@ -60,7 +60,7 @@ public class PortSelectGUI extends LightweightGuiDescription implements WantsScr
     @Override
     public void setScreen(CottonClientScreen screen) {
         if(shouldClose){
-            screen.close();
+            screen.onClose();
         }
         this.screen = screen;
     }
