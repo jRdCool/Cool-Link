@@ -1,25 +1,25 @@
 package com.cbi.coollink.app;
 
 import com.cbi.coollink.net.protocol.ProgramNetworkInterface;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 public final class AppRegistry {
     private static final ArrayList<Container> registeredApps =new ArrayList<>();
     private static final HashMap<Identifier,Container> registeredApps2 = new HashMap<>();
-    public static void registerApp(Identifier appId,AppLauncher launcher, Identifier icon, Text description){
+    public static void registerApp(Identifier appId,AppLauncher launcher, Identifier icon, Component description){
         //if(app instanceof AbstractRootApp)
         //    throw new RuntimeException("attempted to register app with root permissions to app registry");
 
         if(icon == null){//use the default icon if none was set
-            icon = Identifier.of("minecraft","textures/misc/unknown_pack.png");
+            icon = Identifier.fromNamespaceAndPath("minecraft","textures/misc/unknown_pack.png");
         }
         //check if the app was already registered
         Container app = new Container(appId,launcher,icon,description, (be)->false);
@@ -27,12 +27,12 @@ public final class AppRegistry {
         registeredApps.add(app);
     }
 
-    public static void registerApp(Identifier appId,AppLauncher launcher, Identifier icon, Text description, OpenOnBlockEntityCheck blockEntityCheck){
+    public static void registerApp(Identifier appId,AppLauncher launcher, Identifier icon, Component description, OpenOnBlockEntityCheck blockEntityCheck){
         //if(app instanceof AbstractRootApp)
         //    throw new RuntimeException("attempted to register app with root permissions to app registry");
 
         if(icon == null){//use the default icon if none was set
-            icon = Identifier.of("minecraft","textures/misc/unknown_pack.png");
+            icon = Identifier.fromNamespaceAndPath("minecraft","textures/misc/unknown_pack.png");
         }
         //check if the app was already registered
         Container app = new Container(appId,launcher,icon,description, blockEntityCheck);
@@ -48,8 +48,8 @@ public final class AppRegistry {
         return registeredApps.stream().map(Container::appId).toArray(Identifier[]::new);
     }
 
-    public static Text[] getAppDescriptions(){
-        return registeredApps.stream().map(Container::description).toArray(Text[]::new);
+    public static Component[] getAppDescriptions(){
+        return registeredApps.stream().map(Container::description).toArray(Component[]::new);
     }
 
     public static Identifier getIcon(int index){
@@ -60,7 +60,7 @@ public final class AppRegistry {
         return registeredApps.get(index).appId();
     }
 
-    public static Text getDescription(int index){
+    public static Component getDescription(int index){
         return registeredApps.get(index).description();
     }
 
@@ -76,7 +76,7 @@ public final class AppRegistry {
         return container.icon();
     }
 
-    public static Text getDescription(Identifier id){
+    public static Component getDescription(Identifier id){
         Container container = registeredApps2.get(id);
         if(container == null){
             return null;
@@ -105,7 +105,7 @@ public final class AppRegistry {
     }
 
     public interface AppLauncher{
-        AbstractPhoneApp launch(World world, @Nullable BlockEntity clickedOmBlockEntity, NbtCompound appData, ProgramNetworkInterface networkInterface);
+        AbstractPhoneApp launch(Level world, @Nullable BlockEntity clickedOmBlockEntity, CompoundTag appData, ProgramNetworkInterface networkInterface);
     }
 
     /**Function to check if an app should open when the phone click on a block entity
@@ -117,7 +117,7 @@ public final class AppRegistry {
          */
         boolean openOnBlockEntity(BlockEntity be);
     }
-    private record Container(Identifier appId, AppLauncher launcher, Identifier icon, Text description, OpenOnBlockEntityCheck blockEntityCheck){}
+    private record Container(Identifier appId, AppLauncher launcher, Identifier icon, Component description, OpenOnBlockEntityCheck blockEntityCheck){}
 }
 
 
