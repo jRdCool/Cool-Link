@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public abstract class ACableItem extends Item {
             //Main.LOGGER.info("Clicked on an IWire node");
             if (stack.has(Main.WIRE_INFO_COMPONENT)) {
                 WireInfoComponent comp = stack.get(Main.WIRE_INFO_COMPONENT);
-                if (comp != null && (!comp.originBlock().closerToCenterThan(pos, 16))) {
+                if (comp != null && (!comp.originBlock().closerToCenterThan(Vec3.atCenterOf(pos), 16))) {
                     if (context.getPlayer() instanceof ServerPlayer player) {
                         //player.sendMessageToClient(Text.of("!!Nodes are too far apart. Aborting!!"), false);
                         player.connection.send(new ClientboundSystemChatPacket(Component.literal("!!Nodes are too far apart. Aborting!!"),true));
