@@ -9,6 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
 
 public record AioSyncMacPacket(BlockPos pos, byte[] mac1, byte[] mac2, ResourceKey<Level> world) implements CustomPacketPayload {
     public static final Type<AioSyncMacPacket> ID = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(Main.namespace, "aio-sync-mac"));
@@ -20,5 +21,5 @@ public record AioSyncMacPacket(BlockPos pos, byte[] mac1, byte[] mac2, ResourceK
         AioSyncMacPacket::new
     );
     @Override
-    public Type<? extends CustomPacketPayload> type() {return ID;}
+    public @NonNull Type<? extends CustomPacketPayload> type() {return ID;}
 }
