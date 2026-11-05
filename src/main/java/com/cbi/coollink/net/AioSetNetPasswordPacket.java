@@ -1,25 +1,25 @@
 package com.cbi.coollink.net;
 
 import com.cbi.coollink.Main;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
-public record AioSetNetPasswordPacket(BlockPos pos, String newPassword, RegistryKey<World> world) implements CustomPayload {
-    public static final Id<AioSetNetPasswordPacket> ID = new CustomPayload.Id<>(Identifier.of(Main.namespace,"aio-set-net-password"));
-    public static final PacketCodec<RegistryByteBuf, AioSetNetPasswordPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC, AioSetNetPasswordPacket::pos,
-        PacketCodecs.STRING, AioSetNetPasswordPacket::newPassword,
-        PacketCodecs.registryCodec(World.CODEC), AioSetNetPasswordPacket::world,
+public record AioSetNetPasswordPacket(BlockPos pos, String newPassword, ResourceKey<Level> world) implements CustomPacketPayload {
+    public static final Type<AioSetNetPasswordPacket> ID = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(Main.namespace,"aio-set-net-password"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, AioSetNetPasswordPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC, AioSetNetPasswordPacket::pos,
+        ByteBufCodecs.STRING_UTF8, AioSetNetPasswordPacket::newPassword,
+        ByteBufCodecs.fromCodecWithRegistries(Level.RESOURCE_KEY_CODEC), AioSetNetPasswordPacket::world,
         AioSetNetPasswordPacket::new
     );
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 }
