@@ -32,6 +32,7 @@ import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -40,16 +41,22 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.SwingAnimation;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -233,13 +240,18 @@ public class Main implements ModInitializer {
             BlockPos pos = payload.pos();
             String password=payload.newPassword();
             //execute code on the server thread
-            RegistryKey<World> wrk=payload.world();
+            ResourceKey<Level> wrk=payload.world();
             context.server().execute(() ->{
-                BlockEntity be =context.server().getWorld(wrk).getBlockEntity(pos);
+                Level world = context.server().getLevel(wrk);
+                if(world == null){
+                    LOGGER.error("AioSetAdminPasswordPacket received invalid world!");
+                    return;
+                }
+                BlockEntity be = world.getBlockEntity(pos);
 
                 if(be instanceof AIOBlockEntity aio){
                     aio.password=password;
-                    aio.markDirty();
+                    aio.setChanged();
                     aio.updateStates();
                 }
             });
@@ -248,14 +260,19 @@ public class Main implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(AioSetSSIDPacket.ID, (payload, context) -> {
             BlockPos pos = payload.pos();
             String ssid=payload.newName();
-            RegistryKey<World> wrk=payload.world();
+            ResourceKey<Level> wrk=payload.world();
             //execute code on the server thread
             context.server().execute(() ->{
-                BlockEntity be =context.server().getWorld(wrk).getBlockEntity(pos);
+                Level world = context.server().getLevel(wrk);
+                if(world == null){
+                    LOGGER.error("AioSetSSIDPacket received invalid world");
+                    return;
+                }
+                BlockEntity be =world.getBlockEntity(pos);
 
                 if(be instanceof AIOBlockEntity aio){
                     aio.ssid=ssid;
-                    aio.markDirty();
+                    aio.setChanged();
                     aio.updateStates();
                 }
             });
@@ -264,14 +281,19 @@ public class Main implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(AioSetNetPasswordPacket.ID, (payload, context) -> {
             BlockPos pos = payload.pos();
             String netPass=payload.newPassword();
-            RegistryKey<World> wrk=payload.world();
+            ResourceKey<Level> wrk=payload.world();
             //execute code on the server thread
             context.server().execute(() ->{
-                BlockEntity be = context.server().getWorld(wrk).getBlockEntity(pos);
+                Level world = context.server().getLevel(wrk);
+                if(world == null){
+                    LOGGER.error("AioSetNetPasswordPacket received invalid world");
+                    return;
+                }
+                BlockEntity be = world.getBlockEntity(pos);
 
                 if(be instanceof AIOBlockEntity aio){
                     aio.netPass=netPass;
-                    aio.markDirty();
+                    aio.setChanged();
                     aio.updateStates();
                 }
             });
@@ -285,14 +307,14 @@ public class Main implements ModInitializer {
             context.server().execute(() -> {
                 ItemStack heldItem = null;
                 //they removed the get both hands at the same time method so saving them both into a tmp array is a good enough for now solution
-                for (ItemStack itemStack : new ItemStack[]{context.player().getMainHandStack(),context.player().getOffHandStack()}) {
+                for (ItemStack itemStack : new ItemStack[]{context.player().getItemInHand(InteractionHand.MAIN_HAND),context.player().getItemInHand(InteractionHand.OFF_HAND)}) {
                     if (itemStack.getItem().equals(itemFromClient.getItem())) {
                         heldItem = itemStack;
                         break;
                     }
                 }
                 if(heldItem!=null)
-                  heldItem.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+                  heldItem.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 
 
             });
@@ -301,14 +323,14 @@ public class Main implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(WireInfoDataPacket.ID ,(payload, context) -> {
             //check if the item has the component on it already
             ItemStack itemFromClient = payload.heldItem();
-            World world = context.player().getWorld();
-            if(world == null){
-                return;
-            }
+            Level world = context.player().level();
+//            if(world == null){
+//                return;
+//            }
             context.server().execute(() -> {
                 ItemStack heldItem = null;
                 //they removed the get both hands at the same time method so saving them both into a tmp array is a good enough for now solution
-                for (ItemStack itemStack : new ItemStack[]{context.player().getMainHandStack(),context.player().getOffHandStack()}) {
+                for (ItemStack itemStack : new ItemStack[]{context.player().getItemInHand(InteractionHand.MAIN_HAND),context.player().getItemInHand(InteractionHand.OFF_HAND)}) {
                     if (itemStack.getItem().equals(itemFromClient.getItem())) {
                         heldItem = itemStack;
                         break;
@@ -318,7 +340,7 @@ public class Main implements ModInitializer {
                     LOGGER.error("Player attempted to create wire info but were not holding the item they started with");
                     return;
                 }
-                if(heldItem.contains(WIRE_INFO_COMPONENT)){
+                if(heldItem.has(WIRE_INFO_COMPONENT)){
                     if(payload.clear()){
                         heldItem.remove(WIRE_INFO_COMPONENT);
                         return;
@@ -336,13 +358,13 @@ public class Main implements ModInitializer {
                         ((IWireNode) block2).setNode(payload.index(), startingWireInfo.index(),startingWireInfo.originBlock(),payload.wireType());
                     }
                     heldItem.remove(WIRE_INFO_COMPONENT);
-                    context.player().swingHand(context.player().getActiveHand(),true);
+                    context.player().swing(context.player().getUsedItemHand(), SwingAnimation.DEFAULT,true);
                 }else {
                     //starting the wire
                     heldItem.set(WIRE_INFO_COMPONENT, new WireInfoComponent(payload.index(), payload.originBlock()));
-                    context.player().swingHand(context.player().getActiveHand(), true);
+                    context.player().swing(context.player().getUsedItemHand(),SwingAnimation.DEFAULT, true);
                     BlockPos origin = payload.originBlock();
-                    context.player().networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.of("Starting " +payload.wireType().toString() + " Connection at: " + origin.getX() + ", " + origin.getY() + ", " + origin.getZ())));
+                    context.player().connection.send(new ClientboundSystemChatPacket(Component.literal("Starting " +payload.wireType().toString() + " Connection at: " + origin.getX() + ", " + origin.getY() + ", " + origin.getZ()),true));
                 }
             });
 
@@ -350,27 +372,32 @@ public class Main implements ModInitializer {
 
         ServerPlayNetworking.registerGlobalReceiver(UpdateConduitBlockCover.ID, (payload, context) -> {
             BlockPos pos = payload.position();
-            RegistryKey<World> wrk=payload.world();
-            BlockState ns = payload.state();
+            ResourceKey<Level> wrk=payload.world();
+            BlockState networkBlockState = payload.state();
             //execute code on the server thread
             context.server().execute(() ->{
-                BlockEntity be = context.server().getWorld(wrk).getBlockEntity(pos);
+                Level world = context.server().getLevel(wrk);
+                if(world == null){
+                    LOGGER.error("UpdateConduitBlockCover packet received invalid world");
+                    return;
+                }
+                BlockEntity be = world.getBlockEntity(pos);
                 if(be instanceof ConduitBlockEntity conduitBlockEntity){
-                    if(ns.getRegistryEntry().getIdAsString().equals("minecraft:air")){
+                    if(networkBlockState.isAir()){
                         conduitBlockEntity.setCoverBlock(null);
                     }else{
-                        conduitBlockEntity.setCoverBlock(ns);
+                        conduitBlockEntity.setCoverBlock(networkBlockState);
                     }
                 }
             });
         });
 
         ServerPlayNetworking.registerGlobalReceiver(WIFIClientIpPacket.ID,(wifiClientIpPacket, context) -> {
-            RegistryKey<World> wrk=wifiClientIpPacket.world();
+            ResourceKey<Level> wrk=wifiClientIpPacket.world();
             BlockPos apLocation = wifiClientIpPacket.accessPointPosition();
-            World world = context.server().getWorld(wrk);
+            Level world = context.server().getLevel(wrk);
             if(world == null){
-                LOGGER.error("Wold was null");
+                LOGGER.error("WIFIClientIpPacket received invalid world");
                 return;
             }
             context.server().execute(()->{
@@ -382,11 +409,11 @@ public class Main implements ModInitializer {
         });
 
         ServerPlayNetworking.registerGlobalReceiver(RequestAccessPointPositionsPacket.ID,(wifiClientIpPacket, context) -> {
-            RegistryKey<World> wrk=wifiClientIpPacket.world();
+            ResourceKey<Level> wrk=wifiClientIpPacket.world();
             BlockPos apLocation = wifiClientIpPacket.accessPointPosition();
-            World world = context.server().getWorld(wrk);
+            Level world = context.server().getLevel(wrk);
             if(world == null){
-                LOGGER.error("Wold was null");
+                LOGGER.error("RequestAccessPointPositionsPacket received invalid world");
                 return;
             }
             context.server().execute(()->{
@@ -398,11 +425,11 @@ public class Main implements ModInitializer {
         });
 
         ServerPlayNetworking.registerGlobalReceiver(ConnectToWifiNetworkRequestPacket.ID, (connectToWifiNetworkRequestPacket, context) -> {
-            RegistryKey<World> wrk=connectToWifiNetworkRequestPacket.world();
+            ResourceKey<Level> wrk=connectToWifiNetworkRequestPacket.world();
             BlockPos apLocation = connectToWifiNetworkRequestPacket.accessPointPosition();
-            World world = context.server().getWorld(wrk);
+            Level world = context.server().getLevel(wrk);
             if(world == null){
-                LOGGER.error("Wold was null");
+                LOGGER.error("ConnectToWifiNetworkRequestPacket received invalid world");
                 return;
             }
             context.server().execute(()->{
