@@ -90,7 +90,7 @@ public class AIOCableBundle extends Block {
                 }
             }
             BlockState s = world.getBlockState(pos.east());
-            if (world.getBlockState(pos.east()).getBlock() instanceof CoaxWallPortSingle &&(s.setValue(FACING).equals(Direction.WEST))) {//check if the neighbor block is a coax cable
+            if (world.getBlockState(pos.east()).getBlock() instanceof CoaxWallPortSingle &&(s.getValue(FACING).equals(Direction.WEST))) {//check if the neighbor block is a coax cable
                 //Main.LOGGER.info("Neighbor to east is coax");
                 world.setBlock(pos, state.setValue(east, true), UPDATE_ALL);//set this block as connecting to that neighbor block
             }
