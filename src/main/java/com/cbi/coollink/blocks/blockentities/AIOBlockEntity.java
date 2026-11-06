@@ -89,7 +89,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	//write
 	// Serialize the BlockEntity
 	@Override
-	protected void saveAdditional(ValueOutput view) {
+	protected void saveAdditional(@NonNull ValueOutput view) {
 		super.saveAdditional(view);
 		view.putInt("number", 89);
 		view.putString("password", Objects.requireNonNullElse(password, "password123456"));

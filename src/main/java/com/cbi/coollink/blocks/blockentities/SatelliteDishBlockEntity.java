@@ -7,23 +7,24 @@ import com.cbi.coollink.net.protocol.CoaxDataPacket;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.Heightmap;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.cbi.coollink.blocks.networkdevices.SatelliteDishBlock.MultiBlockPartStates.*;
 
 public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
     public SatelliteDishBlockEntity(BlockPos pos, BlockState state) {
@@ -33,44 +34,46 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
     LocalNode connection;
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
-        if(hasNode(getCachedState())){
-            Optional<ReadView> connectionCompound = view.getOptionalReadView("connection");
-            if(connectionCompound.isPresent() && connectionCompound.get().getOptionalInt(LocalNode.ID).isPresent()){
+    protected void loadAdditional(@NonNull ValueInput view) {
+        super.loadAdditional(view);
+        if(hasNode(getBlockState())){
+            Optional<ValueInput> connectionCompound = view.child("connection");
+            if(connectionCompound.isPresent() && connectionCompound.get().getInt(LocalNode.ID).isPresent()){
                 connection = new LocalNode(this,connectionCompound.get());
             }
         }
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        if(hasNode(getCachedState()) && connection != null){
-            WriteView connectionCompound = view.get("connection");
+    protected void saveAdditional(@NonNull ValueOutput view) {
+        if(hasNode(getBlockState()) && connection != null){
+            ValueOutput connectionCompound = view.child("connection");
             connection.write(connectionCompound);
         }
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
-    @Nullable
+    // Deserialize the BlockEntity
     @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
+    public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
+    /*
     @Override
     public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
         return createNbt(registryLookup);
     }
-
+*/
+    
     public void updateStates(){
-        if(world!=null) world.updateListeners(getBlockPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
+        if(level!=null) level.sendBlockUpdated(getBlockPos(),getBlockState(),getBlockState(), Block.UPDATE_CLIENTS);
     }
 
     @Override
-    public Vec3d getNodeOffset(int node) {
-        if(hasNode(getCachedState())){
-            return new Vec3d(0.5,0.5,0.5);
+    public Vec3 getNodeOffset(int node) {
+        if(hasNode(getBlockState())){
+            return new Vec3(0.5,0.5,0.5);
         }
         return null;
     }
@@ -84,7 +87,7 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
      */
     @Override
     public IWireNode getWireNode(int index) {
-        if(hasNode(getCachedState())) {
+        if(hasNode(getBlockState())) {
             return this;
         }
         return (IWireNode) getActiveBlock();
@@ -92,7 +95,7 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
 
     @Override
     public int getOtherNodeIndex(int index) {
-        if(hasNode(getCachedState())){
+        if(hasNode(getBlockState())){
             return connection.getOtherIndex();
         }
         return 0;
@@ -107,7 +110,7 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
      */
     @Override
     public LocalNode getLocalNode(int index) {
-        if(hasNode(getCachedState())){
+        if(hasNode(getBlockState())){
             return connection;
         }
         return null;
@@ -115,11 +118,11 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
 
     @Override
     public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
-        if(hasNode(getCachedState())){
+        if(hasNode(getBlockState())){
             connection = new LocalNode(this, index, otherNode, type, pos);
-            markDirty();
-            if(world != null)
-                world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
+            setChanged();
+            if(level != null)
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
         }
     }
 
@@ -131,11 +134,11 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
      */
     @Override
     public void removeNode(int index, boolean dropWire) {
-        if(hasNode(getCachedState())){
+        if(hasNode(getBlockState())){
             connection = null;
-            markDirty();
-            if(world != null)
-                world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
+            setChanged();
+            if(level != null)
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
         }
     }
 
@@ -189,17 +192,17 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
             if(coaxData.isRequestOnline()){
                 boolean online = false;
                 //check assembled
-                boolean assembled = Objects.requireNonNull(getWorld()).getBlockState(getBlockPos()).get(Main.ASSEMBLED_BOOLEAN_PROPERTY);
+                boolean assembled = Objects.requireNonNull(getLevel()).getBlockState(getBlockPos()).hasProperty(Main.ASSEMBLED_BOOLEAN_PROPERTY);
                 if(assembled){
                     //check if there is sky axis
                     BlockPos thisBlockPos = getBlockPos();
                     BlockPos thisBlockPos2 = thisBlockPos.south();
                     BlockPos thisBlockPos3 = thisBlockPos.east();
                     BlockPos thisBlockPos4 = thisBlockPos2.east();
-                    int topBlock = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos.getX(),thisBlockPos.getZ());
-                    int topBlock2 = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos2.getX(),thisBlockPos2.getZ());
-                    int topBlock3 = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos3.getX(),thisBlockPos3.getZ());
-                    int topBlock4 = Objects.requireNonNull(getWorld()).getTopY(Heightmap.Type.WORLD_SURFACE,thisBlockPos4.getX(),thisBlockPos4.getZ());
+                    int topBlock = Objects.requireNonNull(getLevel()).getHeight(Heightmap.Types.WORLD_SURFACE,thisBlockPos.getX(),thisBlockPos.getZ());
+                    int topBlock2 = Objects.requireNonNull(getLevel()).getHeight(Heightmap.Types.WORLD_SURFACE,thisBlockPos2.getX(),thisBlockPos2.getZ());
+                    int topBlock3 = Objects.requireNonNull(getLevel()).getHeight(Heightmap.Types.WORLD_SURFACE,thisBlockPos3.getX(),thisBlockPos3.getZ());
+                    int topBlock4 = Objects.requireNonNull(getLevel()).getHeight(Heightmap.Types.WORLD_SURFACE,thisBlockPos4.getX(),thisBlockPos4.getZ());
                     int aboveThisBlock = getBlockPos().getY()+2;
                     if(topBlock == aboveThisBlock && topBlock2 == aboveThisBlock && topBlock3 == aboveThisBlock && topBlock4 == aboveThisBlock){
                         //sky axis
@@ -218,7 +221,7 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
 
     @Override
     public int getNodeCount() {
-        BlockState state = getCachedState();
+        BlockState state = getBlockState();
         if(hasNode(state)){
             return 1;
         }else {
@@ -232,38 +235,40 @@ public class SatelliteDishBlockEntity extends BlockEntity implements IWireNode {
     }
 
     private boolean hasNode(BlockState state){
-        return state.get(Main.ASSEMBLED_BOOLEAN_PROPERTY) && state.get(SatelliteDishBlock.multiBlockPose) == SatelliteDishBlock.MultiBlockPartStates.D1;
+        return state.getValue(Main.ASSEMBLED_BOOLEAN_PROPERTY) && state.getValue(SatelliteDishBlock.multiBlockPose) == D1;
     }
 
     public BlockEntity getActiveBlock(){
-        BlockState state = getCachedState();
-        if(!state.get(Main.ASSEMBLED_BOOLEAN_PROPERTY)){
+        BlockState state = getBlockState();
+        if(!state.getValue(Main.ASSEMBLED_BOOLEAN_PROPERTY)){
             return null;
         }
-        if(world == null){
+        if(level == null){
             return null;
         }
-        switch(state.get(SatelliteDishBlock.multiBlockPose)){
-            case D1 -> Main.LOGGER.info(pos.toString());
-            case D2 -> Main.LOGGER.info(pos.add(-1,0,0)  .toString());
-            case D3 -> Main.LOGGER.info(pos.add(-1,0,-1) .toString());
-            case D4 -> Main.LOGGER.info(pos.add(0,0,-1)  .toString());
-            case U1 -> Main.LOGGER.info(pos.add(0,-1,0)  .toString());
-            case U2 -> Main.LOGGER.info(pos.add(-1,-1,0) .toString());
-            case U3 -> Main.LOGGER.info(pos.add(-1,-1,-1).toString());
-            case U4 -> Main.LOGGER.info(pos.add(0,-1,-1) .toString());
+        switch(state.getValue(SatelliteDishBlock.multiBlockPose)){
+            case D1 -> Main.LOGGER.info(getBlockPos().toString());
+            case D2 -> Main.LOGGER.info(getBlockPos().offset(-1,0,0)  .toString());
+            case D3 -> Main.LOGGER.info(getBlockPos().offset(-1,0,-1) .toString());
+            case D4 -> Main.LOGGER.info(getBlockPos().offset(0,0,-1)  .toString());
+            case U1 -> Main.LOGGER.info(getBlockPos().offset(0,-1,0)  .toString());
+            case U2 -> Main.LOGGER.info(getBlockPos().offset(-1,-1,0) .toString());
+            case U3 -> Main.LOGGER.info(getBlockPos().offset(-1,-1,-1).toString());
+            case U4 -> Main.LOGGER.info(getBlockPos().offset(0,-1,-1) .toString());
 
+            default ->
+                    Main.LOGGER.error("How did you get here? Value:"+state.getValue(SatelliteDishBlock.multiBlockPose));
         }
-        return switch(state.get(SatelliteDishBlock.multiBlockPose)){
+        return switch(state.getValue(SatelliteDishBlock.multiBlockPose)){
             case D1 -> this;
-            case D2 -> world.getBlockEntity(pos.add(-1,0,0));
-            case D3 -> world.getBlockEntity(pos.add(-1,0,-1));
-            case D4 -> world.getBlockEntity(pos.add(0,0,-1));
-            case U1 -> world.getBlockEntity(pos.add(0,-1,0));
-            case U2 -> world.getBlockEntity(pos.add(-1,-1,0));
-            case U3 -> world.getBlockEntity(pos.add(-1,-1,-1));
-            case U4 -> world.getBlockEntity(pos.add(0,-1,-1));
-            case null, default -> null;
+            case D2 -> level.getBlockEntity(getBlockPos().offset(-1,0,0));
+            case D3 -> level.getBlockEntity(getBlockPos().offset(-1,0,-1));
+            case D4 -> level.getBlockEntity(getBlockPos().offset(0,0,-1));
+            case U1 -> level.getBlockEntity(getBlockPos().offset(0,-1,0));
+            case U2 -> level.getBlockEntity(getBlockPos().offset(-1,-1,0));
+            case U3 -> level.getBlockEntity(getBlockPos().offset(-1,-1,-1));
+            case U4 -> level.getBlockEntity(getBlockPos().offset(0,-1,-1));
+            default -> null;
         };
 
     }
