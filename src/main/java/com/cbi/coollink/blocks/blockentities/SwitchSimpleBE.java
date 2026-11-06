@@ -9,21 +9,20 @@ import com.cbi.coollink.net.protocol.Mac;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -52,15 +51,15 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
     private final ArrayList<Mac>[] switchingTables = new ArrayList[]{new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>()};
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
-        WriteView.ListView connections = view.getList("connections");
+    protected void saveAdditional(@NonNull ValueOutput view) {
+        super.saveAdditional(view);
+        ValueOutput.ValueOutputList connections = view.childrenList("connections");
         //WriteView.ListAppender<LocalNodeConnection> listAppender = view.getListAppender("connections", LocalNodeConnection.CODEC);
         for(int i=0;i<nodeCount;i++){
             if(localNodes[i]==null){
-                connections.add();
+                connections.addChild();
             }else{
-                WriteView connection = connections.add();
+                ValueOutput connection = connections.addChild();
                 localNodes[i].write(connection);
             }
         }
@@ -69,16 +68,16 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
     }//Writing data
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
-        ReadView.ListReadView lrv = view.getListReadView("connections");
-        List<ReadView> connectionNodes = lrv.stream().toList();
+    protected void loadAdditional(@NonNull ValueInput view) {
+        super.loadAdditional(view);
+        ValueInput.ValueInputList lrv = view.childrenListOrEmpty("connections");
+        List<ValueInput> connectionNodes = lrv.stream().toList();
 
         for (int i=0;i<nodeCount;i++){
             if(i < connectionNodes.size()){
-                ReadView cn = connectionNodes.get(i);
+                ValueInput cn = connectionNodes.get(i);
 
-                if(cn.getOptionalInt(LocalNode.ID).isEmpty()){
+                if(cn.childrenListOrEmpty(LocalNode.ID).isEmpty()){
                     isNodeUsed[i] = false;
                 }else{
                     localNodes[i]=new LocalNode(this , cn);
@@ -91,7 +90,7 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
     }//reading data
 
     @Override
-    public Vec3d getNodeOffset(int node) {
+    public Vec3 getNodeOffset(int node) {
         double node0XN = 0.3;
         double node1XN = 0.4;
         double node2XN = 0.5;
@@ -99,14 +98,14 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
         double node4XN = 0.7;
         double nodeZN = 0.625;
         double nodeY = .04  ;
-        Vec3d[][] nodes = {
-                {new Vec3d(node0XN,nodeY,nodeZN), new Vec3d(node1XN,nodeY,nodeZN), new Vec3d(node2XN,nodeY,nodeZN), new Vec3d(node3XN,nodeY,nodeZN), new Vec3d(node4XN,nodeY,nodeZN) },// - - - - - - - - - - - - - - NORTH
-                {new Vec3d(1-nodeZN,nodeY,node0XN), new Vec3d(1-nodeZN,nodeY,node1XN), new Vec3d(1-nodeZN,nodeY,node2XN), new Vec3d(1-nodeZN,nodeY,node3XN), new Vec3d(1-nodeZN,nodeY,node4XN) },// - - - - - - - EAST
-                {new Vec3d(1-node0XN,nodeY,1-nodeZN), new Vec3d(1-node1XN,nodeY,1-nodeZN), new Vec3d(1-node2XN,nodeY,1-nodeZN), new Vec3d(1-node3XN,nodeY,1-nodeZN), new Vec3d(1-node4XN,nodeY,1-nodeZN) },// SOUTH
-                {new Vec3d(nodeZN,nodeY,1-node0XN), new Vec3d(nodeZN,nodeY,1-node1XN), new Vec3d(nodeZN,nodeY,1-node2XN), new Vec3d(nodeZN,nodeY,1-node3XN), new Vec3d(nodeZN,nodeY,1-node4XN) } // - - - - - - - WEST
+        Vec3[][] nodes = {
+                {new Vec3(node0XN,nodeY,nodeZN), new Vec3(node1XN,nodeY,nodeZN), new Vec3(node2XN,nodeY,nodeZN), new Vec3(node3XN,nodeY,nodeZN), new Vec3(node4XN,nodeY,nodeZN) },// - - - - - - - - - - - - - - NORTH
+                {new Vec3(1-nodeZN,nodeY,node0XN), new Vec3(1-nodeZN,nodeY,node1XN), new Vec3(1-nodeZN,nodeY,node2XN), new Vec3(1-nodeZN,nodeY,node3XN), new Vec3(1-nodeZN,nodeY,node4XN) },// - - - - - - - EAST
+                {new Vec3(1-node0XN,nodeY,1-nodeZN), new Vec3(1-node1XN,nodeY,1-nodeZN), new Vec3(1-node2XN,nodeY,1-nodeZN), new Vec3(1-node3XN,nodeY,1-nodeZN), new Vec3(1-node4XN,nodeY,1-nodeZN) },// SOUTH
+                {new Vec3(nodeZN,nodeY,1-node0XN), new Vec3(nodeZN,nodeY,1-node1XN), new Vec3(nodeZN,nodeY,1-node2XN), new Vec3(nodeZN,nodeY,1-node3XN), new Vec3(nodeZN,nodeY,1-node4XN) } // - - - - - - - WEST
         };
         int dir = 0;
-        switch (getCachedState().get(Properties.HORIZONTAL_FACING)){
+        switch (getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)){
             case EAST -> dir=1;
             case SOUTH -> dir=2;
             case WEST -> dir=3;
@@ -135,17 +134,17 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
     public void setNode(int index, int otherNode, BlockPos pos, WireType type) {
         this.localNodes[index] = new LocalNode(this, index, otherNode, type, pos);
         isNodeUsed[index]=true;
-        markDirty();
-        assert world != null;
-        world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
+        setChanged();
+        assert level != null;
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
     }//setting the node status
 
     @Override
     public void removeNode(int index, boolean dropWire) {
         this.localNodes[index] = null;
-        markDirty();
-        assert world != null;
-        world.updateListeners(getBlockPos(), getCachedState(), getCachedState(), 0);
+        setChanged();
+        assert level != null;
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
         this.setIsNodeUsed(index,false);
     }//Removing the wire
 
@@ -205,11 +204,11 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
             if(connectionIndex != routerPort){
                 switchingTables[connectionIndex].add(ipPacket.getSourceMacAddress());
             }
-            World w = getWorld();
+            Level w = getLevel();
             if(w == null){
                 return;
             }
-            incomingPackets.add(new IncomingPacket(ipPacket, w.getTime()));
+            incomingPackets.add(new IncomingPacket(ipPacket, w.getGameTime()));
         }
     }
 
@@ -228,20 +227,21 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
 
     @SuppressWarnings("unused")
     public void updateStates(){
-        if(world!=null) world.updateListeners(getBlockPos(),getCachedState(),getCachedState(), Block.NOTIFY_LISTENERS);
-    }//notifies the world of updates to the block state
+        if(level!=null) level.sendBlockUpdated(getBlockPos(),getBlockState(),getBlockState(), Block.UPDATE_CLIENTS);
+    }//notifies the level of updates to the block state
 
-    @Nullable
+    // Deserialize the BlockEntity
     @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
+    public @org.jspecify.annotations.Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
+/*
     @Override
     public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
         return createNbt(registryLookup);
     }//Rendering crucial
-
+*/
     @Override
     public void switchProcessPacketQueue() {
         for(int i = 0; i<15 && !switchingQueue.isEmpty(); i++){
@@ -319,8 +319,8 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
         }
     }
 
-    public static void tick(World world, BlockPos blockPos, BlockState blockState, SwitchSimpleBE switchBE) {
-        if(world.isClient){
+    public static void tick(Level world, BlockPos blockPos, BlockState blockState, SwitchSimpleBE switchBE) {
+        if(world.isClientSide()){
             return;
         }
         switchBE.routerCheckCounter ++;
@@ -331,7 +331,7 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
 
         //prevent packets that just came in from being instantly transmitted
 
-        long currentTime = world.getTime();
+        long currentTime = world.getGameTime();
         //go through all the incoming packets
         for(int i=0;i<switchBE.incomingPackets.size();i++){
             //if the packet did not come in the current tick
