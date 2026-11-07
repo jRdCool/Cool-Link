@@ -2,26 +2,28 @@ package com.cbi.coollink.blocks.conduits;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 public class SmallConduit extends Conduit {
 
-    public static final Identifier ID = Identifier.of(Main.namespace,"small_conduit");
-    public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
-    public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
-    public static final SmallConduit ENTRY = new SmallConduit(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"small_conduit");
+    public static final ResourceKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+    public static final ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+    public static final SmallConduit ENTRY = new SmallConduit(BlockBehaviour.Properties.of().strength(0.5f));
 
 
     //cableShape is an integer that is used to switch between the models
@@ -34,40 +36,40 @@ public class SmallConduit extends Conduit {
     //  6 = SW
     //  7 = NW
 
-    public SmallConduit(Settings settings) {
+    public SmallConduit(BlockBehaviour.Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState()
-                .with(cableLevel,1)
+        registerDefaultState(defaultBlockState()
+                .setValue(cableLevel,1)
         );
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
-        VoxelShape shape= VoxelShapes.empty();
-        if(state.get(Conduit.HIDDEN)){
-            shape = VoxelShapes.cuboid(0,0,0,1,1,1);
+    protected @NonNull VoxelShape getShape(BlockState state, @NonNull BlockGetter level, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+        VoxelShape shape= Shapes.empty();
+        if(state.getValue(Conduit.HIDDEN)){
+            shape = Shapes.box(0,0,0,1,1,1);
         }else {
             //use a different hit box based on the rotation of the block
-            if (state.get(cableShape) == 0) {
-                shape = VoxelShapes.union(shape, makeShapeNS());
+            if (state.getValue(cableShape) == 0) {
+                shape = Shapes.join(shape, makeShapeNS(), BooleanOp.OR);
             }
-            if (state.get(cableShape) == 1) {
-                shape = VoxelShapes.union(shape, makeShapeEW());
+            if (state.getValue(cableShape) == 1) {
+                shape = Shapes.join(shape, makeShapeEW(), BooleanOp.OR);
             }
-            if (state.get(cableShape) == 2) {
+            if (state.getValue(cableShape) == 2) {
                 shape = junctionBoxVoxel();
             }
-            if (state.get(cableShape) == 4) {
-                shape = VoxelShapes.union(shape, makeShapeNE());
+            if (state.getValue(cableShape) == 4) {
+                shape = Shapes.join(shape, makeShapeNE(), BooleanOp.OR);
             }
-            if (state.get(cableShape) == 5) {
-                shape = VoxelShapes.union(shape, makeShapeSE());
+            if (state.getValue(cableShape) == 5) {
+                shape = Shapes.join(shape, makeShapeSE(), BooleanOp.OR);
             }
-            if (state.get(cableShape) == 6) {
-                shape = VoxelShapes.union(shape, makeShapeSW());
+            if (state.getValue(cableShape) == 6) {
+                shape = Shapes.join(shape, makeShapeSW(), BooleanOp.OR);
             }
-            if (state.get(cableShape) == 7) {
-                shape = VoxelShapes.union(shape, makeShapeNW());
+            if (state.getValue(cableShape) == 7) {
+                shape = Shapes.join(shape, makeShapeNW(), BooleanOp.OR);
             }
             if (shape.isEmpty()) {
                 shape = makeShapeNS();
@@ -77,47 +79,47 @@ public class SmallConduit extends Conduit {
     }
 
     public VoxelShape makeShapeNS() {
-        VoxelShape shape = VoxelShapes.empty();
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.4375, 0, 0, 0.4375, 0.125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.5625, 0, 0, 0.5625, 0.125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.4375, 0, 0, 0.5625, 0, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.44375, 0.000625, 0, 0.55625, 0.113125, 1));
+        VoxelShape shape = Shapes.empty();
+        shape = Shapes.join(shape, Shapes.box(0.4375, 0, 0, 0.4375, 0.125, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.5625, 0, 0, 0.5625, 0.125, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.4375, 0, 0, 0.5625, 0, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.44375, 0.000625, 0, 0.55625, 0.113125, 1), BooleanOp.OR);
         return shape;
     }
 
     public VoxelShape makeShapeEW() {
-        VoxelShape shape = VoxelShapes.empty();
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.5625, 1, 0.125, 0.5625));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.4375, 1, 0.125, 0.4375));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.4375, 1, 0, 0.5625));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0.000625, 0.44375, 1, 0.113125, 0.55625));
+        VoxelShape shape = Shapes.empty();
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0.5625, 1, 0.125, 0.5625), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0.4375, 1, 0.125, 0.4375), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0.4375, 1, 0, 0.5625), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0.000625, 0.44375, 1, 0.113125, 0.55625), BooleanOp.OR);
         return shape;
     }
 
     public VoxelShape makeShapeNE() {
-        VoxelShape shape = VoxelShapes.empty();
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.4375, 0, 0, 0.5625, 0.125, 0.5625));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.5625, 0, 0.4375, 1, 0.125, 0.5625));
+        VoxelShape shape = Shapes.empty();
+        shape = Shapes.join(shape, Shapes.box(0.4375, 0, 0, 0.5625, 0.125, 0.5625), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.5625, 0, 0.4375, 1, 0.125, 0.5625), BooleanOp.OR);
         return shape;
     }
 
     public VoxelShape makeShapeSE() {
-        VoxelShape shape = VoxelShapes.empty();
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.4375, 0, 0.4375, 1, 0.125, 0.5625));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.4375, 0, 0.5625, 0.5625, 0.125, 1));
+        VoxelShape shape = Shapes.empty();
+        shape = Shapes.join(shape, Shapes.box(0.4375, 0, 0.4375, 1, 0.125, 0.5625), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.4375, 0, 0.5625, 0.5625, 0.125, 1), BooleanOp.OR);
         return shape;
     }
 
     public VoxelShape makeShapeSW() {
-        VoxelShape shape = VoxelShapes.empty();
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.4375, 0, 0.4375, 0.5625, 0.125, 1));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.4375, 0.4375, 0.125, 0.5625));
+        VoxelShape shape = Shapes.empty();
+        shape = Shapes.join(shape, Shapes.box(0.4375, 0, 0.4375, 0.5625, 0.125, 1), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0.4375, 0.4375, 0.125, 0.5625), BooleanOp.OR);
         return shape;
     }
     public VoxelShape makeShapeNW() {
-        VoxelShape shape = VoxelShapes.empty();
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0, 0, 0.4375, 0.5625, 0.125, 0.5625));
-        shape = VoxelShapes.union(shape, VoxelShapes.cuboid(0.4375, 0, 0, 0.5625, 0.125, 0.4375));
+        VoxelShape shape = Shapes.empty();
+        shape = Shapes.join(shape, Shapes.box(0, 0, 0.4375, 0.5625, 0.125, 0.5625), BooleanOp.OR);
+        shape = Shapes.join(shape, Shapes.box(0.4375, 0, 0, 0.5625, 0.125, 0.4375), BooleanOp.OR);
         return shape;
     }
 
@@ -125,7 +127,7 @@ public class SmallConduit extends Conduit {
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
         return new ConduitBlockEntity(pos, state, Main.SMALL_CONDUIT_BLOCK_ENTITY);
     }
 }
