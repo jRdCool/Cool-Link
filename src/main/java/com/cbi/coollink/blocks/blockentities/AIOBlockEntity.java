@@ -359,7 +359,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 			//handle packet
 			handleRouterPacket(data);
 		}else {
-			//otherwise send this indo the switching queue
+			//otherwise send this into the switching queue
 			switchingPacketQueue.add(data);
 		}
 
@@ -718,7 +718,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	public record ConnectedDevice(String ipAddress, Mac deviceMac, String deviceName, int[] connectionTimer){
 
 		@Override
-		public String toString() {
+		public @NonNull String toString() {
 			return "ConnectedDevice{" +
 					"ipAddress='" + ipAddress + '\'' +
 					", deviceMac=" + deviceMac +

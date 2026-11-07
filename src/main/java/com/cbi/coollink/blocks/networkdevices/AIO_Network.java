@@ -8,11 +8,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
@@ -43,10 +46,6 @@ public class AIO_Network extends BaseEntityBlock {
 		super(settings);
 	}
 
-	@Override
-	protected MapCodec<? extends BlockWithEntity> getCodec() {
-		return createCodec(AIO_Network::new);
-	}
 
 
 	//this function is used to create the in game hit box of the block.
@@ -162,13 +161,16 @@ public class AIO_Network extends BaseEntityBlock {
 	}
 
 
+
+
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NonNull Level world, @NonNull BlockState state, @NonNull BlockEntityType<T> type) {
-		return validateTicker(type, Main.AIO_BLOCK_ENTITY, AIOBlockEntity::tick);
+		return createTickerHelper(type, Main.AIO_BLOCK_ENTITY, AIOBlockEntity::tick);
 	}
 
+
 	@Override
-	public BlockState onBreak(Level world, BlockPos pos, BlockState state, Player player) {
+	public void destroy(LevelAccessor world, @NonNull BlockPos pos, @NonNull BlockState state) {
 		//delete both ends of the connection when the block is broken
 		BlockEntity be = world.getBlockEntity(pos);
 		if(be instanceof IWireNode self){
@@ -180,22 +182,24 @@ public class AIO_Network extends BaseEntityBlock {
 				}
 			}
 		}
-		return super.onBreak(world,pos,state,player);
+		super.destroy(world,pos,state);
 	}
 
+
+
 	@Override
-	protected void onExploded(BlockState state, ServerWorld world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+	protected void onExplosionHit(@NonNull BlockState state, ServerLevel level, @NonNull BlockPos pos, @NonNull Explosion explosion, @NonNull BiConsumer<ItemStack, BlockPos> onHit) {
 		//delete both ends of the connection when the block is broken
-		BlockEntity be = world.getBlockEntity(pos);
+		BlockEntity be = level.getBlockEntity(pos);
 		if(be instanceof IWireNode self){
 			for(int i=0;i<self.getNodeCount();i++){
 				if(!self.hasConnection(i)) continue;
-				BlockEntity obe =  world.getBlockEntity(self.getLocalNode(i).getTargetPos());
+				BlockEntity obe =  level.getBlockEntity(self.getLocalNode(i).getTargetPos());
 				if(obe instanceof IWireNode other) {
 					other.removeNode(self.getOtherNodeIndex(i));
 				}
 			}
 		}
-		super.onExploded(state, world, pos, explosion, stackMerger);
+		super.onExplosionHit(state, level, pos, explosion, onHit);
 	}
 }
