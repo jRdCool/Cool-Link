@@ -3,80 +3,67 @@ package com.cbi.coollink.blocks.networkdevices;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.RedstoneControllerWiredBE;
 import com.cbi.coollink.rendering.IWireNode;
-import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.enums.WireConnection;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.*;
-import net.minecraft.world.explosion.Explosion;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.random.WeightedRandom;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.BiConsumer;
 
-import static net.minecraft.state.property.Properties.FACING;
-import static net.minecraft.state.property.Properties.POWERED;
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
 
-public abstract class RedstoneControllerWired extends BlockWithEntity implements BlockEntityProvider {
+public abstract class RedstoneControllerWired extends BaseEntityBlock {
 
-    public static final IntProperty POWER;
+    public static final IntegerProperty POWER;
     static {
-        POWER = Properties.POWER;
+        POWER = BlockStateProperties.POWER;
     }
     private boolean wiresGivePower = true;
-    protected static final BooleanProperty POWERED = Properties.POWERED;
+    protected static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
 
     //private static final int REGULAR_POWER_DELAY = 8;
 
     //private static final int RECOVERABLE_POWER_DELAY = 20;
 
-    protected RedstoneControllerWired(AbstractBlock.Settings settings) {
+    protected RedstoneControllerWired(BlockBehaviour.Properties settings) {
         super(settings);
-        this.setDefaultState((this.stateManager.getDefaultState())
-                .with(POWER, 0)
-                .with(FACING, Direction.SOUTH)
-                .with(POWERED,false));
+        registerDefaultState(defaultBlockState()
+                .setValue(POWER, 0)
+                .setValue(FACING, Direction.SOUTH)
+                .setValue(POWERED,false));
     }//Constructor
-
-    @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return null;
-    }
 
     @Nullable
     @Override
-    public abstract BlockEntity createBlockEntity(BlockPos pos, BlockState state);
+    public abstract BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state);
 
-    public void setPower(WorldAccess world, BlockState state, int power, BlockPos pos, int delay) {
-        world.setBlockState(pos, state.with(POWER, power), 3);
+    public void setPower(LevelAccessor world, BlockState state, int power, BlockPos pos, int delay) {
+        world.setBlock(pos, state.setValue(POWER, power), 3);
         world.scheduleBlockTick(pos, state.getBlock(), delay);
     }
 
 
-    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (state.get(POWER) != 0) {
-            //world.setBlockState(pos, state.with(POWER, 0), 3);
-            state.with(POWER,world.getReceivedRedstonePower(pos));
+    protected void scheduledTick(BlockState state, ServerLevel world, BlockPos pos, WeightedRandom random) {
+        if (state.getValue(POWER) != 0) {
+            //world.setBlockState(pos, state.setValue(POWER, 0), 3);
+            state.setValue(POWER,world.getDirectSignalTo(pos));
         }
     }
 
-    protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-        return state.get(POWER);
+
+    protected int getWeakRedstonePower(BlockState state, view world, BlockPos pos, Direction direction) {
+        return state.getValue(POWER);
     }
 
     protected int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
@@ -93,7 +80,7 @@ public abstract class RedstoneControllerWired extends BlockWithEntity implements
     protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         if (!world.isClient() && !state.isOf(oldState.getBlock())) {
             if (state.get(POWER) > 0 && !world.getBlockTickScheduler().isQueued(pos, this)) {
-                world.setBlockState(pos, state.with(POWER, 0), 18);
+                world.setBlockState(pos, state.setValue(POWER, 0), 18);
             }
 
         }
