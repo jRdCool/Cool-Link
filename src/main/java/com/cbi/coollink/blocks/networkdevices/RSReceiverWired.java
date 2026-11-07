@@ -1,61 +1,62 @@
 package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.blocks.blockentities.RedstoneControllerWiredBE;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.RedstoneView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.tick.ScheduledTickView;
+import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
-import static net.minecraft.state.property.Properties.FACING;
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
 
 public class RSReceiverWired extends RedstoneControllerWired {
-    public RSReceiverWired(Settings settings) {
+    public RSReceiverWired(BlockBehaviour.Properties settings) {
         super(settings);
-        this.setDefaultState((this.stateManager.getDefaultState()).with(RECEIVED_POWER,0));
+        registerDefaultState(defaultBlockState()
+                .setValue(RECEIVED_POWER,0)
+        );
 
     }
 
 
-    public static final IntProperty RECEIVED_POWER = IntProperty.of("received_power",0,15);
-    public static final Identifier ID = Identifier.of(Main.namespace,"redstone_receiver_wired");
-    public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
-    public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
-    public static final RSReceiverWired ENTRY = new RSReceiverWired(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
+    public static final IntegerProperty RECEIVED_POWER = IntegerProperty.create("received_power",0,15);
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"redstone_receiver_wired");
+    public static final ResourceKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+    public static final ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+    public static final RSReceiverWired ENTRY = new RSReceiverWired(BlockBehaviour.Properties.of().strength(0.5f));
 
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new RedstoneControllerWiredBE(pos,state,Main.RS_RECEIVER_WIRED_BLOCK_ENTITY);
+    public BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
+        return new ServerRackBlockEntity(pos,state);
     }
 
     @Override
     public boolean emitsRedstonePower(BlockState state) {return false;}
 
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING)
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateManager) {
+        stateManager.add(FACING)
                 .add(RECEIVED_POWER);
-        super.appendProperties(builder);
+        super.createBlockStateDefinition(stateManager);
     }
 
-
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    @Override
+    protected @NonNull BlockState updateShape(@NonNull BlockState state, @NonNull LevelReader level, @NonNull ScheduledTickAccess ticks, @NonNull BlockPos pos, @NonNull Direction directionToNeighbour, @NonNull BlockPos neighbourPos, @NonNull BlockState neighbourState, @NonNull RandomSource random) {
         //Main.LOGGER.info(neighborPos.toString());
-        return shouldPower(world,pos,direction);
+        return shouldPower(level,pos,directionToNeighbour);
 
         //super.onStateReplaced(state,world);
         /*if (direction == Direction.DOWN) {
@@ -63,48 +64,49 @@ public class RSReceiverWired extends RedstoneControllerWired {
         } else if (direction == Direction.UP) {
             return this.getPlacementState(world, state, pos);
         } else {
-            WireConnection wireConnection = this.getRenderConnectionType(world, pos, direction);
-            return wireConnection.isConnected() == ((WireConnection)state.get((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction))).isConnected() && !isFullyConnected(state) ? (BlockState)state.with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction), wireConnection) : this.getPlacementState(world, (BlockState)((BlockState)this.dotState.with(POWER, (Integer)state.get(POWER))).with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction), wireConnection), pos);
+            WireConnection wireConnection = this.getRenderConnectionType(world, pos, directionToNeighbour);
+            return wireConnection.isConnected() == ((WireConnection)state.get((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(directionToNeighbour))).isConnected() && !isFullyConnected(state) ? (BlockState)state.with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(directionToNeighbour), wireConnection) : this.getPlacementState(world, (BlockState)((BlockState)this.dotState.with(POWER, (Integer)state.get(POWER))).with((Property)DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(directionToNeighbour), wireConnection), pos);
         }*/
     }
 
-    protected BlockState shouldPower(RedstoneView world, BlockPos pos, Direction direction) {
-        if(world.isReceivingRedstonePower(pos)){
+    protected BlockState shouldPower(LevelReader world, BlockPos pos, Direction direction) {
+        if(world.hasNeighborSignal(pos)){
 
-            return world.getBlockState(pos).with(RECEIVED_POWER,world.getEmittedRedstonePower(pos,direction));//.with(POWERED,true);
+            return world.getBlockState(pos).setValue(RECEIVED_POWER,world.getSignal(pos,direction));//.with(POWERED,true);
 
         }
-        return world.getBlockState(pos).with(RECEIVED_POWER,0);//.with(POWERED,false);
+        return world.getBlockState(pos).setValue(RECEIVED_POWER,0);//.with(POWERED,false);
     }
 //
 
 
     @Override
-    public BlockState getAppearance(BlockState state, BlockRenderView renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos) {
+    public @NonNull BlockState getAppearance(@NonNull BlockState state, @NonNull BlockAndLightGetter renderView, @NonNull BlockPos pos, @NonNull Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos) {
         return super.getAppearance(state, renderView, pos, side, sourceState, sourcePos);
     }
 
-    protected boolean onSyncedBlockEvent(BlockState state, World world, BlockPos pos, int type, int data) {
-        if(!world.isClient) {
-            shouldPower(world, pos, state.get(FACING));
+    protected boolean onSyncedBlockEvent(BlockState state, Level world, BlockPos pos, int type, int data) {
+        if(!world.isClientSide()) {
+            shouldPower(world, pos, state.getValue(FACING));
             Main.LOGGER.info("State: " + state + " World: " + world + "\n BlockPos: " + pos + "\ntype: " + type + " data" + data);
 
         }
         return true;
     }
 
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
-        if (!world.isClient) {
-            this.shouldPower(world, pos, state.get(FACING));
+    protected void neighborChanged(@NonNull BlockState state, Level world, @NonNull BlockPos pos, @NonNull Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
+        if (!world.isClientSide()) {
+            this.shouldPower(world, pos, state.getValue(FACING));
         }
 
-        boolean receivingPower = world.isReceivingRedstonePower(pos) || world.isReceivingRedstonePower(pos.up());
-        boolean isPowered = state.get(POWERED);
+
+        boolean receivingPower = world.hasNeighborSignal(pos) || world.hasNeighborSignal(pos.above());
+        boolean isPowered = state.getValue(POWERED);
         if (receivingPower && !isPowered) {
-            world.scheduleBlockTick(pos, this, 4);
-            world.setBlockState(pos, state.with(POWERED, true), 2);
+            world.scheduleTick(pos, this, 4);
+            world.setBlock(pos, state.setValue(POWERED, true), 2);
         } else if (!receivingPower && isPowered) {
-            world.setBlockState(pos, state.with(POWERED, false), 2);
+            world.setBlock(pos, state.setValue(POWERED, false), 2);
         }
 
     }
