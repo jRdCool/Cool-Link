@@ -1,7 +1,7 @@
 package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
-import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
+import com.cbi.coollink.blocks.blockentities.RedstoneControllerWiredBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -30,6 +30,10 @@ public class RSReceiverWired extends RedstoneControllerWired {
 
     }
 
+    @Override
+    public BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
+        return new RedstoneControllerWiredBE(pos,state,Main.RS_RECEIVER_WIRED_BLOCK_ENTITY);
+    }
 
     public static final IntegerProperty RECEIVED_POWER = IntegerProperty.create("received_power",0,15);
     public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"redstone_receiver_wired");
@@ -38,11 +42,7 @@ public class RSReceiverWired extends RedstoneControllerWired {
     public static final RSReceiverWired ENTRY = new RSReceiverWired(BlockBehaviour.Properties.of().strength(0.5f));
 
 
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
-        return new ServerRackBlockEntity(pos,state);
-    }
+
 
     @Override
     public boolean emitsRedstonePower(BlockState state) {return false;}

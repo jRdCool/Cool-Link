@@ -2,67 +2,66 @@ package com.cbi.coollink.blocks.networkdevices;
 
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.RedstoneControllerWiredBE;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.OrientationHelper;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.tick.ScheduledTickView;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
+import net.minecraft.world.level.redstone.Orientation;
+import org.jspecify.annotations.NonNull;
 
-import static net.minecraft.state.property.Properties.FACING;
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
 
 public class RSSenderWired extends RedstoneControllerWired{
-    public RSSenderWired(Settings settings) {
+    public RSSenderWired(BlockBehaviour.Properties settings) {
         super(settings);
 
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
         return new RedstoneControllerWiredBE(pos,state,Main.RS_SENDER_WIRED_BLOCK_ENTITY);
     }
 
     //private static final BooleanProperty POWERED = Properties.POWERED;
 
-    public static final Identifier ID = Identifier.of(Main.namespace,"redstone_sender_wired");
-    public static final RegistryKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
-    public static final RegistryKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
-    public static final RSSenderWired ENTRY = new RSSenderWired(AbstractBlock.Settings.create().hardness(0.5f).registryKey(BLOCK_KEY));
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"redstone_sender_wired");
+    public static final ResourceKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
+    public static final ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
+    public static final RSSenderWired ENTRY = new RSSenderWired(BlockBehaviour.Properties.of().strength(0.5f));
 
     //Properties.POWERED
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing());
+    public @org.jspecify.annotations.Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
     }
 
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateManager) {
+        stateManager.add(FACING);
+        super.createBlockStateDefinition(stateManager);
     }
     public boolean emitsRedstonePower(BlockState state) {
         return true;
     }
 
-    protected void updateNeighbors(World world, BlockPos pos, BlockState state) {
-        Direction direction = state.get(FACING);
-        BlockPos blockPos = pos.offset(direction.getOpposite());
-        WireOrientation wireOrientation = OrientationHelper.getEmissionOrientation(world, direction.getOpposite(), null);
-        world.updateNeighbor(blockPos, this, wireOrientation);
-        world.updateNeighborsExcept(blockPos, this, direction, wireOrientation);
+    protected void updateNeighbors(Level world, BlockPos pos, BlockState state) {
+        Direction direction = state.getValue(FACING);
+        BlockPos blockPos = pos.offset(direction.getOpposite().getUnitVec3i());
+        Orientation wireOrientation = ExperimentalRedstoneUtils.initialOrientation(world, direction.getOpposite(), null);
+        world.updateNeighborsAt(blockPos, this, wireOrientation);
+        world.updateNeighborsAtExceptFromFacing(blockPos, this, direction, wireOrientation);
+
     }
 
     /*
@@ -74,11 +73,11 @@ public class RSSenderWired extends RedstoneControllerWired{
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }*/
 
-    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (state.get(POWERED)) {
-            world.setBlockState(pos, state.with(POWERED, false), 2);
+    protected void scheduledTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+        if (state.getValue(POWERED)) {
+            world.setBlock(pos, state.setValue(POWERED, false), 2);
         } else {
-            world.setBlockState(pos, state.with(POWERED, true), 2);
+            world.setBlock(pos, state.setValue(POWERED, true), 2);
             //world.scheduleBlockTick(pos, this, 2);
         }
 
