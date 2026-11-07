@@ -3,19 +3,18 @@ package com.cbi.coollink.blocks.networkdevices;
 import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.blockentities.AIOBlockEntity;
 import com.cbi.coollink.rendering.IWireNode;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
@@ -170,7 +169,7 @@ public class AIO_Network extends BaseEntityBlock {
 
 
 	@Override
-	public void destroy(LevelAccessor world, @NonNull BlockPos pos, @NonNull BlockState state) {
+	public @NonNull BlockState playerWillDestroy(Level world, @NonNull BlockPos pos, @NonNull BlockState state, @NonNull Player player){
 		//delete both ends of the connection when the block is broken
 		BlockEntity be = world.getBlockEntity(pos);
 		if(be instanceof IWireNode self){
@@ -182,7 +181,7 @@ public class AIO_Network extends BaseEntityBlock {
 				}
 			}
 		}
-		super.destroy(world,pos,state);
+		return super.playerWillDestroy(world,pos,state,player);
 	}
 
 

@@ -169,7 +169,7 @@ public abstract class Conduit extends BaseEntityBlock {
 
     }
 
-    public BlockState onBreak(Level world, BlockPos pos, BlockState state, Player player){
+    public @NonNull BlockState playerWillDestroy(Level world, @NonNull BlockPos pos, @NonNull BlockState state, @NonNull Player player){
         BlockEntity be = world.getBlockEntity(pos);
         if(be instanceof IWireNode self){
             for(int i=0;i<self.getNodeCount();i++){
@@ -200,7 +200,7 @@ public abstract class Conduit extends BaseEntityBlock {
     }
 
     @Override
-    public void destroy(LevelAccessor world, BlockPos pos, BlockState state) {
+    public void destroy(LevelAccessor world, BlockPos pos, @NonNull BlockState state) {
     
         BlockPos neighbor1= new BlockPos(pos.getX()+1,pos.getY(),pos.getZ());//E//the location of the nigher block you want to check this should be reassigned for every block you want to check
         BlockPos neighbor2= new BlockPos(pos.getX()-1,pos.getY(),pos.getZ());//W

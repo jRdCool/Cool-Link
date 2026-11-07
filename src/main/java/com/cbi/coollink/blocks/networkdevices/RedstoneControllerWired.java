@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.random.WeightedRandom;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -58,7 +59,8 @@ public abstract class RedstoneControllerWired extends BaseEntityBlock {
 
     public void setPower(LevelAccessor world, BlockState state, int power, BlockPos pos, int delay) {
         world.setBlock(pos, state.setValue(POWER, power), 3);
-        world.scheduleBlockTick(pos, state.getBlock(), delay);
+        world.scheduleTick(pos, state.getBlock(), delay);
+
     }
 
 
@@ -90,14 +92,13 @@ public abstract class RedstoneControllerWired extends BaseEntityBlock {
     @Override
     protected void onPlace(@NonNull BlockState state, Level world, @NonNull BlockPos pos, @NonNull BlockState oldState, boolean notify) {
         if (!world.isClientSide() && !state.is(oldState.getBlock())) {
-            if (state.getValue(POWER) > 0 && !world.getBlockTickScheduler().isQueued(pos, this)) {
+            //if (state.getValue(POWER) > 0 && !world.getBlockTickScheduler().isQueued(pos, this)) {
                 world.setBlock(pos, state.setValue(POWER, 0), 18);
-            }
-
+            //}
         }
     }
     @Override
-    public void destroy(LevelAccessor world, @NonNull BlockPos pos, @NonNull BlockState state) {
+    public @NonNull BlockState playerWillDestroy(Level world, @NonNull BlockPos pos, @NonNull BlockState state, @NonNull Player player) {
         //delete both ends of the connection when the block is broken
         BlockEntity be = world.getBlockEntity(pos);
         if(be instanceof IWireNode self){
@@ -109,7 +110,7 @@ public abstract class RedstoneControllerWired extends BaseEntityBlock {
                 }
             }
         }
-        super.destroy(world,pos,state);
+        return super.playerWillDestroy(world,pos,state,player);
     }
 
     @Override
