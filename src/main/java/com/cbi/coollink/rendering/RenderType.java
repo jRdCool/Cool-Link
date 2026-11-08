@@ -2,57 +2,46 @@ package com.cbi.coollink.rendering;
 
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.renderpearl.api.vertex.VertexFormat;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
 
-import static net.minecraft.client.gl.RenderPipelines.POSITION_COLOR_SNIPPET;
-import static net.minecraft.client.gl.RenderPipelines.TRANSFORMS_AND_PROJECTION_SNIPPET;
 
+public class RenderType {
 
-public class RenderType extends RenderT {
-
+/*
     public RenderType(String name, int size, boolean hasCrumbling, boolean translucent, Runnable begin, Runnable end) {
         super(name, size,hasCrumbling,translucent,begin,end);
     }//String name, int size, boolean hasCrumbling, boolean translucent, Runnable begin, Runnable end
+*/
 
-
-    private static final RenderPipeline PIPELINE = RenderPipeline.builder( new RenderPipeline.Snippet[]{POSITION_COLOR_SNIPPET})
+    private static final RenderPipeline PIPELINE = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
             .withLocation("pipeline/debug_quads")
             .withCull(true)
-            .withVertexFormat(VertexFormats.POSITION_COLOR_LIGHT, VertexFormat.DrawMode.QUADS)
-            .build();
+            //.withVertexFormat(VertexFormats.POSITION_COLOR_LIGHT, VertexFormat.DrawMode.QUADS)
+            .build()
+    );
 
-    public static final RenderLayer WIRE = RenderLayer.of(
+    public static final net.minecraft.client.renderer.rendertype.RenderType WIRE = net.minecraft.client.renderer.rendertype.RenderType.create(
             "wire",
-            256,
-            false,
-            true,
-            PIPELINE,
-            MultiPhaseParameters.builder()
+            //256,
+            //false,
+            //true,
+            //PIPELINE,
+            //MultiPhaseParameters.builder()
                     //other params (texture?) can be configured here
-                    .build(false)
+            //        .build(false)
+            RenderSetup.builder(PIPELINE).createRenderSetup()
     );
 
-    public static final RenderLayer SERVER_RACK = RenderLayer.of(
+    public static final net.minecraft.client.renderer.rendertype.RenderType SERVER_RACK = net.minecraft.client.renderer.rendertype.RenderType.create(
             "serverrack",
-            256,
-            false,
-            true,
-            PIPELINE,
-            MultiPhaseParameters.builder()
+            //256,
+            //false,
+            //true,
+            //PIPELINE,
+            //MultiPhaseParameters.builder()
                     //other params (texture?) can be configured here
-                    .build(false)
+            //        .build(false)
+            RenderSetup.builder(PIPELINE).createRenderSetup()
     );
-    @Override
-    public void draw(BuiltBuffer buffer) {
-
-    }
-
-    @Override
-    public VertexFormat getVertexFormat() {
-        return null;
-    }
-
-    @Override
-    public VertexFormat.DrawMode getDrawMode() {
-        return null;
-    }
 }

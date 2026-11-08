@@ -51,7 +51,7 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 
 
 
-		submitNodeCollector.submitCustomGeometry( poseStack,"rendertype" ,((pose, buffer) -> {
+		submitNodeCollector.submitCustomGeometry( poseStack,RenderType.WIRE ,((pose, buffer) -> {
 			IWireNode otherBlock;
 			for (int i = 0; i < te.getNodeCount(); i++) {
 				if (!te.hasConnection(i)) continue;//check that this node is connected
@@ -201,106 +201,6 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 
 		BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
 	}
-
-/*
-	@Override
-	public void render(T tileEntityIn, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn,
-					   int combinedLightIn, int combinedOverlayIn, Vec3 cameraPos) {
-		IWireNode te = (IWireNode) tileEntityIn;
-		Level world = tileEntityIn.getLevel();
-		IWireNode otherBlock;
-		if(world==null) return;
-		//time += partialTicks;
-
-
-
-		for (int i = 0; i < te.getNodeCount(); i++) {
-
-
-			if (!te.hasConnection(i)) continue;//check that this node is connected
-			if (world.getBlockEntity(te.getLocalNode(i).getTargetPos())instanceof IWireNode){//check the target has wire nodes
-				otherBlock =(IWireNode) world.getBlockEntity(te.getLocalNode(i).getTargetPos());
-				if(otherBlock==null)continue;//????? what why is this necessary, would instance of not take care of this?
-			}else{continue;}
-			Vec3 d1 = te.getNodeOffset(i);
-			float ox1 = ((float) d1.x);
-			float oy1 = ((float) d1.y);
-			float oz1 = ((float) d1.z);
-
-			IWireNode wn = otherBlock.getWireNode(i); //get the wire node of a given node index
-			if (wn == null) {//if that returned null then stop rendering further
-				//TODO make this logging toggleable
-				Main.LOGGER.warn("getWireNode("+i+") returned null when attempting to render wire for "+otherBlock.getBlockPos());
-				continue;
-			}
-
-			Vec3 d2 = wn.getNodeOffset(te.getOtherNodeIndex(i)); // get other
-			float ox2 = ((float) d2.x);
-			float oy2 = ((float) d2.y);
-			float oz2 = ((float) d2.z);
-			BlockPos other = te.getNodePos(i);
-
-			float tx = other.getX() - te.getBlockPos().getX();
-			float ty = other.getY() - te.getBlockPos().getY();
-			float tz = other.getZ() - te.getBlockPos().getZ();
-			matrixStackIn.pushPose();
-
-			float dis = distanceFromZero(tx, ty, tz);
-
-			matrixStackIn.translate(tx + ox2, ty + oy2, tz + oz2);
-			wireRender(
-					tileEntityIn,
-					other,
-					matrixStackIn,
-					bufferIn,
-					-tx - ox2 + ox1,
-					-ty - oy2 + oy1,
-					-tz - oz2 + oz1,
-					te.getNodeType(i),
-					dis
-				);
-				matrixStackIn.popPose();
-			}
-
-		/*if(ClientEventHandler.clientRenderHeldWire) {
-			LocalPlayer player = ClientMinecraftWrapper.getPlayer();
-			Util.Triple<BlockPos, Integer, WireType> wireNode = Util.getWireNodeOfSpools(player.getInventory().getSelected());
-			if(wireNode == null) return;
-
-			BlockPos nodePos = wireNode.a;
-			int nodeIndex = wireNode.b;
-			WireType wireType = wireNode.c;
-			if(!nodePos.equals(te.getPos())) return;
-
-			Vec3d d1 = te.getNodeOffset(nodeIndex);
-			float ox1 = ((float) d1.x());
-			float oy1 = ((float) d1.y());
-			float oz1 = ((float) d1.z());
-
-			Vec3d playerPos = player.getPosition(partialTicks);
-			float tx = (float)playerPos.x - te.getPos().getX();
-			float ty = (float)playerPos.y - te.getPos().getY();
-			float tz = (float)playerPos.z - te.getPos().getZ();
-			matrixStackIn.pushPose();
-
-			float dis = distanceFromZero(tx, ty, tz);
-
-			matrixStackIn.translate(tx + .5f, ty + .5f, tz + .5f);
-			wireRender(
-					tileEntityIn,
-					player.blockPosition(),
-					matrixStackIn,
-					bufferIn,
-					-tx + ox1,
-					-ty + oy1,
-					-tz + oz1,
-					wireType,
-					dis
-			);
-			matrixStackIn.popPose();
-		}
-	}
-*/
 
 
 	private static float divf(int a, int b) {
