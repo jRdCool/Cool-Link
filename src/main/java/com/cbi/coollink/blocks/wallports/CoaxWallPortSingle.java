@@ -20,7 +20,6 @@ import org.jspecify.annotations.NonNull;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.*;
 
 public class CoaxWallPortSingle extends BaseEntityBlock {
-    //public static final CoaxWallPortSingle ENTRY = new CoaxWallPortSingle(AbstractBlock.Settings.create().hardness(0.5f));
 
     public CoaxWallPortSingle(Properties settings,String woodType){
         super(settings);
