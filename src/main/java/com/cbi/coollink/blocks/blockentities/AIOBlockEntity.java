@@ -114,8 +114,24 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		password=view.getStringOr("password","password123546");
 		ssid = view.getStringOr("ssid","Unconfigured Network");
 		netPass = view.getStringOr("Wireless_Password","");
-		int[] mac1Bytes = view.getIntArray("MAC1").get();
-		int[] mac2Bytes = view.getIntArray("MAC2").get();
+		int[] mac1Bytes;
+		int[] mac2Bytes;
+		if(view.getIntArray("MAC1").isPresent())
+		{
+			mac1Bytes = view.getIntArray("MAC1").get();
+		}
+		else {
+			Main.LOGGER.error(" Mac1 Load failure, Initialized with no data");
+			mac1Bytes = new int[3];
+		}
+		if (view.getIntArray("MAC2").isPresent()){
+			mac2Bytes = view.getIntArray("MAC2").get();
+		}
+		else {
+			Main.LOGGER.error(" Mac2 Load failure, Initialized with no data");
+			mac2Bytes = new int[3];
+		}
+
 		setMacAddresses(mac1Bytes,mac2Bytes);
 		ValueInput.ValueInputList lrv = view.childrenListOrEmpty("connections");
 		List<ValueInput> connectionNodes = lrv.stream().toList();
