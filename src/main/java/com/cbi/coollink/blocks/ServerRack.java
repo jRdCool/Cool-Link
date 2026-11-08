@@ -87,7 +87,7 @@ public class ServerRack extends BaseEntityBlock/* implements BlockEntityProvider
 
 
     public ServerRack(BlockBehaviour.Properties settings) {
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
         registerDefaultState(defaultBlockState()
                 .setValue(half,Half.BOTTOM)
                 .setValue(direction,Direction.NORTH_SOUTH)
