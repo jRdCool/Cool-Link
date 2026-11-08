@@ -15,9 +15,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -36,7 +34,7 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 
 
 	@Override
-	public WireNodeRenderState createRenderState() {
+	public @NonNull WireNodeRenderState createRenderState() {
 		return new WireNodeRenderState();
 	}
 
@@ -50,96 +48,61 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 
 
 
+		IWireNode otherBlock;
+		for (int i = 0; i < te.getNodeCount(); i++) {
+			if (!te.hasConnection(i)) continue;//check that this node is connected
+			if (world.getBlockEntity(te.getLocalNode(i).getTargetPos())instanceof IWireNode){//check the target has wire nodes
+				otherBlock =(IWireNode) world.getBlockEntity(te.getLocalNode(i).getTargetPos());
+				if(otherBlock==null)continue;//????? what why is this necessary, would instance of not take care of this?
+			}else{continue;}
+			Vec3 d1 = te.getNodeOffset(i);
+			float ox1 = ((float) d1.x);
+			float oy1 = ((float) d1.y);
+			float oz1 = ((float) d1.z);
 
-		submitNodeCollector.submitCustomGeometry( poseStack,RenderType.WIRE ,((pose, buffer) -> {
-			IWireNode otherBlock;
-			for (int i = 0; i < te.getNodeCount(); i++) {
-				if (!te.hasConnection(i)) continue;//check that this node is connected
-				if (world.getBlockEntity(te.getLocalNode(i).getTargetPos())instanceof IWireNode){//check the target has wire nodes
-					otherBlock =(IWireNode) world.getBlockEntity(te.getLocalNode(i).getTargetPos());
-					if(otherBlock==null)continue;//????? what why is this necessary, would instance of not take care of this?
-				}else{continue;}
-				Vec3 d1 = te.getNodeOffset(i);
-				float ox1 = ((float) d1.x);
-				float oy1 = ((float) d1.y);
-				float oz1 = ((float) d1.z);
+			IWireNode wn = otherBlock.getWireNode(i); //get the wire node of a given node index
+			if (wn == null) {//if that returned null then stop rendering further
+				//TODO make this logging toggleable
+				Main.LOGGER.warn("getWireNode("+i+") returned null when attempting to render wire for "+otherBlock.getBlockPos());
+				continue;
+			}
 
-				IWireNode wn = otherBlock.getWireNode(i); //get the wire node of a given node index
-				if (wn == null) {//if that returned null then stop rendering further
-					//TODO make this logging toggleable
-					Main.LOGGER.warn("getWireNode("+i+") returned null when attempting to render wire for "+otherBlock.getBlockPos());
-					continue;
-				}
+			Vec3 d2 = wn.getNodeOffset(te.getOtherNodeIndex(i)); // get other
+			float ox2 = ((float) d2.x);
+			float oy2 = ((float) d2.y);
+			float oz2 = ((float) d2.z);
+			BlockPos other = te.getNodePos(i);
 
-				Vec3 d2 = wn.getNodeOffset(te.getOtherNodeIndex(i)); // get other
-				float ox2 = ((float) d2.x);
-				float oy2 = ((float) d2.y);
-				float oz2 = ((float) d2.z);
-				BlockPos other = te.getNodePos(i);
-
-				float tx = other.getX() - te.getBlockPos().getX();
-				float ty = other.getY() - te.getBlockPos().getY();
-				float tz = other.getZ() - te.getBlockPos().getZ();
-				poseStack.pushPose();
+			float tx = other.getX() - te.getBlockPos().getX();
+			float ty = other.getY() - te.getBlockPos().getY();
+			float tz = other.getZ() - te.getBlockPos().getZ();
+			poseStack.pushPose();
 
 
 
-				float dis = distanceFromZero(tx, ty, tz);
+			float dis = distanceFromZero(tx, ty, tz);
 
-				poseStack.translate(tx + ox2, ty + oy2, tz + oz2);
+			poseStack.translate(tx + ox2, ty + oy2, tz + oz2);
+			final int lambdaTypeIndex = i;
+			//this is what actually submits the vertices for rendering
+			submitNodeCollector.submitCustomGeometry( poseStack,RenderType.WIRE ,((pose, buffer) -> {
 				wireRender(
 						state.blockEntity,
 						other,
-						poseStack,
+						pose,
 						buffer,
 						-tx - ox2 + ox1,
 						-ty - oy2 + oy1,
 						-tz - oz2 + oz1,
-						te.getNodeType(i),
+						te.getNodeType(lambdaTypeIndex),
 						dis
 				);
-				poseStack.popPose();
-			}
+			}) );
 
-		/*if(ClientEventHandler.clientRenderHeldWire) {
-			LocalPlayer player = ClientMinecraftWrapper.getPlayer();
-			Util.Triple<BlockPos, Integer, WireType> wireNode = Util.getWireNodeOfSpools(player.getInventory().getSelected());
-			if(wireNode == null) return;
+			poseStack.popPose();
+		}
 
-			BlockPos nodePos = wireNode.a;
-			int nodeIndex = wireNode.b;
-			WireType wireType = wireNode.c;
-			if(!nodePos.equals(te.getPos())) return;
 
-			Vec3d d1 = te.getNodeOffset(nodeIndex);
-			float ox1 = ((float) d1.x());
-			float oy1 = ((float) d1.y());
-			float oz1 = ((float) d1.z());
-
-			Vec3d playerPos = player.getPosition(partialTicks);
-			float tx = (float)playerPos.x - te.getPos().getX();
-			float ty = (float)playerPos.y - te.getPos().getY();
-			float tz = (float)playerPos.z - te.getPos().getZ();
-			matrixStackIn.pushPose();
-
-			float dis = distanceFromZero(tx, ty, tz);
-
-			matrixStackIn.translate(tx + .5f, ty + .5f, tz + .5f);
-			wireRender(
-					tileEntityIn,
-					player.blockPosition(),
-					matrixStackIn,
-					bufferIn,
-					-tx + ox1,
-					-ty + oy1,
-					-tz + oz1,
-					wireType,
-					dis
-			);
-			matrixStackIn.popPose();
-		}*/
-
-		}) );
 		poseStack.popPose();
 	}
 
@@ -178,7 +141,7 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 	}
 
 	@Override
-	public boolean shouldRender(BlockEntity blockEntity, @NonNull Vec3 cameraPosition) {
+	public boolean shouldRender(@NonNull BlockEntity blockEntity, @NonNull Vec3 cameraPosition) {
 		double distance = getViewDistance();
 
 		return getRenderBoundingBox(blockEntity).distanceToSqr(cameraPosition) < distance * distance;
@@ -187,18 +150,11 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 	@Override
 	public void extractRenderState(T blockEntity, WireNodeRenderState state, float partialTicks, @NonNull Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
 
-		BlockEntityRenderer.super.extractRenderState(blockEntity,state,partialTicks,cameraPosition,breakProgress);
 		IWireNode te = (IWireNode) blockEntity;
 		Level world = blockEntity.getLevel();
 		if(world==null) return;
 		state.blockEntity = blockEntity;
 		state.nodeCount = te.getNodeCount();
-
-
-
-
-
-
 		BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
 	}
 
@@ -216,52 +172,50 @@ public class WireNodeRenderer<T extends BlockEntity> implements BlockEntityRende
 	}
 
 
-	public static void wireRender(BlockEntity tileEntityIn, BlockPos other, PoseStack stack, VertexConsumer ivertexbuilder, float x, float y, float z,
+	public static void wireRender(BlockEntity tileEntityIn, BlockPos other, PoseStack.Pose stack, VertexConsumer ivertexbuilder, float x, float y, float z,
 			WireType type, float dis) {
 		//matrix.pushPose();
 
-		Matrix4f matrix4f = stack.last().pose();
+		Matrix4f matrix4f = stack.pose();
 		float f = Mth.invSqrt(x * x + z * z) * 0.025F / 2.0F;//fastInvSqrt
 		float o1 = z * f;
 		float o2 = x * f;
-		BlockPos blockpos1 = tileEntityIn.getBlockPos();
+		//BlockPos blockpos1 = tileEntityIn.getBlockPos();
 		var world = tileEntityIn.getLevel();
 		if(world==null){return;}
 
-		int i = (int)world.getBrightness(LightLayer.SKY,blockpos1);
-		int j = (int)world.getBrightness(LightLayer.SKY,other);
-		int k = (int)world.getBrightness(LightLayer.SKY,blockpos1);
-		int l = (int)world.getBrightness(LightLayer.SKY,other);
-		wirePart(ivertexbuilder, matrix4f, x, y, z, j, i, l, k, 0.025F, 0.025F, o1, o2, type, dis, tileEntityIn.getBlockState(), stack, 0, 1f);
-		wirePart(ivertexbuilder, matrix4f, x, y, z, j, i, l, k, 0.025F, 0.0F, o1, o2, type, dis, tileEntityIn.getBlockState(), stack, 1, 1f);
+		//int i = world.getBrightness(LightLayer.SKY,blockpos1);
+		//int j = world.getBrightness(LightLayer.SKY,other);
+		//int k = world.getBrightness(LightLayer.SKY,blockpos1);
+		//int l = world.getBrightness(LightLayer.SKY,other);
+		wirePart(ivertexbuilder, matrix4f, x, y, z, 0.025F, 0.025F, o1, o2, type, dis, 1f);
+		wirePart(ivertexbuilder, matrix4f, x, y, z, 0.025F, 0.0F, o1, o2, type, dis, 1f);
 		//light
 		//matrix.popPose();
 	}
 
-	public static void wirePart(VertexConsumer vertBuilder, Matrix4f matrix, float x, float y, float z, int l1, int l2,
-								int l3, int l4, float a, float b, float o1, float o2, WireType type, float dis, BlockState state, PoseStack stack, int lightOffset, float hangFactor) {
+	public static void wirePart(VertexConsumer vertBuilder, Matrix4f matrix, float x, float y, float z, float a, float b, float o1, float o2, WireType type, float dis, float hangFactor) {
 		for (int j = 0; j < 24; ++j) {
-			float f = (float) j / 23.0F;
-			int k = (int) Mth.lerp(f, (float) l1, (float) l2);
-			int l = (int) Mth.lerp(f, (float) l3, (float) l4);
+			//float f = (float) j / 23.0F;
+			//int k = (int) Mth.lerp(f, (float) l1, (float) l2);
+			//int l = (int) Mth.lerp(f, (float) l3, (float) l4);
 			int light = 1;//LightmapTextureManager.pack(k, l);
 
-			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j, false, o1, o2, type, dis, state, stack, lightOffset, hangFactor);
-			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j + 1, true, o1, o2, type, dis, state, stack, lightOffset+1, hangFactor);
-			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j, true, o1, o2, type, dis, state, stack, lightOffset, hangFactor);
-			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j + 1, false, o1, o2, type, dis, state, stack, lightOffset+1, hangFactor);
+			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j, false, o1, o2, type, dis, hangFactor);
+			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j + 1, true, o1, o2, type, dis, hangFactor);
+			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j, true, o1, o2, type, dis, hangFactor);
+			wireVert(vertBuilder, matrix, light, x, y, z, a, b, 24, j + 1, false, o1, o2, type, dis, hangFactor);
 
 		}
 
 	}
-	@SuppressWarnings("unused")
+
 	static Color[] colors = {Color.RED, Color.GREEN, new Color(0f, 0f, 1f, 1f)};
 	//static float LIGHT_Y_OFFSET = -0.03f;
 
 
-	@SuppressWarnings("unused")
 	public static void wireVert(VertexConsumer vertBuilder, Matrix4f matrix, int light, float x, float y, float z,
-			float a, float b, int count, int index, boolean sw, float o1, float o2, WireType type, float dis, BlockState state, PoseStack stack, int lightOffset, float hangFactor) {
+			float a, float b, int count, int index, boolean sw, float o1, float o2, WireType type, float dis, float hangFactor) {
 		int cr = type.getRed();
 		int cg = type.getGreen();
 		int cb = type.getBlue();
