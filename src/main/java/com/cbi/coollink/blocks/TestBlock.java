@@ -15,6 +15,6 @@ public class TestBlock extends Block {
 
     public static final TestBlock ENTRY = new TestBlock(Properties.of().strength(0.5f)/*.registryKey(BLOCK_KEY)*/);
     public TestBlock(Properties settings) {
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
     }
 }

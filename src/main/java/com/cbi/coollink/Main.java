@@ -184,10 +184,10 @@ public class Main implements ModInitializer {
             Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"wall_ports/coax_wall_port_"+wood);
             ResourceKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
             ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
-            CoaxWallPortSingle block = new CoaxWallPortSingle(BlockBehaviour.Properties.of().strength(0.5f)/*.registryKey(BLOCK_KEY)*/,wood);
+            CoaxWallPortSingle block = new CoaxWallPortSingle(BlockBehaviour.Properties.of().strength(0.5f).setId(BLOCK_KEY)/*.registryKey(BLOCK_KEY)*/,wood);
             coaxWallPortVarients.put(wood,block);
             Registry.register(BuiltInRegistries.BLOCK, BLOCK_KEY, block);
-            Registry.register(BuiltInRegistries.ITEM, ITEM_KEY, new BlockItem(block, new Item.Properties()/*.registryKey(ITEM_KEY)*/));
+            Registry.register(BuiltInRegistries.ITEM, ITEM_KEY, new BlockItem(block, new Item.Properties()));
             coaxWallPortSingleBlockEntities.put(wood, registerBlockEntity(Identifier.fromNamespaceAndPath(namespace,"coax_wall_port_single_block_entity_"+wood), CoaxWallPortSingleBE.of(wood),block));
         }
 

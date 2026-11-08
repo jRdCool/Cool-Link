@@ -28,7 +28,7 @@ public class AIOWallPort extends Block {
     public static final AIOWallPort ENTRY = new AIOWallPort(Properties.of().strength(0.5f)/*.registryKey(BLOCK_KEY)*/);
 
     public AIOWallPort(Properties settings){
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
         //Main.LOGGER.info("AIOWallPort loaded");
     }
 
