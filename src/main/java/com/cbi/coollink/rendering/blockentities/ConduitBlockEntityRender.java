@@ -2,25 +2,51 @@ package com.cbi.coollink.rendering.blockentities;
 
 import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
 import com.cbi.coollink.rendering.WireNodeRenderer;
-import com.mojang.authlib.minecraft.client.MinecraftClient;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.util.RandomSource;
+import com.cbi.coollink.rendering.blockentities.state.WireNodeRenderState;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.MovingBlockRenderState;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
 public class ConduitBlockEntityRender extends WireNodeRenderer<ConduitBlockEntity> {
-
-    //BlockRenderManager
-    private final BlockRenderManager blockRenderManager = MinecraftClient.getInstance().getBlockRenderManager();
-    private final RandomSource random = new ChunkRandom(new LocalRandom(0));//used for textures that can have random rotations(dirt, grass, ect...) no idea how the game makes it no spaz out
-
-    public ConduitBlockEntityRender(BlockEntityRendererFactory.Context context) {
+    public ConduitBlockEntityRender(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
+    @Override
+    public void submit(WireNodeRenderState state, @NonNull PoseStack poseStack, @NonNull SubmitNodeCollector submitNodeCollector, @NonNull CameraRenderState camera) {
+        BlockPos pos = state.blockEntity.getBlockPos();
+        ConduitBlockEntity conduitBlockEntity = (ConduitBlockEntity) state.blockEntity;
+        if(conduitBlockEntity.isCovered()){
+            BlockState blockState = conduitBlockEntity.getCoverBlock();
+            ClientLevel level = (ClientLevel) conduitBlockEntity.getLevel();
+            assert level != null;
+            Holder<Biome> biome = level.getBiome(pos);
 
+            MovingBlockRenderState movingBlockRenderState = new MovingBlockRenderState();
+            movingBlockRenderState.randomSeedPos = pos;
+            movingBlockRenderState.blockPos = pos;
+            movingBlockRenderState.blockState = blockState;
+            movingBlockRenderState.biome = biome;
+            movingBlockRenderState.cardinalLighting = level.cardinalLighting();
+            movingBlockRenderState.lightEngine = level.getLightEngine();
+
+
+            submitNodeCollector.submitMovingBlock(poseStack, movingBlockRenderState, 0);
+        }
+        super.submit(state, poseStack, submitNodeCollector, camera);
+    }
+
+    /*
     @Override
     public void render(ConduitBlockEntity conduit, float partialTicks, MatrixStack matrixStackIn, VertexConsumerProvider bufferIn, int combinedLightIn, int combinedOverlayIn, Vec3 cameraPos) {
         if(conduit.isCovered()){
@@ -35,9 +61,12 @@ public class ConduitBlockEntityRender extends WireNodeRenderer<ConduitBlockEntit
         }
         super.render(conduit,partialTicks,matrixStackIn,bufferIn,combinedLightIn,combinedOverlayIn,cameraPos);
     }
+     */
 
+    /*
     //for later when we want to be able to render wires from the conduits
     public void renderWires(ConduitBlockEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn, VertexConsumerProvider bufferIn, int combinedLightIn, int combinedOverlayIn, Vec3 cameraPos){
         super.render(tileEntityIn, partialTicks, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn, cameraPos);
     }
+     */
 }
