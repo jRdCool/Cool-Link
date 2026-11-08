@@ -23,7 +23,7 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 
 public class RSReceiverWired extends RedstoneControllerWired {
     public RSReceiverWired(BlockBehaviour.Properties settings) {
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
         registerDefaultState(defaultBlockState()
                 .setValue(RECEIVED_POWER,0)
         );

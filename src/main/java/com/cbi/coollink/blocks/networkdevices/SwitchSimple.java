@@ -41,7 +41,7 @@ public class SwitchSimple extends BaseEntityBlock {
     public static final ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
     public static final SwitchSimple ENTRY = new SwitchSimple(BlockBehaviour.Properties.of().strength(0.5f));
     public SwitchSimple(BlockBehaviour.Properties settings) {
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
     }
 
     //@Override

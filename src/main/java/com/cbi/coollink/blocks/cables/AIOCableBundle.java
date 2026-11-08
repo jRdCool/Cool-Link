@@ -41,7 +41,7 @@ public class AIOCableBundle extends Block {
     public static final AIOCableBundle ENTRY = new AIOCableBundle(Properties.of().strength(0.5f)/*.registryKey(BLOCK_KEY)*/);
 
     public AIOCableBundle(Properties settings){
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
         registerDefaultState(defaultBlockState()
                 .setValue(north,false)
                 .setValue(south,false)

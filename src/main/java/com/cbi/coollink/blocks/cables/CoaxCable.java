@@ -49,7 +49,7 @@ public class CoaxCable extends Block {
 
 
     public CoaxCable(Properties settings){
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
         registerDefaultState(defaultBlockState()
             .setValue(north,false)
             .setValue(south,false)

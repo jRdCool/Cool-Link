@@ -40,7 +40,7 @@ public class SatelliteDishBlock extends BaseEntityBlock {
     //All property definitions MUST be declared before the entry
     public static final EnumProperty<MultiBlockPartStates> multiBlockPose = EnumProperty.create("multiblockpart", MultiBlockPartStates.class);
     public SatelliteDishBlock(BlockBehaviour.Properties settings) {
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
 
         registerDefaultState(defaultBlockState()
                 .setValue(ASSEMBLED_BOOLEAN_PROPERTY, false)

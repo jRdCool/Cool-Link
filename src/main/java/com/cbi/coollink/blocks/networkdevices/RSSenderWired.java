@@ -25,7 +25,7 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 
 public class RSSenderWired extends RedstoneControllerWired{
     public RSSenderWired(BlockBehaviour.Properties settings) {
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
 
     }
 

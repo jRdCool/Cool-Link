@@ -39,7 +39,7 @@ public class MediumConduit extends Conduit {
 
 
     public MediumConduit(BlockBehaviour.Properties settings) {
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
         registerDefaultState(defaultBlockState().setValue(cableLevel,2));
     }
 

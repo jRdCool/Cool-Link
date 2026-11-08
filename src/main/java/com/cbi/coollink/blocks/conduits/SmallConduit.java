@@ -37,7 +37,7 @@ public class SmallConduit extends Conduit {
     //  7 = NW
 
     public SmallConduit(BlockBehaviour.Properties settings) {
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
         registerDefaultState(defaultBlockState()
                 .setValue(cableLevel,1)
         );

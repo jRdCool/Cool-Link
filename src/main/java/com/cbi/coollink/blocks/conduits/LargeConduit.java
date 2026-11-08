@@ -37,7 +37,7 @@ public class LargeConduit extends Conduit {
 
 
     public LargeConduit(BlockBehaviour.Properties settings) {
-        super(settings);
+        super(settings.setId(BLOCK_KEY));
         registerDefaultState(defaultBlockState()
                 .setValue(cableLevel,3)
         );

@@ -42,7 +42,8 @@ public class AIO_Network extends BaseEntityBlock {
 	public static final AIO_Network ENTRY = new AIO_Network(BlockBehaviour.Properties.of().strength(0.5f));
 
 	public AIO_Network(BlockBehaviour.Properties settings) {
-		super(settings);
+		super(settings.setId(BLOCK_KEY));
+
 	}
 
 
