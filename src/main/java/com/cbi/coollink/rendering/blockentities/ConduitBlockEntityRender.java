@@ -15,7 +15,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.NonNull;
 
-import java.util.List;
 
 public class ConduitBlockEntityRender extends WireNodeRenderer<ConduitBlockEntity> {
     public ConduitBlockEntityRender(BlockEntityRendererProvider.Context context) {
