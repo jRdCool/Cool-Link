@@ -4,13 +4,6 @@ import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.ServerRack;
 import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
 import com.cbi.coollink.rendering.RenderType;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
 
 public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<ServerRackBlockEntity> {
     public ServerRackBlockEntityRenderer(BlockEntityRendererFactory.Context context){

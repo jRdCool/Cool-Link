@@ -96,7 +96,7 @@ public class Main implements ModInitializer {
     //creative mode tab group
     public static final CreativeModeTab COOL_LINK_ITEM_GROUP = FabricCreativeModeTab.builder()
             .icon(() -> new ItemStack(AIO_Network.ENTRY))
-            .displayName(Component.literal("Cool Link"))
+            .title(Component.literal("Cool Link"))
             .build();
 
     //wire connection info item component
