@@ -11,7 +11,7 @@ public class CoaxialCable extends ACableItem {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"coaxial_cable");
     public static final ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
     public CoaxialCable(Item.Properties settings) {
-        super(settings);
+        super(settings.setId(ITEM_KEY));
         TYPE = WireType.COAX;
     }
 }

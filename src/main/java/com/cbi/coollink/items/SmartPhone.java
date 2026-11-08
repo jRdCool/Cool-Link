@@ -27,7 +27,7 @@ public class SmartPhone extends Item {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"smart_phone");
     public static final ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
     public SmartPhone(Properties settings) {
-        super(settings);
+        super(settings.setId(ITEM_KEY));
 
     }
     private static final int deviceID = 0x31;

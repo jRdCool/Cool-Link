@@ -21,7 +21,7 @@ public class WireTester extends Item {
     public static final ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
 
     public WireTester(Properties settings) {
-        super(settings);
+        super(settings.setId(ITEM_KEY));
     }
 
     @Override

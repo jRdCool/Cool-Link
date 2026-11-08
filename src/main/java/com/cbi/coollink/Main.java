@@ -89,8 +89,8 @@ public class Main implements ModInitializer {
 
 
     //Cable Registries
-    public static final Cat6Cable cat6CableEntry = Registry.register(BuiltInRegistries.ITEM, Cat6Cable.ITEM_KEY, new Cat6Cable(new Item.Properties()/*.registryKey(Cat6Cable.ITEM_KEY)*/));
-    public static final CoaxialCable coaxialCableEntry = Registry.register(BuiltInRegistries.ITEM, CoaxialCable.ITEM_KEY,new CoaxialCable(new Item.Properties()/*.registryKey(CoaxialCable.ITEM_KEY)*/));
+    public static final Cat6Cable cat6CableEntry = Registry.register(BuiltInRegistries.ITEM, Cat6Cable.ITEM_KEY, new Cat6Cable(new Item.Properties().setId(Cat6Cable.ITEM_KEY)));
+    public static final CoaxialCable coaxialCableEntry = Registry.register(BuiltInRegistries.ITEM, CoaxialCable.ITEM_KEY,new CoaxialCable(new Item.Properties().setId(CoaxialCable.ITEM_KEY)));
 
 
     //creative mode tab group
@@ -122,49 +122,49 @@ public class Main implements ModInitializer {
 
         //test block
         Registry.register(BuiltInRegistries.BLOCK, TestBlock.BLOCK_KEY,TestBlock.ENTRY);
-        Registry.register(BuiltInRegistries.ITEM, TestBlock.ITEM_KEY,new BlockItem(TestBlock.ENTRY, new Item.Properties()/*.registryKey(TestBlock.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM, TestBlock.ITEM_KEY,new BlockItem(TestBlock.ENTRY, new Item.Properties().setId(TestBlock.ITEM_KEY)));
 
         //aio network
         Registry.register(BuiltInRegistries.BLOCK, AIO_Network.BLOCK_KEY, AIO_Network.ENTRY);
 
-        Registry.register(BuiltInRegistries.ITEM, AIO_Network.ITEM_KEY,new BlockItem(AIO_Network.ENTRY, new Item.Properties()/*.registryKey(AIO_Network.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM, AIO_Network.ITEM_KEY,new BlockItem(AIO_Network.ENTRY, new Item.Properties().setId(AIO_Network.ITEM_KEY)));
 
         //smartphone
-        SmartPhone smartPhoneEntry = Registry.register(BuiltInRegistries.ITEM, SmartPhone.ITEM_KEY,new SmartPhone(new Item.Properties()/*.registryKey(SmartPhone.ITEM_KEY)*/));
+        SmartPhone smartPhoneEntry = Registry.register(BuiltInRegistries.ITEM, SmartPhone.ITEM_KEY,new SmartPhone(new Item.Properties()));
 
         //redstone controllers wired
         Registry.register(BuiltInRegistries.BLOCK, RSReceiverWired.BLOCK_KEY, RSReceiverWired.ENTRY);
         //BlockRenderLayerMap.putBlock(RSReceiverWired.ENTRY, BlockRenderLayer.CUTOUT);
-        Registry.register(BuiltInRegistries.ITEM, RSReceiverWired.ITEM_KEY,new BlockItem(RSReceiverWired.ENTRY, new Item.Properties()/*.registryKey(RSReceiverWired.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM, RSReceiverWired.ITEM_KEY,new BlockItem(RSReceiverWired.ENTRY, new Item.Properties().setId(RSReceiverWired.ITEM_KEY)));
         Registry.register(BuiltInRegistries.BLOCK, RSSenderWired.BLOCK_KEY, RSSenderWired.ENTRY);
         //BlockRenderLayerMap.putBlock(RSReceiverWired.ENTRY, BlockRenderLayer.CUTOUT);
-        Registry.register(BuiltInRegistries.ITEM, RSSenderWired.ITEM_KEY,new BlockItem(RSSenderWired.ENTRY, new Item.Properties()/*.registryKey(RSSenderWired.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM, RSSenderWired.ITEM_KEY,new BlockItem(RSSenderWired.ENTRY, new Item.Properties().setId((RSSenderWired.ITEM_KEY))));
 
         //wire tester
-        WireTester wireTesterEntry = Registry.register(BuiltInRegistries.ITEM, WireTester.ITEM_KEY,new WireTester(new Item.Properties()/*.registryKey(WireTester.ITEM_KEY)*/));
-        ProgramingCable programingCableEntry = Registry.register(BuiltInRegistries.ITEM, ProgramingCable.ITEM_KEY,new ProgramingCable(new Item.Properties()/*.registryKey(ProgramingCable.ITEM_KEY)*/));
+        WireTester wireTesterEntry = Registry.register(BuiltInRegistries.ITEM, WireTester.ITEM_KEY,new WireTester(new Item.Properties()));
+        ProgramingCable programingCableEntry = Registry.register(BuiltInRegistries.ITEM, ProgramingCable.ITEM_KEY,new ProgramingCable(new Item.Properties()));
 
         //server Rack
         Registry.register(BuiltInRegistries.BLOCK, ServerRack.BLOCK_KEY, ServerRack.ENTRY);
 
-        Registry.register(BuiltInRegistries.ITEM, ServerRack.ITEM_KEY,new BlockItem(ServerRack.ENTRY, new Item.Properties()/*.registryKey(ServerRack.ITEM_KEY)*/ ));
+        Registry.register(BuiltInRegistries.ITEM, ServerRack.ITEM_KEY,new BlockItem(ServerRack.ENTRY, new Item.Properties().setId(ServerRack.ITEM_KEY)));
 
         //satellite dish
         Registry.register(BuiltInRegistries.BLOCK, SatelliteDishBlock.BLOCK_KEY, SatelliteDishBlock.ENTRY);
 
-        Registry.register(BuiltInRegistries.ITEM, SatelliteDishBlock.ITEM_KEY,new BlockItem(SatelliteDishBlock.ENTRY, new Item.Properties()/*.registryKey(SatelliteDishBlock.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM, SatelliteDishBlock.ITEM_KEY,new BlockItem(SatelliteDishBlock.ENTRY, new Item.Properties().setId(SatelliteDishBlock.ITEM_KEY)));
 
         //small conduit
         Registry.register(BuiltInRegistries.BLOCK, SmallConduit.BLOCK_KEY,SmallConduit.ENTRY);
-        Registry.register(BuiltInRegistries.ITEM, SmallConduit.ITEM_KEY,new BlockItem(SmallConduit.ENTRY, new Item.Properties()/*.registryKey(SmallConduit.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM, SmallConduit.ITEM_KEY,new BlockItem(SmallConduit.ENTRY, new Item.Properties().setId(SmallConduit.ITEM_KEY)));
 
         //medium conduit
         Registry.register(BuiltInRegistries.BLOCK, MediumConduit.BLOCK_KEY, MediumConduit.ENTRY);
-        Registry.register(BuiltInRegistries.ITEM, MediumConduit.ITEM_KEY,new BlockItem(MediumConduit.ENTRY, new Item.Properties()/*.registryKey(MediumConduit.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM, MediumConduit.ITEM_KEY,new BlockItem(MediumConduit.ENTRY, new Item.Properties().setId(MediumConduit.ITEM_KEY)));
 
         //large conduit
         Registry.register(BuiltInRegistries.BLOCK, LargeConduit.BLOCK_KEY, LargeConduit.ENTRY);
-        Registry.register(BuiltInRegistries.ITEM, LargeConduit.ITEM_KEY,new BlockItem(LargeConduit.ENTRY, new Item.Properties()/*.registryKey(LargeConduit.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM, LargeConduit.ITEM_KEY,new BlockItem(LargeConduit.ENTRY, new Item.Properties().setId(LargeConduit.ITEM_KEY)));
 
         //coax cable
         Registry.register(BuiltInRegistries.BLOCK, CoaxCable.BLOCK_KEY, CoaxCable.ENTRY);
@@ -173,26 +173,26 @@ public class Main implements ModInitializer {
         //Switch(Simple)
         Registry.register(BuiltInRegistries.BLOCK, SwitchSimple.BLOCK_KEY, SwitchSimple.ENTRY);
 
-        Registry.register(BuiltInRegistries.ITEM, SwitchSimple.ITEM_KEY,new BlockItem(SwitchSimple.ENTRY, new Item.Properties()/*.registryKey(SwitchSimple.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM, SwitchSimple.ITEM_KEY,new BlockItem(SwitchSimple.ENTRY, new Item.Properties().setId(SwitchSimple.ITEM_KEY)));
 
         //legacy Items
         Registry.register(BuiltInRegistries.BLOCK, AIOCableBundle.BLOCK_KEY, AIOCableBundle.ENTRY);
-        Registry.register(BuiltInRegistries.ITEM,AIOCableBundle.ITEM_KEY,new BlockItem(AIOCableBundle.ENTRY,new Item.Properties()/*.registryKey(AIOCableBundle.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM,AIOCableBundle.ITEM_KEY,new BlockItem(AIOCableBundle.ENTRY,new Item.Properties().setId(AIOCableBundle.ITEM_KEY)));
 
         for(String wood:woodTypes) {
             //Main.LOGGER.info("Registering coax wall port of type: "+ wood);
             Identifier ID = Identifier.fromNamespaceAndPath(Main.namespace,"wall_ports/coax_wall_port_"+wood);
             ResourceKey<Block> BLOCK_KEY = Main.createBlockRegistryKey(ID);
             ResourceKey<Item> ITEM_KEY = Main.createItemRegistryKey(ID);
-            CoaxWallPortSingle block = new CoaxWallPortSingle(BlockBehaviour.Properties.of().strength(0.5f).setId(BLOCK_KEY)/*.registryKey(BLOCK_KEY)*/,wood);
+            CoaxWallPortSingle block = new CoaxWallPortSingle(BlockBehaviour.Properties.of().strength(0.5f).setId(BLOCK_KEY),wood);
             coaxWallPortVarients.put(wood,block);
             Registry.register(BuiltInRegistries.BLOCK, BLOCK_KEY, block);
-            Registry.register(BuiltInRegistries.ITEM, ITEM_KEY, new BlockItem(block, new Item.Properties()));
+            Registry.register(BuiltInRegistries.ITEM, ITEM_KEY, new BlockItem(block, new Item.Properties().setId(ITEM_KEY)));
             coaxWallPortSingleBlockEntities.put(wood, registerBlockEntity(Identifier.fromNamespaceAndPath(namespace,"coax_wall_port_single_block_entity_"+wood), CoaxWallPortSingleBE.of(wood),block));
         }
 
         Registry.register(BuiltInRegistries.BLOCK,AIOWallPort.BLOCK_KEY,AIOWallPort.ENTRY);
-        Registry.register(BuiltInRegistries.ITEM,AIOWallPort.ITEM_KEY,new BlockItem(AIOWallPort.ENTRY,new Item.Properties()/*.registryKey(AIOWallPort.ITEM_KEY)*/));
+        Registry.register(BuiltInRegistries.ITEM,AIOWallPort.ITEM_KEY,new BlockItem(AIOWallPort.ENTRY,new Item.Properties().setId(AIOWallPort.ITEM_KEY)));
 
         //item registration
         CreativeModeTabEvents.modifyOutputEvent(ITEM_GROUP).register(entries -> entries.accept(AIO_Network.ENTRY));
