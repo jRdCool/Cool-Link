@@ -4,14 +4,19 @@ import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.networkdevices.RSSenderWired;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueOutput;
 import org.jspecify.annotations.NonNull;
 
 
@@ -41,6 +46,17 @@ public class WireTester extends Item {
                 //Main.LOGGER.info("Set to 0");
             }
             if (context.getPlayer() !=null) {context.getPlayer().swing(context.getHand(), SwingAnimation.DEFAULT, true);}
+        } else if (world.getBlockEntity(pos) instanceof BlockEntity be){
+            TagValueOutput tvo = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING);
+            be.saveWithFullMetadata(tvo);
+            CompoundTag tag = tvo.buildResult();
+            String env = "";
+            if(context.getPlayer() instanceof ServerPlayer){
+                env = "server";
+            } else {
+                env = "client";
+            }
+            Main.LOGGER.info(env+": "+ tag);
         }
         return super.useOn(context);
     }
