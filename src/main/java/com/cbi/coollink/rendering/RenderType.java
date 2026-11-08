@@ -42,6 +42,8 @@ public class RenderType {
             //MultiPhaseParameters.builder()
                     //other params (texture?) can be configured here
             //        .build(false)
+            //create a custom pipeline to allow for a texture
+            //then pass the texture here
             RenderSetup.builder(PIPELINE).createRenderSetup()
     );
 }

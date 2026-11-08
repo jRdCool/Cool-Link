@@ -1,66 +1,80 @@
 package com.cbi.coollink.rendering.blockentities;
 
-import com.cbi.coollink.Main;
 import com.cbi.coollink.blocks.ServerRack;
 import com.cbi.coollink.blocks.blockentities.ServerRackBlockEntity;
 import com.cbi.coollink.rendering.RenderType;
+import com.cbi.coollink.rendering.blockentities.state.ServerRackRenderState;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<ServerRackBlockEntity> {
-    public ServerRackBlockEntityRenderer(BlockEntityRendererFactory.Context context){
+public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<ServerRackBlockEntity, ServerRackRenderState> {
 
+//    private static final Identifier SERVER_RACK_TEXTURE = Identifier.of(Main.namespace, "textures/test.png");
+
+    public ServerRackBlockEntityRenderer(BlockEntityRendererProvider.Context context){}
+
+    @Override
+    public @NonNull ServerRackRenderState createRenderState() {
+        return new ServerRackRenderState();
     }
 
-    private static final Identifier SERVER_RACK_TEXTURE = Identifier.of(Main.namespace, "textures/test.png");
     @Override
-    public void render(ServerRackBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, Vec3d cameraPos) {
-        if(entity.getCachedState().get(ServerRack.half)== ServerRack.Half.BOTTOM) {
-            RenderLayer layer = RenderType.SERVER_RACK;
-
-
-           // RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            //RenderSystem.setShaderTexture(0, SERVER_RACK_TEXTURE);
-            //RenderLayer.getEntityTranslucent(SERVER_RACK_TEXTURE);
-            //SpriteIdentifier spriteIdentifier = new SpriteIdentifier(SERVER_RACK_TEXTURE,Identifier.of(Main.namespace,"textures/test"));
-            //spriteIdentifier.getVertexConsumer(vertexConsumers,layer);
-
-            VertexConsumer vertexConsumer = vertexConsumers.getBuffer(layer);
-            matrices.push();
-            if(entity.getCachedState().get(ServerRack.direction) == ServerRack.Direction.EAST_WEST) {
-                matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(90));
-                matrices.translate(0,0,-1);
+    public void submit(@NonNull ServerRackRenderState state, @NonNull PoseStack poseStack, @NonNull SubmitNodeCollector submitNodeCollector, @NonNull CameraRenderState camera) {
+        ServerRackBlockEntity entity = state.blockEntity;
+        if(entity.getBlockState().getValue(ServerRack.half)== ServerRack.Half.BOTTOM) {
+            poseStack.pushPose();
+            if(entity.getBlockState().getValue(ServerRack.direction) == ServerRack.Direction.EAST_WEST) {
+                poseStack.rotate(Axis.YN,(float)Math.toRadians(90));
+                poseStack.translate(0,0,-1);
             }
-
-            //TODO: check the installed servers and only render on bays that have servers installed
-            renderServer(matrices,vertexConsumer,0);
-            renderServer(matrices,vertexConsumer,1);
-            renderServer(matrices,vertexConsumer,2);
-            renderServer(matrices,vertexConsumer,3);
-            renderServer(matrices,vertexConsumer,4);
-            renderServer(matrices,vertexConsumer,5);
-            matrices.pop();
+            submitNodeCollector.submitCustomGeometry(poseStack,RenderType.SERVER_RACK, (pose, vertexConsumer) -> {
+                //TODO: check the installed servers and only render on bays that have servers installed
+                renderServer(pose,vertexConsumer,0);
+                renderServer(pose,vertexConsumer,1);
+                renderServer(pose,vertexConsumer,2);
+                renderServer(pose,vertexConsumer,3);
+                renderServer(pose,vertexConsumer,4);
+                renderServer(pose,vertexConsumer,5);
+            });
+            poseStack.popPose();
         }
+    }
+
+    @Override
+    public void extractRenderState(@NonNull ServerRackBlockEntity blockEntity, ServerRackRenderState state, float partialTicks, @NonNull Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        state.blockEntity = blockEntity;
+        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
     }
 
     /**Renders a server in a slot on the server rack
      * note: this should only be called for the bottom rack
-     * @param matrices the transformation matrix for converting the vertexes into world coordinates, note this should already be tuned for any rack rotations
+     * @param pose the transformation matrix for converting the vertexes into world coordinates, note this should already be tuned for any rack rotations
      * @param vertexConsumer the vertexConsumer/renderBuffer to wright to
      * @param slot the rack slot to render to, range between 0-5
      TODO: add additional params for animations and stuff
      */
-    void renderServer(MatrixStack matrices, VertexConsumer vertexConsumer,int slot){
-        matrices.push();
+    void renderServer(PoseStack.Pose pose, VertexConsumer vertexConsumer, int slot){
         //apparently the slots are not evenly spaced!
         switch(slot) {
-            case 0 -> matrices.translate(0, 1.0 / 4.6, 0);
-            case 1 -> matrices.translate(0, 0.595, 0);
-            case 2 -> matrices.translate(0, 4.16 / 4.6, 0);
-            case 3 -> matrices.translate(0, 5.6 / 4.6, 0);
-            case 4 -> matrices.translate(0, 1.53, 0);
-            case 5 -> matrices.translate(0, 8.48 / 4.6, 0);
+            case 0 -> pose.translate(0, 1.0f / 4.6f, 0);
+            case 1 -> pose.translate(0, 0.595f, 0);
+            case 2 -> pose.translate(0, 4.16f / 4.6f, 0);
+            case 3 -> pose.translate(0, 5.6f / 4.6f, 0);
+            case 4 -> pose.translate(0, 1.53f, 0);
+            case 5 -> pose.translate(0, 8.48f / 4.6f, 0);
         }
 
-        MatrixStack.Entry matrix = matrices.peek();
+        Matrix4f matrix = pose.pose();
         //center rect
         //quadY(matrix,vertexConsumer,0,0,0,1,1,0xFF_00AF00,FACE_FRONT | FACE_BACK);
 
@@ -95,58 +109,66 @@ public class ServerRackBlockEntityRenderer implements BlockEntityRenderer<Server
         //back
         quadZ(matrix,vertexConsumer, 0.085f, -serverHeight/2,1,0.83f,serverHeight,0xFF_c4c1bc,FACE_BACK | FACE_FRONT);
 
-        matrices.pop();
+        //un translate
+        switch(slot) {
+            case 0 -> pose.translate(0, -1.0f / 4.6f, 0);
+            case 1 -> pose.translate(0, -0.595f, 0);
+            case 2 -> pose.translate(0, -4.16f / 4.6f, 0);
+            case 3 -> pose.translate(0, -5.6f / 4.6f, 0);
+            case 4 -> pose.translate(0, -1.53f, 0);
+            case 5 -> pose.translate(0, -8.48f / 4.6f, 0);
+        }
     }
 
     static final int FACE_FRONT = 1;
     static final int FACE_BACK = 2;
 
-    void quadX(MatrixStack.Entry matrix, VertexConsumer vertexConsumer, float x,float y, float z, float dy, float dz, int color, int facesBits){
+    void quadX(Matrix4f matrix, VertexConsumer vertexConsumer, float x, float y, float z, float dy, float dz, int color, int facesBits){
         if((facesBits & 1) != 0){
             vertexConsumer
-                    .vertex(matrix, x, y, z).color(color).normal(x,y,z).texture(0,0).light(255).overlay(255)
-                    .vertex(matrix, x, y+dy, z).color(color).normal(x+dy,y,z).texture(0,1).light(255).overlay(255)
-                    .vertex(matrix, x, y+dy, z+dz).color(color).normal(x+dy,y+dy,z).texture(1,1).light(255).overlay(255)
-                    .vertex(matrix, x, y, z+dz).color(color).normal(x,y+dy,z).texture(1,0).light(255).overlay(255);
+                    .addVertex(matrix, x, y, z).setColor(color).setNormal(x,y,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x, y+dy, z).setColor(color).setNormal(x+dy,y,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x, y+dy, z+dz).setColor(color).setNormal(x+dy,y+dy,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x, y, z+dz).setColor(color).setNormal(x,y+dy,z).setLight(255).setOverlay(255);
         }
         if((facesBits & 2) != 0){
             vertexConsumer
-                    .vertex(matrix, x, y, z).color(color).normal(x,y,z).texture(0,0).light(255).overlay(255)
-                    .vertex(matrix, x, y, z+dz).color(color).normal(x+dy,y,z).texture(0,1).light(255).overlay(255)
-                    .vertex(matrix, x, y+dy, z+dz).color(color).normal(x+dy,y+dy,z).texture(1,1).light(255).overlay(255)
-                    .vertex(matrix, x, y+dy, z).color(color).normal(x,y+dy,z).texture(1,0).light(255).overlay(255);
+                    .addVertex(matrix, x, y, z).setColor(color).setNormal(x,y,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x, y, z+dz).setColor(color).setNormal(x+dy,y,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x, y+dy, z+dz).setColor(color).setNormal(x+dy,y+dy,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x, y+dy, z).setColor(color).setNormal(x,y+dy,z).setLight(255).setOverlay(255);
         }
     }
-    void quadY(MatrixStack.Entry matrix, VertexConsumer vertexConsumer, float x,float y, float z, float dx, float dz, int color, int facesBits){
+    void quadY(Matrix4f matrix, VertexConsumer vertexConsumer, float x,float y, float z, float dx, float dz, int color, int facesBits){
         if((facesBits & 1) == 1){
             vertexConsumer
-                    .vertex(matrix, x, y, z).color(color).normal(x,y,z).texture(0,0).light(255).overlay(255)
-                    .vertex(matrix, x+dx, y, z).color(color).normal(x+dx,y,z).texture(0,1).light(255).overlay(255)
-                    .vertex(matrix, x+dx, y, z+dz).color(color).normal(x+dx, y, z+dz).texture(1,1).light(255).overlay(255)
-                    .vertex(matrix, x, y, z+dz).color(color).normal(x, y, z+dz).texture(1,0).light(255).overlay(255);
+                    .addVertex(matrix, x, y, z).setColor(color).setNormal(x,y,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x+dx, y, z).setColor(color).setNormal(x+dx,y,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x+dx, y, z+dz).setColor(color).setNormal(x+dx, y, z+dz).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x, y, z+dz).setColor(color).setNormal(x, y, z+dz).setLight(255).setOverlay(255);
         }
         if((facesBits & 2) != 0){
             vertexConsumer
-                    .vertex(matrix, x, y, z).color(color).normal(x,y,z).texture(0,0).light(255).overlay(255)
-                    .vertex(matrix, x, y, z+dz).color(color).normal(x,y,z+dz).texture(0,1).light(255).overlay(255)
-                    .vertex(matrix, x+dx, y, z+dz).color(color).normal(x+dx, y, z+dz).texture(1,1).light(255).overlay(255)
-                    .vertex(matrix, x+dx, y, z).color(color).normal(x+dx, y, z).texture(1,0).light(255).overlay(255);
+                    .addVertex(matrix, x, y, z).setColor(color).setNormal(x,y,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x, y, z+dz).setColor(color).setNormal(x,y,z+dz).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x+dx, y, z+dz).setColor(color).setNormal(x+dx, y, z+dz).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x+dx, y, z).setColor(color).setNormal(x+dx, y, z).setLight(255).setOverlay(255);
         }
     }
-    void quadZ(MatrixStack.Entry matrix, VertexConsumer vertexConsumer, float x, float y, float z, float dx, float dy, int color, int facesBits){
+    void quadZ(Matrix4f matrix, VertexConsumer vertexConsumer, float x, float y, float z, float dx, float dy, int color, int facesBits){
         if((facesBits & 1) == 1){
             vertexConsumer
-                    .vertex(matrix, x, y, z).color(color).normal(x,y,z).texture(0,0).light(255).overlay(255)
-                    .vertex(matrix, x+dx, y, z).color(color).normal(x+dx,y,z).texture(0,1).light(255).overlay(255)
-                    .vertex(matrix, x+dx, y+dy, z).color(color).normal(x+dx, y+dy, z).texture(1,1).light(255).overlay(255)
-                    .vertex(matrix, x, y+dy, z).color(color).normal(x, y+dy, z).texture(1,0).light(255).overlay(255);
+                    .addVertex(matrix, x, y, z).setColor(color).setNormal(x,y,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x+dx, y, z).setColor(color).setNormal(x+dx,y,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x+dx, y+dy, z).setColor(color).setNormal(x+dx, y+dy, z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x, y+dy, z).setColor(color).setNormal(x, y+dy, z).setLight(255).setOverlay(255);
         }
         if((facesBits & 2) != 0){
             vertexConsumer
-                    .vertex(matrix, x, y, z).color(color).normal(x,y,z).texture(0,0).light(255).overlay(255)
-                    .vertex(matrix, x, y+dy, z).color(color).normal(x,y+dy,z).texture(0,1).light(255).overlay(255)
-                    .vertex(matrix, x+dx, y+dy, z).color(color).normal(x+dx, y+dy, z).texture(1,1).light(255).overlay(255)
-                    .vertex(matrix, x+dx, y, z).color(color).normal(x+dx, y, z).texture(1,0).light(255).overlay(255);
+                    .addVertex(matrix, x, y, z).setColor(color).setNormal(x,y,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x, y+dy, z).setColor(color).setNormal(x,y+dy,z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x+dx, y+dy, z).setColor(color).setNormal(x+dx, y+dy, z).setLight(255).setOverlay(255)
+                    .addVertex(matrix, x+dx, y, z).setColor(color).setNormal(x+dx, y, z).setLight(255).setOverlay(255);
         }
     }
 }
