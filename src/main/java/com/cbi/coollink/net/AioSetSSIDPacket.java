@@ -9,6 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
 
 public record AioSetSSIDPacket(BlockPos pos, String newName, ResourceKey<Level> world) implements CustomPacketPayload {
     public static final Type<AioSetSSIDPacket> ID = new Type<>(Identifier.fromNamespaceAndPath(Main.namespace,"aio-set-ssid"));
@@ -19,5 +20,5 @@ public record AioSetSSIDPacket(BlockPos pos, String newName, ResourceKey<Level> 
         AioSetSSIDPacket::new
     );
     @Override
-    public Type<? extends CustomPacketPayload> type() {return ID;}
+    public @NonNull Type<? extends CustomPacketPayload> type() {return ID;}
 }

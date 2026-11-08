@@ -39,9 +39,9 @@ public class SendPackAndWaitCommand implements CliProgram {
             packetNbt = NbtIo.read(Util.stringDataInput(rawStringNbt));
         } catch (IOException e) {
             throw new RuntimeException(e);
-            stdout.addLine("§cError parsing NBT:§r "+e.getMessage());
-            response = true;
-            return;
+            //stdout.addLine("§cError parsing NBT:§r "+e.getMessage());
+            //response = true;
+            //return;
         }
         networkInterface.sendRawData(destIp,packetNbt, context -> {
             stdout.addLine("Received response from: " + context.getData().getSourceIpAddress() + " " + context.getData().getData());

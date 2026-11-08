@@ -9,6 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
 
 public record AioSetNetPasswordPacket(BlockPos pos, String newPassword, ResourceKey<Level> world) implements CustomPacketPayload {
     public static final Type<AioSetNetPasswordPacket> ID = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(Main.namespace,"aio-set-net-password"));
@@ -19,7 +20,7 @@ public record AioSetNetPasswordPacket(BlockPos pos, String newPassword, Resource
         AioSetNetPasswordPacket::new
     );
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NonNull Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 }

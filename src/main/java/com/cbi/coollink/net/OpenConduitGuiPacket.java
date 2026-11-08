@@ -7,6 +7,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
 
 public record OpenConduitGuiPacket(CompoundTag conduitNBT, BlockPos pos) implements CustomPacketPayload {
 
@@ -18,8 +19,8 @@ public record OpenConduitGuiPacket(CompoundTag conduitNBT, BlockPos pos) impleme
     );
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return null;
+    public @NonNull Type<? extends CustomPacketPayload> type() {
+        return ID;
     }
 }
 

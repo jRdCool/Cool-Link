@@ -104,7 +104,7 @@ abstract public class ProgramNetworkInterface {
 
     public String getDeviceIp(){
         return deviceIp;
-    };
+    }
 
     public class ResponseContext{
         private final int port;

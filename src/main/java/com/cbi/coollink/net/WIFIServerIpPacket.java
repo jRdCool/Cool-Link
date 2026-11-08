@@ -7,6 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
 
 public record WIFIServerIpPacket(IpDataPacket data, BlockPos apPos) implements CustomPacketPayload {
     public static final Type<WIFIServerIpPacket> ID =new Type<>(Identifier.fromNamespaceAndPath(Main.namespace,"wifi-server-ip-packet"));
@@ -16,7 +17,7 @@ public record WIFIServerIpPacket(IpDataPacket data, BlockPos apPos) implements C
             WIFIServerIpPacket::new
     );
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NonNull Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 

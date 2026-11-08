@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
 
 public class IpDataPacket implements WireDataPacket{
 
-    public static final StreamCodec<ByteBuf, IpDataPacket> PACKET_CODEC = new StreamCodec<ByteBuf, IpDataPacket>() {
+    public static final StreamCodec<ByteBuf, IpDataPacket> PACKET_CODEC = new StreamCodec<>() {
         public @NonNull IpDataPacket decode(ByteBuf byteBuf) {
             boolean hasDestMac;
             Mac mac1 = null;
@@ -70,7 +70,7 @@ public class IpDataPacket implements WireDataPacket{
             ByteBufCodecs.COMPOUND_TAG.encode(byteBuf,data.ipData);
 
         }
-    };;
+    };
 
     private Mac destinationMacAddress;
     private final Mac sourceMacAddress;
