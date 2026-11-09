@@ -13,6 +13,7 @@ import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -361,5 +362,20 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
         data.putString("type","error");
         data.putString("message","Unsupported operation: "+component);
         return original.createResponsePacket(data);
+    }
+
+    @Override
+    public @NonNull CompoundTag getUpdateTag(HolderLookup.@NonNull Provider registries) {
+        return saveWithoutMetadata(registries);
+    }
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+
+        if(level==null)return;
+
+        BlockState state = getBlockState();
+        level.sendBlockUpdated(worldPosition,state,state,Block.UPDATE_ALL);
     }
 }
