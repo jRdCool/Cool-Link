@@ -155,12 +155,11 @@ public class PhoneGui extends LightweightGuiDescription {
 
             for (WifiNetworkInfo network : savedNetworks) {
                 //if this AP is not in this dimension, then skip it
-                if (!world.dimension().registry().equals(network.dimension())) {
+                if (!world.dimension().identifier().equals(network.dimension())) {
                     continue;
                 }
                 BlockPos knownAp = new BlockPos(network.apX(), network.apY(), network.apZ());
                 if (playerPosition.distanceTo(Vec3.atCenterOf(knownAp)) < 512) {//only check for aps that are less than 512 blocks away
-
                     ClientPlayNetworking.send(new RequestAccessPointPositionsPacket(world.dimension(), knownAp));//request all ap locations on that network
                 }
             }
