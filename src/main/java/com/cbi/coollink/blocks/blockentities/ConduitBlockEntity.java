@@ -6,6 +6,8 @@ import com.cbi.coollink.blocks.conduits.Conduit;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import com.cbi.coollink.rendering.IWireNode;
 import com.cbi.coollink.rendering.LocalNode;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -752,5 +754,20 @@ public class ConduitBlockEntity extends BlockEntity implements IWireNode {
      */
     public void setJunctionBoxOutPutIndex(int inputIndex, int outPutIndex){
         junctionBoxExitIndexID[inputIndex]=outPutIndex;
+    }
+
+    @Override
+    public @NonNull CompoundTag getUpdateTag(HolderLookup.@NonNull Provider registries) {
+        return saveWithoutMetadata(registries);
+    }
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+
+        if(level==null)return;
+
+        BlockState state = getBlockState();
+        level.sendBlockUpdated(worldPosition,state,state,Block.UPDATE_ALL);
     }
 }
