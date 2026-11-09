@@ -4,11 +4,14 @@ import com.cbi.coollink.blocks.blockentities.ConduitBlockEntity;
 import com.cbi.coollink.blocks.cables.createadditons.WireType;
 import com.cbi.coollink.net.protocol.WireDataPacket;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 public interface IWireNode {
 
