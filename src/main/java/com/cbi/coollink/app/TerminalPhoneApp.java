@@ -76,8 +76,6 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
                     inputBox.setText(commandHistory.get(histroyLocation));
                 }
             }
-        } else {
-            Main.LOGGER.info("KEy pressed: "+ch+" "+keyCode+" "+modifiers);
         }
     }
 

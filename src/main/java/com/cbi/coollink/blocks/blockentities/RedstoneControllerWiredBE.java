@@ -18,6 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -31,6 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+
+import static net.minecraft.world.level.block.Block.UPDATE_NEIGHBORS;
 
 public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode, NetworkDevice {
 
@@ -207,10 +210,10 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
                         sendPacket(generateNotSupportedPacket("set power",ipData));
                     }else {
                         int powerLevel = ipData.getData().getIntOr("power", 0);
-                        powerLevel = Math.min(15, Math.max(0, powerLevel));
+                        powerLevel = Math.clamp(powerLevel, 0, 15);
                         Level world = getLevel();
                         if (world != null) {
-                            world.setBlock(getBlockPos(), getBlockState().setValue(RedstoneControllerWired.POWER, powerLevel),0);
+                            world.setBlock(getBlockPos(), getBlockState().setValue(RedstoneControllerWired.POWER, powerLevel), UPDATE_NEIGHBORS);
                             //Main.LOGGER.info("RSS set power to: "+powerLevel);
                         }
                     }
