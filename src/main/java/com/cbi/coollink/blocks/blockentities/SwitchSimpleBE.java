@@ -74,13 +74,11 @@ public class SwitchSimpleBE extends BlockEntity implements IWireNode, Switch {
 
         ValueInput.ValueInputList lrv = view.childrenListOrEmpty("connections");
         List<ValueInput> connectionNodes = lrv.stream().toList();
-        Main.LOGGER.info(connectionNodes.toString());
-
         for (int i=0;i<nodeCount;i++){
             if(i < connectionNodes.size()){
                 ValueInput cn = connectionNodes.get(i);
 
-                if(cn.childrenListOrEmpty(LocalNode.ID).isEmpty()){
+                if(cn.getInt(LocalNode.ID).isEmpty()){
                     isNodeUsed[i] = false;
                 }else{
                     localNodes[i]=new LocalNode(this , cn);
