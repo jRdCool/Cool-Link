@@ -59,14 +59,15 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
     @Override
     public void keyPressed(int ch, int keyCode, int modifiers) {
 
-        if(ch == SDLKeycode.SDLK_RETURN || ch == SDLKeycode.SDLK_KP_ENTER){ // enter key => execute command
+        //the SDL constants work for the keycode not the ch
+        if(ch == 40 || ch == 88){ // enter key => execute command
             executeCommand();
-        } else if(ch == SDLKeycode.SDLK_UP){ //up key => previous command
+        } else if(ch == 82){ //up key => previous command
             if(histroyLocation > 0){
                 histroyLocation --;
                 inputBox.setText(commandHistory.get(histroyLocation));
             }
-        } else if(ch == SDLKeycode.SDLK_DOWN){ // down key => next command
+        } else if(ch == 81){ // down key => next command
             if(histroyLocation < commandHistory.size()){
                 histroyLocation++;
                 if(histroyLocation == commandHistory.size()){
@@ -75,6 +76,8 @@ public class TerminalPhoneApp extends AbstractPhoneApp{
                     inputBox.setText(commandHistory.get(histroyLocation));
                 }
             }
+        } else {
+            Main.LOGGER.info("KEy pressed: "+ch+" "+keyCode+" "+modifiers);
         }
     }
 
