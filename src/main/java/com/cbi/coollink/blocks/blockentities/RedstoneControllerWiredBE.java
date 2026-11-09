@@ -321,7 +321,7 @@ public class RedstoneControllerWiredBE extends BlockEntity implements IWireNode,
             if(i < connectionNodes.size()){
                 ValueInput cn = connectionNodes.get(i);
 
-                if(cn.childrenListOrEmpty(LocalNode.ID).isEmpty()){
+                if(cn.getInt(LocalNode.ID).isEmpty()){
                     isNodeUsed[i] = false;
                 }else{
                     localNodes[i]=new LocalNode(this , cn);

@@ -51,7 +51,7 @@ public abstract class AWallPortBlockEntity extends BlockEntity implements IWireN
 
         for (int i=0;i<nodeCount;i++){
             ValueInput compound = nodeIDS.get(i);
-            if(compound == null || compound.childrenListOrEmpty(LocalNode.ID).isEmpty()){
+            if(compound == null || compound.getInt(LocalNode.ID).isEmpty()){
                 isNodeUsed[i] = false;
                 continue;
             }
