@@ -176,23 +176,23 @@ public class SatelliteDishBlock extends BaseEntityBlock {
         if(correctStructureFound){//if the whole multi block structure is there then set the appropriate block states of the structure
             //bottom
             BlockPos settingBlock;
-            world.setBlock(cornerBlock,state.setValue(multiBlockPose, MultiBlockPartStates.D1).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),0);
+            world.setBlock(cornerBlock,state.setValue(multiBlockPose, MultiBlockPartStates.D1).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),UPDATE_ALL);
             settingBlock=new BlockPos(cornerBlock.getX()+1,cornerBlock.getY(),cornerBlock.getZ());
-            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.D2).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),0);
+            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.D2).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),UPDATE_ALL);
             settingBlock=new BlockPos(cornerBlock.getX()+1,cornerBlock.getY(),cornerBlock.getZ()+1);
-            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.D3).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),0);
+            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.D3).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),UPDATE_ALL);
             settingBlock=new BlockPos(cornerBlock.getX(),cornerBlock.getY(),cornerBlock.getZ()+1);
-            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.D4).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),0);
+            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.D4).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),UPDATE_ALL);
 
             //top
             settingBlock=new BlockPos(cornerBlock.getX(),cornerBlock.getY()+1,cornerBlock.getZ());
-            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.U1).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),0);
+            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.U1).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),UPDATE_ALL);
             settingBlock=new BlockPos(cornerBlock.getX()+1,cornerBlock.getY()+1,cornerBlock.getZ());
-            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.U2).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),0);
+            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.U2).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),UPDATE_ALL);
             settingBlock=new BlockPos(cornerBlock.getX()+1,cornerBlock.getY()+1,cornerBlock.getZ()+1);
-            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.U3).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),0);
+            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.U3).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),UPDATE_ALL);
             settingBlock=new BlockPos(cornerBlock.getX(),cornerBlock.getY()+1,cornerBlock.getZ()+1);
-            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.U4).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),0);
+            world.setBlock(settingBlock,state.setValue(multiBlockPose, MultiBlockPartStates.U4).setValue(ASSEMBLED_BOOLEAN_PROPERTY,true),UPDATE_ALL);
         }
 
 
