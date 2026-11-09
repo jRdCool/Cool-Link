@@ -115,24 +115,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		password=view.getStringOr("password","password123546");
 		ssid = view.getStringOr("ssid","Unconfigured Network");
 		netPass = view.getStringOr("Wireless_Password","");
-		int[] mac1Bytes;
-		int[] mac2Bytes;
-		if(view.getIntArray("MAC1").isPresent())
-		{
-			mac1Bytes = view.getIntArray("MAC1").get();
-		}
-		else {
-			Main.LOGGER.error(" Mac1 Load failure, Initialized with no data");
-			mac1Bytes = new int[3];
-		}
-		if (view.getIntArray("MAC2").isPresent()){
-			mac2Bytes = view.getIntArray("MAC2").get();
-		}
-		else {
-			Main.LOGGER.error(" Mac2 Load failure, Initialized with no data");
-			mac2Bytes = new int[3];
-		}
-
+		int[] mac1Bytes= view.getIntArray("MAC1").orElse(new int[3]);
+		int[] mac2Bytes= view.getIntArray("MAC2").orElse(new int[3]);
 		setMacAddresses(mac1Bytes,mac2Bytes);
 		ValueInput.ValueInputList lrv = view.childrenListOrEmpty("connections");
 		List<ValueInput> connectionNodes = lrv.stream().toList();
@@ -171,7 +155,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		return createNbt(registryLookup);
 	}//Rendering Crucial
 */
-
+	@SuppressWarnings("unused")
 	public static void tick(Level world, BlockPos pos, BlockState state, AIOBlockEntity be) {
 		//called from the AIONetwork block class
 		if(world.isClientSide()){
@@ -223,7 +207,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		this.mac2 = new Mac(mac2);
 	}//mac addresses new
 
-	@Deprecated
+	//@Deprecated
 	public void setMacAddresses(byte[] mac1,byte[] mac2){
 		this.mac1 = new Mac(mac1);
 		this.mac2 = new Mac(mac2);
@@ -330,8 +314,8 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	/**
 	 * Send a packet of data to this device.
 	 * NOTE FOR IMPLEMENTATION: this method is your class receiving this data from another class, this is called from another class.
-	 * Mid wire blocks(wall ports, conduits, ect..) should throw a warning upon calling this method.
-	 * All other blocks should first check that the data packet is of the correct type (coax, ethernet, fiber ect..) then process the packet accordingly
+	 * Mid wire blocks(wall ports, conduits, ect.) should throw a warning upon calling this method.
+	 * All other blocks should first check that the data packet is of the correct type (coax, ethernet, fiber ect.) then process the packet accordingly
 	 *
 	 * @param connectionIndex The index of the connection node on the destination device that is reviving the data
 	 * @param data            The data to send to the other device
@@ -408,9 +392,9 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	/**
-	 * Take an ip packet from the wifi and transmits it over the network
+	 * Take an ip packet from the Wi-Fi and transmits it over the network
 	 *
-	 * @param packet The ip packet transmitted over the wifi
+	 * @param packet The ip packet transmitted over the Wi-Fi
 	 * @param player The player that transmitted it
 	 */
 	@Override
@@ -492,21 +476,21 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	private String generateNewIp(){
-		String ip = "";
-		boolean ipExsists = false;
+		String ip;
+		boolean ipExists;
 
 		do{
-			ipExsists = false;
+			ipExists = false;
 			int num = (int)(Math.random()*252)+2;
 			ip = IPADDRESS_BASE+num;
-			//check if the address exsists
+			//check if the address exists
 			for(ConnectedDevice device: connectedDevices){
 				if(device.ipAddress().equals(ip)){
-					ipExsists = true;
+					ipExists = true;
 					break;
 				}
 			}
-		}while (ipExsists);
+		}while (ipExists);
 
 		return ip;
 	}
@@ -530,7 +514,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 
 	private void sendPacket(IpDataPacket packet) {
 		//Main.LOGGER.info("AIO processing send packet: "+packet);
-		//figure out what port to send out the paket on/if the packet needs to be sent over wifi
+		//figure out what port to send out the packet on/if the packet needs to be sent over Wi-Fi
 		int port = -1;
 		if(eth0SwitchingTable.contains(packet.getDestinationMacAddress())){
 			port = 0;
@@ -540,7 +524,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 		}
 
 		if(port == -1){
-			//check for wifi routing
+			//check for Wi-Fi routing
 			//checkPhoneRouting
 			ServerPlayer player = mobileClientRouting.get(packet.getDestinationMacAddress());
 			if(player != null){
@@ -560,14 +544,14 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 				case 0 -> eth0SwitchingTable.clear();
 				case 1 -> eth1SwitchingTable.clear();
 			}
-			//also i guess the packet is lost then
+			//also I guess the packet is lost then
 			return;
 		}
 		if(portConnected.getBlockEntity() instanceof IWireNode otherDevice){
 			//Main.LOGGER.info("AIO sending packet on port: "+port+" "+packet);
 			otherDevice.transmitData(portConnected.getIndex(), packet);
 		}else{
-			//uhhhhh i guess the packet is lost then
+			//uhhhhh I guess the packet is lost then
 		}
 	}
 
@@ -685,7 +669,7 @@ public class AIOBlockEntity extends BlockEntity implements IWireNode, AccessPoin
 	}
 
 	void processDisconnect(Mac disconnectedMac){
-		//in the case that this disconnect is from a wifi client
+		//in the case that this disconnect is from a Wi-Fi client
 		mobileClientRouting.remove(disconnectedMac);
 		//remove from connected devices
 		for(int i=0;i<connectedDevices.size();i++){
