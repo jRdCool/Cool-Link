@@ -211,16 +211,17 @@ public class SnakeGameApp extends AbstractPhoneApp{
      */
     @Override
     public void keyPressed(int ch, int keyCode, int modifiers) {
-        if(ch == 265){
+        Main.LOGGER.info(ch+" "+keyCode);
+        if(ch == 82){//up
             if(directionOfTravel!=2)
                 nextDirection=0;
-        }else if(ch == 263){
+        }else if(ch == 80){//left
             if(directionOfTravel!=3)
                nextDirection=1;;
-        }else if(ch ==264){
+        }else if(ch == 81){//down
             if(directionOfTravel!=0)
                nextDirection=2;
-        }else if(ch == 262){
+        }else if(ch == 79){//right
             if(directionOfTravel!=1)
                nextDirection=3;
         }
